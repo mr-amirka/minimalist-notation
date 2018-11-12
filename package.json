@@ -1,0 +1,27 @@
+{
+  "name": "minimalist-notation",
+  "version": "1.1.1",
+  "description": "Minimalist Notation",
+  "main": "./index.js",
+  "keywords": [
+    "CSS",
+    "preprocessor",
+    "parser",
+    "minimalist",
+    "notation",
+    "atomic",
+    "functional"
+  ],
+  "author": {
+    "name": "Absolutely Amir",
+    "email": "mr.amirka@ya.ru",
+    "url": "https://github.com/mr-amirka"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mr-amirka/amirka.git"
+  },
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}
