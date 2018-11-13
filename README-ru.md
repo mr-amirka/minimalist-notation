@@ -31,14 +31,14 @@ Output:
 
 ```
 
-    * [CLI](#cli)  
-    * [Usage with Webpack](#usage-with-webpack)  
-    * [Runtime](#runtime)  
-        * [Standalone](#standalone)  
-        * [Integration](#integration)  
-            * [Integrating "Minimalist Notation" into Angular 6](#integrating-minimalist-notation-into-angular-6)  
-            * [Integrating "Minimalist Notation" into AngularJS](#integrating-minimalist-notation-into-angularjs)  
-            * [Integrating "Minimalist Notation" into React](#integrating-minimalist-notation-into-react)  
+* [CLI](#cli)  
+* [Usage with Webpack](#usage-with-webpack)  
+* [Runtime](#runtime)  
+    * [Standalone](#standalone)  
+    * [Integration](#integration)  
+        * [Integrating "Minimalist Notation" into Angular 6](#integrating-minimalist-notation-into-angular-6)  
+        * [Integrating "Minimalist Notation" into AngularJS](#integrating-minimalist-notation-into-angularjs)  
+        * [Integrating "Minimalist Notation" into React](#integrating-minimalist-notation-into-react)  
 
 
 
