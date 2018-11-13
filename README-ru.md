@@ -117,7 +117,7 @@ module.exports = {
 };
 ```
 
-PS: see amirka/node-mn.d.ts
+PS: see node-mn/index.d.ts
 
 <field key="region" dbtype="varchar" precision="255" phptype="string" null="false" default="" index="fulltext" />
 
