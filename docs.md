@@ -1,5 +1,5 @@
 
-[Русский](https://github.com/mr-amirka/amirka/blob/master/src/README-ru.md)
+[Русский](https://github.com/mr-amirka/minimalist-notation/blob/master/docs-ru.md)
 
 
 # Minimalist Notation Docs
@@ -32,9 +32,9 @@
 
 
 
-* [Getting started](https://github.com/mr-amirka/amirka/blob/master/README.md)  
-* [Presets](https://github.com/mr-amirka/amirka/blob/master/src/presets.md)  
-* [From author](https://github.com/mr-amirka/amirka/blob/master/src/from-author.md)    
+* [Getting started](https://github.com/mr-amirka/minimalist-notation/blob/master/README.md)  
+* [Presets](https://github.com/mr-amirka/mn-presets/blob/master/README.md)  
+* [From author](https://github.com/mr-amirka/minimalist-notation/blob/master/from-author.md)    
 
 
 Try this tests:
@@ -80,19 +80,6 @@ If you are using the Functional/Atomic CSS methodology, then:
 
 ```css
 [m~='dn250'] {
-  -khtml-transition-duration: 250ms !important;
-  -ms-transition-duration: 250ms !important;
-  -o-transition-duration: 250ms !important;
-  -moz-transition-duration: 250ms !important;
-  -webkit-transition-duration: 250ms !important;
-  transition-duration: 250ms !important;
-}
-```   
-
-
-If you are concerned about why some attributes have the ``` !important ``` flag, this is due to the fact that atomic styles should be given higher priority than traditional classes and complex selectors, since the use of atomic styles implies a more precise markup customization over top of other more general CSS rules. For example, the flag ``` !important ``` Was necessary when I applied the technology ``` MN ``` along with ``` Angular Material (MD) ``` to customize the appearance of some elements, since styles MD's complex selectors did override MN styles. However, this approach can create a rake for you if you want to use JS to dynamically change the style of an element covered by the ``` !important ``` flag from CSS. Therefore, this nuance is worth considering. For example, this is provided for in some default MN rules for the generation of style essences. You can add the suffix ``` -i ``` to the end of the name of the essence:
-```css
-[m~='dn250-i'] {
   -khtml-transition-duration: 250ms;
   -ms-transition-duration: 250ms;
   -o-transition-duration: 250ms;
@@ -100,8 +87,7 @@ If you are concerned about why some attributes have the ``` !important ``` flag,
   -webkit-transition-duration: 250ms;
   transition-duration: 250ms;
 }
-```
-
+```   
 
 
 Thanks to MN:
@@ -179,15 +165,15 @@ Output:
 
 ```css
 @media mediaName{
-  .c0F0\@mediaName{color:rgb(0,255,0)!important}
+  .c0F0\@mediaName{color:rgb(0,255,0)}
 }
 .f12{font-size:12px}
 .f14\:h:hover{font-size:14px}
-.parent .cF00\<\.parent{color:rgb(255,0,0)!important}
+.parent .cF00\<\.parent{color:rgb(255,0,0)}
 .bg0F0{background:rgb(0,255,0)}
-.sq40{width:40px!important;height:40px!important}
-.p10{padding:10px!important}
-.mb10{margin-bottom:10px!important}
+.sq40{width:40px;height:40px}
+.p10{padding:10px}
+.mb10{margin-bottom:10px}
 
 ```
 
@@ -204,15 +190,15 @@ Output:
 
 ```css
 @media mediaName{
-  [m~='c0F0@mediaName']{color:rgb(0,255,0)!important}
+  [m~='c0F0@mediaName']{color:rgb(0,255,0)}
 }
 [m~='f12']{font-size:12px}
 [m~='f14:h']:hover{font-size:14px}
-.parent [m~='cF00<.parent']{color:rgb(255,0,0)!important}
+.parent [m~='cF00<.parent']{color:rgb(255,0,0)}
 [m~='bg0F0']{background:rgb(0,255,0)}
-[m~='sq40']{width:40px!important;height:40px!important}
-[m~='p10']{padding:10px!important}
-[m~='mb10']{margin-bottom:10px!important}
+[m~='sq40']{width:40px;height:40px}
+[m~='p10']{padding:10px}
+[m~='mb10']{margin-bottom:10px}
 
 ```
 
@@ -248,8 +234,8 @@ Example 3:
 essence name: ``` cF ```;  essence context: ``` :h ```
 
 Example 4:  
-``` mh-10@sm>1  ``` ->   
-essence name: ``` mh-10 ```;  essence context: ``` @sm>1 ```
+``` mh-10@m>1  ``` ->   
+essence name: ``` mh-10 ```;  essence context: ``` @m>1 ```
 
 
 ### Essence name
@@ -304,7 +290,7 @@ However, in such cases only the first found name of the media query is used. In 
 
 This is done for ease of use of the notation, for example, in cases when we specify a common media query for several attributes of a child element, but for some attributes this media query should be different:  
 ```html
-<div m="(sq200|f20|f14@sm)>.child1@md">
+<div m="(sq200|f20|f14@m)>.child1@d">
   <div class="child1">
     text
   </div>
@@ -312,11 +298,11 @@ This is done for ease of use of the notation, for example, in cases when we spec
 ```
 
 
-The notation ``` (sq200|f20|f14@sm)>.child1@md ``` is parsing like several such lines:
+The notation ``` (sq200|f20|f14@m)>.child1@d ``` is parsing like several such lines:
 
-1. ``` sq200>.child1@md ```  
-2. ``` f20>.child1@md ```  
-3. ``` f14@sm>.child1@md ```  
+1. ``` sq200>.child1@d ```  
+2. ``` f20>.child1@d ```  
+3. ``` f14@m>.child1@d ```  
 
 In line *3* we will receive several names of media queries, but only the first name of the media query in this sequence will take effect.  
 
@@ -384,13 +370,13 @@ Thus, we get the desired:
 By default, the media query name is generated in CSS as it is, for example:  
 INPUT:  
 ```html
-<div m="f20@sm f10@print">text</div>
+<div m="f20@m f10@print">text</div>
 ```  
 
 OUTPUT:  
 ```css
 @media sm {
-  [m~='f20@sm'] {
+  [m~='f20@m'] {
     font-size: 20px;
   }
 }
@@ -418,19 +404,19 @@ mn.media.xs = {
 ```  
 
 ```html
-<div m="f18@sm f16@xs">text</div>
+<div m="f18@m f16@m2">text</div>
 ```  
 
 OUTPUT:  
 
 ```css
 @media (max-width: 991px) {
-  [m~='f18@sm'] {
+  [m~='f18@m'] {
     font-size: 18px;
   }
 }
 @media (max-width: 767px) {
-  [m~='f16@xs'] {
+  [m~='f16@m2'] {
     font-size: 16px;
   }
 }
@@ -646,14 +632,14 @@ Practical example:
 Generated CSS:
 ```css
 [m~='lh']{line-height:1}
-[m~='bg0']{background:rgba(0,0,0,1) !important}
-[m~='cF']{color:rgba(255,255,255,1) !important}
-[m~='tc']{text-align:center !important}
+[m~='bg0']{background:rgba(0,0,0,1)}
+[m~='cF']{color:rgba(255,255,255,1)}
+[m~='tc']{text-align:center}
 [m~='tbl']>*{display:table-cell;vertical-align:middle}
 [m~='tbl']{display:table}
-[m~='h50']{height:50px !important}
-[m~='w200']{width:200px !important}
-[m~='mb10']{margin-bottom:10px !important}
+[m~='h50']{height:50px}
+[m~='w200']{width:200px}
+[m~='mb10']{margin-bottom:10px}
 ```
 
 
@@ -669,7 +655,7 @@ Into functions that you specify to generate essences of  styles, are input the p
 
 ```js
 params.ni || (params.ni = '');
-params.i = params.ni ? '' : '!important';
+params.i = params.ni ? '' : '';
 ```
 
 
@@ -717,10 +703,10 @@ mn('br', p => {
 
 OUTPUT:  
 ```css
-[m~='p10']{padding:10px !important}
-[m~='mb20']{margin-bottom:20px !important}
-[m~='dt5']{top:5px !important}
-[m~='br2']{border-right-width:2px !important}
+[m~='p10']{padding:10px}
+[m~='mb20']{margin-bottom:20px}
+[m~='dt5']{top:5px}
+[m~='br2']{border-right-width:2px}
 ```
 
 
@@ -746,12 +732,12 @@ mn('x', p => {
 ```
 ```css
 [m~='x10y5']{
-  -khtml-transform:translate(10px,5px) !important;
-  -ms-transform:translate(10px,5px) !important;
-  -o-transform:translate(10px,5px) !important;
-  -moz-transform:translate(10px,5px) !important;
-  -webkit-transform:translate(10px,5px) !important;
-  transform:translate(10px,5px) !important
+  -khtml-transform:translate(10px,5px);
+  -ms-transform:translate(10px,5px);
+  -o-transform:translate(10px,5px);
+  -moz-transform:translate(10px,5px);
+  -webkit-transform:translate(10px,5px);
+  transform:translate(10px,5px)
 }
 ```
 
@@ -761,12 +747,12 @@ mn('x', p => {
 ```
 ```css
 [m~='x12']{
-  -khtml-transform:translate(12px,0px) !important;
-  -ms-transform:translate(12px,0px) !important;
-  -o-transform:translate(12px,0px) !important;
-  -moz-transform:translate(12px,0px) !important;
-  -webkit-transform:translate(12px,0px) !important;
-  transform:translate(12px,0px) !important
+  -khtml-transform:translate(12px,0px);
+  -ms-transform:translate(12px,0px);
+  -o-transform:translate(12px,0px);
+  -moz-transform:translate(12px,0px);
+  -webkit-transform:translate(12px,0px);
+  transform:translate(12px,0px)
 }
 ```
 
@@ -776,12 +762,12 @@ mn('x', p => {
 ```
 ```css
 [m~='x0y20%']{
-  -khtml-transform:translate(0px,20%) !important;
-  -ms-transform:translate(0px,20%) !important;
-  -o-transform:translate(0px,20%) !important;
-  -moz-transform:translate(0px,20%) !important;
-  -webkit-transform:translate(0px,20%) !important;
-  transform:translate(0px,20%) !important
+  -khtml-transform:translate(0px,20%);
+  -ms-transform:translate(0px,20%);
+  -o-transform:translate(0px,20%);
+  -moz-transform:translate(0px,20%);
+  -webkit-transform:translate(0px,20%);
+  transform:translate(0px,20%)
 }
 ```
 
@@ -791,12 +777,12 @@ mn('x', p => {
 ```
 ```css
 [m~='x0y20']{
-  -khtml-transform:translate(0px,20px) !important;
-  -ms-transform:translate(0px,20px) !important;
-  -o-transform:translate(0px,20px) !important;
-  -moz-transform:translate(0px,20px) !important;
-  -webkit-transform:translate(0px,20px) !important;
-  transform:translate(0px,20px) !important
+  -khtml-transform:translate(0px,20px);
+  -ms-transform:translate(0px,20px);
+  -o-transform:translate(0px,20px);
+  -moz-transform:translate(0px,20px);
+  -webkit-transform:translate(0px,20px);
+  transform:translate(0px,20px)
 }
 ```
 
@@ -806,12 +792,12 @@ mn('x', p => {
 ```
 ```css
 [m~='x7%y20%']{
-  -khtml-transform:translate(7%,20%) !important;
-  -ms-transform:translate(7%,20%) !important;
-  -o-transform:translate(7%,20%) !important;
-  -moz-transform:translate(7%,20%) !important;
-  -webkit-transform:translate(7%,20%) !important;
-  transform:translate(7%,20%) !important
+  -khtml-transform:translate(7%,20%);
+  -ms-transform:translate(7%,20%);
+  -o-transform:translate(7%,20%);
+  -moz-transform:translate(7%,20%);
+  -webkit-transform:translate(7%,20%);
+  transform:translate(7%,20%)
 }
 ```
 
@@ -821,12 +807,12 @@ mn('x', p => {
 ```
 ```css
 [m~='x0y20s90']{
-  -webkit-transform:translate(0px,20px) scale(0.9) !important;
-  -moz-transform:translate(0px,20px) scale(0.9) !important;
-  -o-transform:translate(0px,20px) scale(0.9) !important;
-  -ms-transform:translate(0px,20px) scale(0.9) !important;
-  -khtml-transform:translate(0px,20px) scale(0.9) !important;
-  transform:translate(0px,20px) scale(0.9) !important
+  -webkit-transform:translate(0px,20px) scale(0.9);
+  -moz-transform:translate(0px,20px) scale(0.9);
+  -o-transform:translate(0px,20px) scale(0.9);
+  -ms-transform:translate(0px,20px) scale(0.9);
+  -khtml-transform:translate(0px,20px) scale(0.9);
+  transform:translate(0px,20px) scale(0.9)
 }
 ```
 
@@ -891,16 +877,16 @@ mn.utils.extend(mn.states, {
 Output:
 ```css
 [m~='x10:h']:hover{
-  -khtml-transform:translate(10px,0px) !important;
-  -ms-transform:translate(10px,0px) !important;
-  -o-transform:translate(10px,0px) !important;
-  -moz-transform:translate(10px,0px) !important;
-  -webkit-transform:translate(10px,0px) !important;
-  transform:translate(10px,0px) !important
+  -khtml-transform:translate(10px,0px);
+  -ms-transform:translate(10px,0px);
+  -o-transform:translate(10px,0px);
+  -moz-transform:translate(10px,0px);
+  -webkit-transform:translate(10px,0px);
+  transform:translate(10px,0px)
 }
 [m~='cF00:a']:active,
 [m~='cF00:a'].active{
-  color:rgba(255,0,0,1) !important
+  color:rgba(255,0,0,1)
 }
 [m~='f16:(h|a)']:hover,
 [m~='f16:(h|a)']:active,
@@ -968,10 +954,10 @@ mn.states.i = [
 
 Output:
 ```css
-[m~='cA:i']::-webkit-input-placeholder{color:rgb(170,170,170) !important}
-[m~='cA:i']::-moz-placeholder{color:rgb(170,170,170) !important}
-[m~='cA:i']:-ms-input-placeholder{color:rgb(170,170,170) !important}
-[m~='cA:i']::placeholder{color:rgb(170,170,170) !important}
+[m~='cA:i']::-webkit-input-placeholder{color:rgb(170,170,170)}
+[m~='cA:i']::-moz-placeholder{color:rgb(170,170,170)}
+[m~='cA:i']:-ms-input-placeholder{color:rgb(170,170,170)}
+[m~='cA:i']::placeholder{color:rgb(170,170,170)}
 ```
 
 
@@ -1088,29 +1074,29 @@ Output:
 ```css
 [m~='cF00:a'].active,
 [m~='cF00:a']:active{
-  color:rgba(255,0,0,1) !important
+  color:rgba(255,0,0,1)
 }
 a:hover [m~='x10<a:h']{
-  -khtml-transform:translate(10px,0px) !important;
-  -ms-transform:translate(10px,0px) !important;
-  -o-transform:translate(10px,0px) !important;
-  -moz-transform:translate(10px,0px) !important;
-  -webkit-transform:translate(10px,0px) !important;
-  transform:translate(10px,0px) !important
+  -khtml-transform:translate(10px,0px);
+  -ms-transform:translate(10px,0px);
+  -o-transform:translate(10px,0px);
+  -moz-transform:translate(10px,0px);
+  -webkit-transform:translate(10px,0px);
+  transform:translate(10px,0px)
 }
 .parent1 [m~='c0F0:a<.parent1']:active,
 .parent1 [m~='c0F0:a<.parent1'].active{
-  color:rgba(0,255,0,1) !important
+  color:rgba(0,255,0,1)
 }
 .parent1[m~='c065:a<0.parent1']:active,
 .parent1[m~='c065:a<0.parent1'].active{
-  color:rgba(0,102,85,1) !important
+  color:rgba(0,102,85,1)
 }
 .parent2 .parent1 [m~='bg02<.parent1<.parent2']{
-  background-color:rgba(0,0,0,0.13333333333333333) !important
+  background-color:rgba(0,0,0,0.13333333333333333)
 }
 .parent2:hover .parent1>*>*>[m~='bgD852<3.parent1<.parent2:h']{
-  background-color:rgba(221,136,85,0.13333333333333333) !important
+  background-color:rgba(221,136,85,0.13333333333333333)
 }
 ```
 
@@ -1125,20 +1111,20 @@ Input:
 Output:
 ```css
 .anyClass>*>[m~='(sq50|bg0)<2.anyClass']{
-  background:rgba(0,0,0,1) !important
+  background:rgba(0,0,0,1)
 }
 .anyClass>*>[m~='(sq50|bg0)<2.anyClass']{
-  width:50px !important;
-  height:50px !important
+  width:50px;
+  height:50px
 }
 [m~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
-  background:rgba(0,0,255,0.5333333333333333) !important
+  background:rgba(0,0,255,0.5333333333333333)
 }
 [m~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
-  height:5px !important
+  height:5px
 }
 [m~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
-  width:50px !important
+  width:50px
 }
 ```
 
@@ -1185,17 +1171,17 @@ Several laconic ways:
 
 Example 1.
 ```js
-mn.assign('.container', '(mhAuto-i|ph15-i|w750-i@sm-md|w970-i@md|w1170-i@lg)');
+mn.assign('.container', '(mhAuto|ph15|w750@m2-|w970@d|w1170@d2)');
 ```
 
 Example 2. Without the use of predefined default synonyms for media queries:  
 ```js
-mn.assign('.container', '(mhAuto-i|ph15-i|w750-i@768-|w970-i@992-|w1170-i@1200-)');
+mn.assign('.container', '(mhAuto|ph15|w750@768-|w970@992-|w1170@1200-)');
 ```
 
 Example 3. If we want to be able to reuse container styles in other selectors, then we can declare the container as an essence:
 ```js
-mn('container', '(mhAuto-i|ph15-i|w750-i@sm-md|w970-i@md|w1170-i@lg)');
+mn('container', '(mhAuto|ph15|w750@m2-|w970@d|w1170@d2)');
 ```
 
 Thus, all the power of minimalist notation will be used, for which selectors are automatically generated:  
@@ -1240,12 +1226,12 @@ Output:
 
 This given example
 ```js
-mn('container', '(mhAuto-i|ph15-i|w750-i@sm-md|w970-i@md|w1170-i@lg)');
+mn('container', '(mhAuto|ph15|w750@m2-|w970@d|w1170@d2)');
 ```
 is an abbreviated form of such a declaration:
 ```js
 mn('container', {
- exts: '(mhAuto-i|ph15-i|w750-i@sm-md|w970-i@md|w1170-i@lg)'
+ exts: '(mhAuto|ph15|w750@m2-|w970@d|w1170@d2)'
 });
 ```
 
@@ -1265,17 +1251,17 @@ mn('container', {
     paddingRight: '15px'
   },
   media: {
-    xs: { // вместо синонима можно указать сам медиа-запрос '(min-width: 768px)'
+    'm2-': { // вместо синонима можно указать сам медиа-запрос '(min-width: 768px)'
       style: {
         width: '750px'
       }
     },
-    md: {
+    d: {
       style: {
         width: '970px'
       }
     },
-    lg: {
+    d2: {
       style: {
         width: '1170px'
       }

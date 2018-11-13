@@ -1,4 +1,4 @@
-[English](https://github.com/mr-amirka/amirka/blob/master/README.md)
+[English](https://github.com/mr-amirka/minimalist-notation/blob/master/README.md)
 
 
 # Minimalist Notation
@@ -19,31 +19,34 @@ Output:
 
 ```css
 @media mediaName{
-  .c0F0\@mediaName{color:rgb(0,255,0)!important}
+  .c0F0\@mediaName{color:rgb(0,255,0)}
 }
 .f12{font-size:12px}
 .f14\:h:hover{font-size:14px}
-.parent .cF00\<\.parent{color:rgb(255,0,0)!important}
+.parent .cF00\<\.parent{color:rgb(255,0,0)}
 .bg0F0{background:rgb(0,255,0)}
-.sq40{width:40px!important;height:40px!important}
-.p10{padding:10px!important}
-.mb10{margin-bottom:10px!important}
+.sq40{width:40px;height:40px}
+.p10{padding:10px}
+.mb10{margin-bottom:10px}
 
 ```
 
-
     * [CLI](#cli)  
-    * [Webpack Plugin](#webpack-plugin)  
+    * [Usage with Webpack](#usage-with-webpack)  
     * [Runtime](#runtime)  
         * [Standalone](#standalone)  
         * [Integration](#integration)  
-            * [Как интегрировать "Minimalist Notation" в Angular 6](#Как-интегрировать-minimalist-notation-в-angular-6)  
-            * [Как интегрировать "Minimalist Notation" в AngularJS](#Как-интегрировать-minimalist-notation-в-angularjs)  
-            * [Как интегрировать "Minimalist Notation" в React](#Как-интегрировать-minimalist-notation-в-react)  
+            * [Integrating "Minimalist Notation" into Angular 6](#integrating-minimalist-notation-into-angular-6)  
+            * [Integrating "Minimalist Notation" into AngularJS](#integrating-minimalist-notation-into-angularjs)  
+            * [Integrating "Minimalist Notation" into React](#integrating-minimalist-notation-into-react)  
 
-    * [Подробная документация](https://github.com/mr-amirka/amirka/blob/master/src/README-ru.md)  
-    * [Предустановленные опции](https://github.com/mr-amirka/amirka/blob/master/src/presets-ru.md)  
-    * [От автора](https://github.com/mr-amirka/amirka/blob/master/src/from-author-ru.md)  
+
+
+* [Подробная документация](https://github.com/mr-amirka/minimalist-notation/blob/master/docs-ru.md)  
+* [Предустановленные опции](https://github.com/mr-amirka/mn-presets/blob/master/README.md)  
+* [От автора](https://github.com/mr-amirka/minimalist-notation/blob/master/from-author-ru.md)  
+
+
 
 Try this tests:
 * https://jsfiddle.net/j6d8aozy/51/  
@@ -74,62 +77,63 @@ mn --compile ./src --output ./dist/styles.css
 
 
 
-### Webpack Plugin
+### Usage with Webpack
 
 ```sh
-npm install amirka --save
+npm install node-mn --save
 ```
 
 
 ```js
-const MnWebpackPlugin = require('amirka/webpack-plugin');
+const { compileSource } = require('node-mn');
+
+compileSource({
+  watch: true,
+  path: './node_modules/',
+  entry: {
+    './dist/styles': './src',
+    './dist/other': './other',
+    './dist/market.app': {
+       include: [ /^.*?(common\.app|market\.app\/src)\/.*\.(html?|jsx?)$/ ]
+     }
+  },
+  exclude: [ /^.*\/?node_modules\/.*?\/node_modules\/.*$/ ],
+  presets: [
+    require('mn-presets/medias'),
+    require('mn-presets/prefixes'),
+    require('mn-presets/styles'),
+    require('mn-presets/states'),
+    require('mn-presets/theme')
+    //,require('common.app/mn-theme')
+  ]
+});
 
 module.exports = {
   //...
   plugins: [
     //...
-    new MnWebpackPlugin({
-      input: {
-        './dist/styles': './src',
-        './dist/other': './other'
-      },
-      include: [ /^.*\.(html?|jsx?)$/ ],
-      exclude: [ /\/node_modules\// ],
-      presets: [
-        require('amirka/mn-presets/mn.medias'),
-      	require('amirka/mn-presets/mn.prefixes'),
-      	require('amirka/mn-presets/mn.styles'),
-      	require('amirka/mn-presets/mn.states'),
-      	require('amirka/mn-presets/mn.theme')
-      ]
-      hideInfo: true
-    })
-
   ]
   //...
 };
 ```
 
-PS: см. amirka/node-mn.d.ts
+PS: see amirka/node-mn.d.ts
 
-
+<field key="region" dbtype="varchar" precision="255" phptype="string" null="false" default="" index="fulltext" />
 
 
 ## Runtime
 
 ```js
-const mn = require("amirka/services/mn")
+const mn = require("services/mn")
   .setPresets([
-    require('amirka/mn-presets/mn.medias'),
-    require('amirka/mn-presets/mn.runtime-prefixes'),
-    require('amirka/mn-presets/mn.styles'),
-    require('amirka/mn-presets/mn.states'),
-    require('amirka/mn-presets/mn.theme')
+    require('mn-presets/medias'),
+    require('mn-presets/runtime-prefixes'),
+    require('mn-presets/styles'),
+    require('mn-presets/states'),
+    require('mn-presets/theme')
   ]);
-require('amirka/services/polyfill').andReady({
-  'CSS.escape': 'assets/css.escape.shim.js',
-  'setImmediate': 'assets/set-immediate.shim.js'
-}).finally(() => {
+require('mn-services/ready')(() => {
   mn.getCompiler('m').recursiveCheck(document)
   mn.compile();
 
@@ -143,28 +147,35 @@ require('amirka/services/polyfill').andReady({
 
 
 ```html
-<script src="https://dartline.ru/assets/standalone-mn.js" async></script>
+<script src="https://dartline.ru/assets/last-standalone-mn.js" async></script>
 ```
 
 
 ## Integration
 
 
-### Как интегрировать "Minimalist Notation" в Angular 6
+### Integrating "Minimalist Notation" into Angular 6
 
 
 ```ts
 
-require("amirka/services/mn").setPresets([
-  require('amirka/mn-presets/mn.medias'),
-  require('amirka/mn-presets/mn.runtime-prefixes'),
-  require('amirka/mn-presets/mn.styles'),
-  require('amirka/mn-presets/mn.states'),
-  require('amirka/mn-presets/mn.theme')
+import * as mn from 'services/mn';
+import * as mnMedias from 'mn-presets/medias';
+import * as mnPrefixes from 'mn-presets/runtime-prefixes';
+import * as mnStyles from 'mn-presets/styles';
+import * as mnStates from 'mn-presets/states';
+import * as mnTheme from 'mn-presets/theme';
+
+mn.setPresets([
+  mnMedias,
+  mnPrefixes,
+  mnStyles,
+  mnStates,
+  mnTheme
 ]);
 
 //DIRECTIVES
-import { MDirective } from 'amirka/angular-mn';
+import { MDirective } from 'angular-mn';
 
 @NgModule({
   imports: [
@@ -184,21 +195,21 @@ export class AppModule {}
 ```
 
 
-### Как интегрировать "Minimalist Notation" в AngularJS
+### Integrating "Minimalist Notation" into AngularJS
 
 
 ```js
 
-require("amirka/services/mn").setPresets([
-  require('amirka/mn-presets/mn.medias'),
-  require('amirka/mn-presets/mn.runtime-prefixes'),
-  require('amirka/mn-presets/mn.styles'),
-  require('amirka/mn-presets/mn.states'),
-  require('amirka/mn-presets/mn.theme')
+require("mn-services/mn").setPresets([
+  require('mn-presets/medias'),
+  require('mn-presets/runtime-prefixes'),
+  require('mn-presets/styles'),
+  require('mn-presets/states'),
+  require('mn-presets/theme')
 ]);
 
 const app = angular.module('app', [ /* ...*/ ]);
-require('amirka/angularjs-mn')(app);
+require('angularjs-mn')(app);
 //...
 
 
@@ -206,44 +217,49 @@ require('amirka/angularjs-mn')(app);
 ```
 
 
-### Как интегрировать "Minimalist Notation" в React
+### Integrating "Minimalist Notation" into  React
 
 Example:
 
-```jsx
+```js
 // index.jsx
-import React from 'react';
-import { render } from 'react-dom';
-import { Root } from './components/root';
+const React = require('react');
+const { render } = require('react-dom');
+const Root = require('./components/root');
 
-require("amirka/services/mn").setPresets([
-  require('amirka/mn-presets/mn.medias'),
-  require('amirka/mn-presets/mn.runtime-prefixes'),
-  require('amirka/mn-presets/mn.styles'),
-  require('amirka/mn-presets/mn.states'),
-  require('amirka/mn-presets/mn.theme')
+require("mn-services/mn").setPresets([
+  require('mn-presets/medias'),
+  require('mn-presets/runtime-prefixes'),
+  require('mn-presets/styles'),
+  require('mn-presets/states'),
+  require('mn-presets/theme')
 ]);
-require('amirka/services/polyfill').andReady({
-  'CSS.escape': 'assets/css.escape.shim.js'
-}).finally(() => [].forEach.call(
+
+require('mn-services/ready')(() => [].forEach.call(
   document.querySelectorAll('[root]'),
-  (node) => render(<Root/>, node)
+  node => render(<Root/>, node)
 ));
 
 
 //root.jsx
-import React, { Component } from 'react';
-import { MyComponent } from './my-component';
+const React = require('react');
+const { Component } = React;
+const MyComponent = require('./my-component');
 
-export class Root extends Component {
+class Root extends Component {
 	render() {
 		return (<MyComponent/>);
 	}
 }
 
+module.exports = Root;
+
+
 // my-component.jsx
-import React, { Component } from 'react';
-import { withMn, MnFrame } from 'amirka/react-mn';
+const React = require('react');
+const { Component } = React;
+
+const { withMn, MnFrame } = require('react-mn');
 
 
 class _MyComponent extends Component {
@@ -261,8 +277,8 @@ class _MyComponent extends Component {
   }
 }
 
-export const MyComponent = withMn(_MyComponent);
+module.exports = withMn(_MyComponent);
 
 ```
 
-PS: MnFrame - компонент, который отображается в iframe
+PS: MnFrame - the component that is displayed in the iframe

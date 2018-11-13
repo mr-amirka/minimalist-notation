@@ -1,18 +1,18 @@
-[Русский](https://github.com/mr-amirka/amirka/blob/master/src/from-author-ru.md)
+[Русский](https://github.com/mr-amirka/minimalist-notation/blob/master/src/from-author-ru.md)
 
 
 # From the author
 
 
 
-* [How it started](#how-it-started)  
-* [Minimalism](#minimalism)   
+    * [How it started](#how-it-started)  
+    * [Minimalism](#minimalism)   
 
 
 
-* [Getting started](https://github.com/mr-amirka/amirka/blob/master/README.md)
-* [More documentation](https://github.com/mr-amirka/amirka/blob/master/src/README.md)
-* [Presets](https://github.com/mr-amirka/amirka/blob/master/src/presets.md)
+* [Getting started](https://github.com/mr-amirka/minimalist-notation/blob/master/README.md)
+* [More documentation](https://github.com/mr-amirka/minimalist-notation/blob/master/docs.md)
+* [Presets](https://github.com/mr-amirka/mn-presets/blob/master/README.md)
 
 
 

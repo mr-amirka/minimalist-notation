@@ -1,17 +1,17 @@
-[English](https://github.com/mr-amirka/amirka/blob/master/src/from-author.md)
+[English](https://github.com/mr-amirka/minimalist-notation/blob/master/from-author.md)
 
 
 # From the author
 
 
-* [Начало](#Начало)  
-* [Минимализм](#Минимализм)   
+    * [Начало](#Начало)  
+    * [Минимализм](#Минимализм)   
 
 
 
-* [Getting started](https://github.com/mr-amirka/amirka/blob/master/README-ru.md)
-* [Подробная документация](https://github.com/mr-amirka/amirka/blob/master/src/README-ru.md)
-* [Предустановленные опции](https://github.com/mr-amirka/amirka/blob/master/src/presets-ru.md)
+* [Getting started](https://github.com/mr-amirka/minimalist-notation/blob/master/README-ru.md)
+* [Подробная документация](https://github.com/mr-amirka/minimalist-notation/blob/master/docs-ru.md)
+* [Предустановленные опции](https://github.com/mr-amirka/mn-presets/blob/master/README.md)
 
 
 Try this tests:
@@ -186,7 +186,7 @@ C технологией MN у Вас может возникнуть ощуще
 
 
 
-Вы можете добавить свой обработчик, генерирующий ессенции стилей. Примеры находятся в директории репозитория ``` /mn-presets ```.
+Вы можете добавить свой обработчик, генерирующий ессенции стилей. Примеры находятся в репозитории ``` mn-presets ```.
 
 
 Я старался сделать парсинг и генерацию CSS как можно более оптимальной:
