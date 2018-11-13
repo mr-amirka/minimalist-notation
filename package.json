@@ -23,5 +23,8 @@
   },
   "license": "MIT",
   "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "mn-emitter": "*",
+    "mn-utils": "*"
+  }
 }
