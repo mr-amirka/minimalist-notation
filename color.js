@@ -137,7 +137,7 @@ const getBackgroundParams = (_color, i, end) => {
 };
 
 color.getBackground = (input) => {
-  let radial = '', repeating, matches, angle = 0, i, l, vls, v = input;
+  let radial = '', repeating, matches, angle = 180, i, l, vls, v = input;
   if (matches = /^(.*)rpt$/i.exec(v)) {
     repeating = true;
     v = matches[1];

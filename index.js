@@ -412,11 +412,11 @@ module.exports = () => {
     const context = $$root[mediaName] || ($$root[mediaName] = {});
     const contextEssence = context[essenceName] || (context[essenceName] = createContextEssence(essenceName, essence, excludes));
     contextEssence.updated = true;
-    joinMaps(contextEssence.map, selectors, contextEssence.selectors);
+    extend(contextEssence.map, selectors = joinMaps({}, selectors, contextEssence.selectors));
     const __childsHandle = (childs, separator) => {
-      for(let childName in childs) {
+      for (let childName in childs) {
         updateEssence(essenceName + separator + childName, selectors, mediaName, excludes, childs[childName]);
-      };
+      }
     };
     const { childs, media, exts } = essence;
     childs && __childsHandle(childs, '.');
