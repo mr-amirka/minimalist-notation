@@ -35,6 +35,9 @@ const splitMultiplier = escapedSplitProvider('*').base;
 const splitState = escapedSplitProvider(':').base;
 const splitReverse = escapedSplitProvider('!').base;
 const regexpScope = /^(.*?)\[(.*)\]$/;
+const regexpAttrEscape = /\[([^\]]*)\]/g;
+const replacerEscape = (_, v) => '[' + escapeCss(v) + ']';
+
 
 const selectorsCompileProvider = module.exports = (instance) => {
   const parseId = (comboName) => parseComboName(comboName, '#' + escapeCss(comboName));
@@ -134,7 +137,7 @@ const selectorsCompileProvider = module.exports = (instance) => {
     return alts;
   };
   const getEssence = (name) => {
-    const states = splitState(name);
+    const states = splitState(name.replace(regexpAttrEscape, replacerEscape));
     const selector = unslash(states.shift());
     return {
       selector,
