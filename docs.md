@@ -38,7 +38,7 @@
 
 
 Try this tests:
-* https://jsfiddle.net/dzgj2sL3/ 
+* https://jsfiddle.net/dzgj2sL3/
 * https://jsfiddle.net/j6d8aozy/46/  
 
 Home page: http://minimalist-notation.org  
@@ -375,7 +375,7 @@ INPUT:
 
 OUTPUT:  
 ```css
-@media sm {
+@media m {
   [m~='f20@m'] {
     font-size: 20px;
   }
@@ -393,11 +393,11 @@ Example:
 
 INPUT:  
 ```js
-mn.media.sm = {
+mn.media.m = {
   query: '(max-width: 991px)',
   priority: 0
 };
-mn.media.xs = {
+mn.media.m2 = {
   query: '(max-width: 767px)',
   priority: 1
 };

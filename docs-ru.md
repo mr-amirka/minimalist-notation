@@ -365,7 +365,7 @@ INPUT:
 
 OUTPUT:  
 ```css
-@media sm {
+@media m {
   [m~='f20@m'] {
     font-size: 20px;
   }
@@ -382,11 +382,11 @@ OUTPUT:
 Пример:  
 INPUT:  
 ```js
-mn.media.sm = {
+mn.media.m = {
   query: '(max-width: 991px)',
   priority: 0
 };
-mn.media.xs = {
+mn.media.m2 = {
   query: '(max-width: 767px)',
   priority: 1
 };
