@@ -4,8 +4,16 @@ const isString = require("mn-utils/is-string");
 module.exports = (attrs) => {
   attrs = getAttrs(attrs);
   if (!attrs) return null;
-  //const regexp = /m=("([^"]+)"|'([^']+)')/gm;
-  const regexp = new RegExp('\\s+(' + attrs.join('|') + ')=("([^"]+)"|\'([^\']+)\')', 'gm');
+  // const regexp = /m=\{?("([^"]+)"|'([^']+)')/gm;
+  /*
+    \{? - minifixed for JSX
+    example:
+      <div m={'rlv st1' + m}>
+        ...
+      </div>
+  */
+  const attrName = '(' + attrs.join('|') + ')';
+  const regexp = new RegExp('\\s+' + attrName + '=\{?("([^"]+)"|\'([^\']+)\')', 'gm');
   return (dst, text) => {
     let count = 0;
     text.replace(regexp, (all, attrName, vWrap, v1, v2) => {

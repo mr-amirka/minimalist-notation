@@ -5,9 +5,10 @@
 const emitterProvider = require('mn-emitter');
 const selectorsCompileProvider = require('./selectors-compile-provider');
 
+
 const utils = {
   ...require('mn-utils'),
-  color: require('./color')
+  color: require('mn-utils/color')
 };
 
 const {
@@ -36,7 +37,10 @@ const {
   splitProvider,
   joinProvider,
   withDefer,
-  withResult
+  withResult,
+  trim,
+  map,
+  breakup
 } = utils;
 
 
@@ -214,11 +218,13 @@ module.exports = () => {
       priority: defaultPriority
     };
     const media = $$media[mediaName];
-    let query = media && media.query;
+    let query = media && media.query || '';
     let priority = media && media.priority;
+    let selector = media && media.selector || '';
     if (query) {
       return {
         query,
+        selector,
         priority: priority || 0
       };
     }
@@ -256,35 +262,47 @@ module.exports = () => {
     } catch (ex) {
       return {
         query: mediaName,
+        selector,
         priority: defaultPriority
       };
     }
 
     priority || (priority = defaultPriority);
     priority++;
-    return {query, priority};
+    return {query, selector, priority};
   };
 
   const __mode = (context, mediaName) => {
-    const selectorPrefix = $$selectorPrefix || '';
+
+    const media = parseMediaName(mediaName);
+    const mediaQuery = media.query;
+    const mediaSelector = media.selector;
+    const mediaPriority = media.priority;
+
+    const selectorPrefix = ($$selectorPrefix || '') + (mediaSelector ? (mediaSelector + ' ') : '');
+
+    const prefixIteratee = selector => selectorPrefix + selector;
+    const selectorsIteratee = selectorPrefix
+      ? (selectors => joinComma(map(selectors, prefixIteratee)) + cssText)
+      : (selectors => joinComma(selectors) + cssText);
+
     let isContinue = true;
-    let essenceName, contextEssence, essence, selectors;
+    let essenceName, contextEssence, essence, cssText;
     for (essenceName in context) {
       if ((contextEssence = context[essenceName]) && contextEssence.updated) {
         isContinue = false;
-        contextEssence.content = getEessenceContent(contextEssence.cssText, contextEssence.map, selectorPrefix);
+        cssText = contextEssence.cssText;
+        contextEssence.content = cssText ? joinOnly(map(
+          getEessenceSelectors(contextEssence.map),
+          selectorsIteratee
+        )) : '';
         delete contextEssence.updated;
       }
     }
     if (isContinue) return;
-    const media = parseMediaName(mediaName);
-    const mediaQuery = media.query;
-    const mediaPriority = media.priority;
-    const essences = __values(context).sort(__priotitySort);
-    const l = essences.length;
-    let output = new Array(l);
-    for (let i = 0; i < l; i++) output[i] = essences[i].content;
-    if (mediaQuery) output = ['@media ', mediaQuery, '{', joinOnly(output), '}'];
+
+    let output = map(__values(context).sort(__priotitySort), 'content');
+    if (mediaQuery) output = [ '@media ', mediaQuery, '{', joinOnly(output), '}' ];
     setStyle('media.' + mediaName, joinOnly(output), mediaPriority);
   };
 
@@ -643,18 +661,17 @@ const normalizeInclude = normalizeNamesProvider(splitSpace);
 
 const __priotitySort = (a, b) => a.priority - b.priority;
 const regexpBrowserPrefix = /((\:\:\-?|\:\-)([a-z]+\-)?)/;
-const getEessenceContent = (cssText, selectorsMap, selectorPrefix) => {
-  if (!cssText) return cssText;
+const getEessenceSelectors = (selectorsMap) => {
   const specifics = {}, other = [];
   let matchs, prefix, selector;
   for (selector in selectorsMap) push(
     (matchs = regexpBrowserPrefix.exec(selector))
       ? (specifics[prefix = matchs[3]] || (specifics[prefix] = []))
-      : other, selectorPrefix + selector);
-  const output = [];
-  for (selector in specifics) push(output, joinComma(specifics[selector]) + cssText);
-  other.length && push(output, joinComma(other) + cssText);
-  return joinOnly(output);
+      : other, selector);
+  const outputSelectors = [];
+  for (selector in specifics) push(outputSelectors, specifics[selector]);
+  other.length && push(outputSelectors, other);
+  return outputSelectors;
 };
 
 const __extendDepth = (dst, src) => extendDepth(dst, src, $$mergeDepth);
