@@ -56,6 +56,10 @@ Try this tests:
 Home page: http://minimalist-notation.org  
 
 
+The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
+
+
+
 Буду благодарен за Ваши отзывы и замечания. Пишите мне в [telegram](https://t.me/mr_amirka).    
 С любовью, Ваш mr.Amirka :)  
 
@@ -82,6 +86,7 @@ mn --compile ./src --output ./dist/styles.css
 ```sh
 npm install node-mn --save
 ```
+
 
 
 ```js

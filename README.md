@@ -41,7 +41,7 @@ Output:
 
 
 * [CLI](#cli)  
-* [Usage with Webpack](#usage-with-webpack)  
+* [Usage with Webpack](#usage-with-webpack)   
 * [Runtime](#runtime)  
     * [Standalone](#standalone)  
     * [Integration](#integration)  
@@ -61,6 +61,9 @@ Try this tests:
 * https://jsfiddle.net/j6d8aozy/46/  
 
 Home page: http://minimalist-notation.org  
+
+
+The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
 
 
 

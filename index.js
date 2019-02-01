@@ -607,7 +607,7 @@ const splitSpace = splitProvider(/\s+/);
 const splitSelector = splitProvider(/\s*,+\s*/);
 const __matchName = routeParseProvider('^([a-z]+):name(.*?):suffix$');
 const __matchImportant = routeParseProvider('^(.*?):prefix(-i):ni$');
-const __matchValue = routeParseProvider('^(([A-Z][a-z]+):camel|((\\-):negative?[0-9]+):num):value([a-z%]+):unit?(.*?):other?$');
+const __matchValue = routeParseProvider('^(([A-Z][a-z]+):camel|((\\-):negative?[0-9\\.]+):num):value([a-z%]+):unit?(.*?):other?$');
 
 const __compilerClear = (compiler) => {
   compiler.clear();
