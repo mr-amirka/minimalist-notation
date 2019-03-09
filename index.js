@@ -3,7 +3,7 @@
  * @author Absolutely Amir <mr.amirka@ya.ru>
  */
 const emitterProvider = require('mn-emitter');
-const selectorsCompileProvider = require('./selectors-compile-provider');
+const selectorsCompileProvider = require('./selectorsCompileProvider');
 
 
 const utils = {

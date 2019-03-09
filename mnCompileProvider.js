@@ -1,5 +1,5 @@
 const minimalistNotationProvider = require("./index");
-const isArray = require("mn-utils/is-array");
+const isArray = require("mn-utils/isArray");
 module.exports = ({ presets, ...options } = {}) => {
   const {
     setPresets,

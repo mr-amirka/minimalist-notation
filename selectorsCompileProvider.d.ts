@@ -1,5 +1,5 @@
 import { FlagsMap } from 'mn-utils';
-import { escapedBreakupCore } from 'mn-utils/escaped-breakup-provider'
+import { escapedBreakupCore } from 'mn-utils/escapedBreakupProvider'
 declare namespace selectorsCompileProvider {
 
   interface essenceOptions {

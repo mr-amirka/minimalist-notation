@@ -1,5 +1,5 @@
-const isArray = require("mn-utils/is-array");
-const isString = require("mn-utils/is-string");
+const isArray = require("mn-utils/isArray");
+const isString = require("mn-utils/isString");
 
 module.exports = (attrs) => {
   attrs = getAttrs(attrs);
