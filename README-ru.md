@@ -32,7 +32,8 @@ Output:
 ```
 
 * [CLI](#cli)  
-* [Usage with Webpack](#usage-with-webpack)  
+* [Usage with Webpack](#usage-with-webpack)   
+* [Usage with Node.js](#usage-with-node.js)   
 * [Runtime](#runtime)  
     * [Standalone](#standalone)  
     * [Integration](#integration)  
@@ -84,9 +85,63 @@ mn --compile ./src --output ./dist/styles.css
 ### Usage with Webpack
 
 ```sh
-npm install node-mn --save
+npm install mn-loader --save-dev
 ```
 
+
+```js
+const { MnPlugin } = require('mn-loader');
+
+module.exports = {
+  /* ... */
+  module: {
+    rules: [
+
+      {
+        test: /\.jsx?$/,
+        use: [
+          {
+            loader: "babel-loader",
+            options: {
+              /* ... */
+            }
+          },
+          {
+            loader: 'mn-loader',
+            options: {
+              id: 'app'
+            }
+          }
+        ]
+      }
+  },
+  plugins: [
+    new MnPlugin({
+      id: 'app',
+      attrs: [ 'm' ],
+      output: './dist/app.css',
+      template: './src/index.html',
+      presets: [
+        require('mn-presets/medias'),
+        require('mn-presets/prefixes'),
+        require('mn-presets/styles'),
+        require('mn-presets/states'),
+        require('mn-presets/theme'),
+        require('./theme'),
+      ]
+    }),
+    /* ... */
+  ],
+  /* ... */
+};
+```
+
+
+### Usage with Node.js
+
+```sh
+npm install node-mn --save
+```
 
 
 ```js
@@ -94,37 +149,29 @@ const { compileSource } = require('node-mn');
 
 compileSource({
   watch: true,
-  path: './node_modules/',
+  path: './src',
   entry: {
     './dist/styles': './src',
     './dist/other': './other',
     './dist/market.app': {
-       include: [ /^.*?(common\.app|market\.app\/src)\/.*\.(html?|jsx?)$/ ]
+       include: [ /^.*?market\.app\/.*\.(html?|jsx?)$/ ]
      }
   },
-  exclude: [ /^.*\/?node_modules\/.*?\/node_modules\/.*$/ ],
+  exclude: [ /^.*\/node_modules\/.*$/ ],
   presets: [
     require('mn-presets/medias'),
     require('mn-presets/prefixes'),
     require('mn-presets/styles'),
     require('mn-presets/states'),
     require('mn-presets/theme')
-    //,require('common.app/mn-theme')
   ]
 });
 
-module.exports = {
-  //...
-  plugins: [
-    //...
-  ]
-  //...
-};
 ```
+
 
 PS: see node-mn/index.d.ts
 
-<field key="region" dbtype="varchar" precision="255" phptype="string" null="false" default="" index="fulltext" />
 
 
 ## Runtime
@@ -133,7 +180,7 @@ PS: see node-mn/index.d.ts
 const mn = require("services/mn")
   .setPresets([
     require('mn-presets/medias'),
-    require('mn-presets/runtime-prefixes'),
+    require('mn-presets/runtimePrefixes'),
     require('mn-presets/styles'),
     require('mn-presets/states'),
     require('mn-presets/theme')
@@ -166,7 +213,7 @@ require('mn-services/ready')(() => {
 
 import * as mn from 'services/mn';
 import * as mnMedias from 'mn-presets/medias';
-import * as mnPrefixes from 'mn-presets/runtime-prefixes';
+import * as mnPrefixes from 'mn-presets/runtimePrefixes';
 import * as mnStyles from 'mn-presets/styles';
 import * as mnStates from 'mn-presets/states';
 import * as mnTheme from 'mn-presets/theme';
@@ -207,7 +254,7 @@ export class AppModule {}
 
 require("mn-services/mn").setPresets([
   require('mn-presets/medias'),
-  require('mn-presets/runtime-prefixes'),
+  require('mn-presets/runtimePrefixes'),
   require('mn-presets/styles'),
   require('mn-presets/states'),
   require('mn-presets/theme')
@@ -234,7 +281,7 @@ const Root = require('./components/root');
 
 require("mn-services/mn").setPresets([
   require('mn-presets/medias'),
-  require('mn-presets/runtime-prefixes'),
+  require('mn-presets/runtimePrefixes'),
   require('mn-presets/styles'),
   require('mn-presets/states'),
   require('mn-presets/theme')

@@ -1,5 +1,6 @@
 const isArray = require("mn-utils/isArray");
 const isString = require("mn-utils/isString");
+const unslash = require("mn-utils/unslash");
 
 module.exports = (attrs) => {
   attrs = getAttrs(attrs);
@@ -12,13 +13,27 @@ module.exports = (attrs) => {
         ...
       </div>
   */
+
+  /*
+    (:\\s+((\\\\"([^"]+)\\\\")|("([^"]+)"))) - fixed for dist js
+    example:
+      _.dom("div\, {m: "abs s ovxHidden ovScroll", null})
+  */
+
+  /*
+    (\\\\"([^"]+)\\\\") - fixed for dev dist js
+    example:
+      eval(" ... _.dom(\"div\", {\n    m: \"abs s ovxHidden ovScroll\"\n  }, null) ...")
+  */
   const attrName = '(' + attrs.join('|') + ')';
-  const regexp = new RegExp('\\s+' + attrName + '=\{?("([^"]+)"|\'([^\']+)\')', 'gm');
+  const regexp = new RegExp('(\\s+|\\{)' + attrName + '((=\\{?("([^"]+)"|\'([^\']+)\'))|(:\\s*((\\\\"([^"]+)\\\\")|("([^"]+)"))))', 'gm');
   return (dst, text) => {
+
     let count = 0;
-    text.replace(regexp, (all, attrName, vWrap, v1, v2) => {
+    text.replace(regexp, (all, prefix, attrName, withQuoteValueAll, vvWrap1, vWrap1, v1, v2, withQuoteValue2, vvWrap2, vWrap2, v3, v4) => {
+
       const essencesMap = dst[attrName] || (dst[attrName] = {});
-      (v1 || v2).split(regexpSpace).forEach((name) => {
+      (v3 ? unslash(v3) : (v1 || v2 || v4)).split(regexpSpace).forEach((name) => {
         count++;
         (essencesMap[name] || (essencesMap[name] = {
           name,
