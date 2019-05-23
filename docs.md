@@ -660,7 +660,7 @@ params.i = params.ni ? '' : '';
 
 
 
-PS: see function **amirka/utils/route-parse-provider**
+PS: see function **mn-utils/route-parse-provider**
 
 
 #### Generating the essences of styles

@@ -26,12 +26,10 @@ module.exports = (attrs) => {
       eval(" ... _.dom(\"div\", {\n    m: \"abs s ovxHidden ovScroll\"\n  }, null) ...")
   */
   const attrName = '(' + attrs.join('|') + ')';
-  const regexp = new RegExp('(\\s+|\\{)' + attrName + '((=\\{?("([^"]+)"|\'([^\']+)\'))|(:\\s*((\\\\"([^"]+)\\\\")|("([^"]+)"))))', 'gm');
+  const regexp = new RegExp('(\\s+|\\{)' + attrName + '((=\\{?("([^"]+)"|\'([^\']+)\'))|(:\\s*(\\\\"([^"]+)\\\\"|"([^"]+)")))', 'gm');
   return (dst, text) => {
-
     let count = 0;
-    text.replace(regexp, (all, prefix, attrName, withQuoteValueAll, vvWrap1, vWrap1, v1, v2, withQuoteValue2, vvWrap2, vWrap2, v3, v4) => {
-
+    text.replace(regexp, (all, prefix, attrName, withQuoteValueAll, vvWrap1, vWrap1, v1, v2, vvWrap2, vWrap2, v3, v4) => {
       const essencesMap = dst[attrName] || (dst[attrName] = {});
       (v3 ? unslash(v3) : (v1 || v2 || v4)).split(regexpSpace).forEach((name) => {
         count++;

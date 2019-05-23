@@ -1,6 +1,6 @@
 /**
  * @overview minimalist-notation
- * @author Absolutely Amir <mr.amirka@ya.ru>
+ * @author Amir Absolutely <mr.amirka@ya.ru>
  */
 const emitterProvider = require('mn-emitter');
 const selectorsCompileProvider = require('./selectorsCompileProvider');

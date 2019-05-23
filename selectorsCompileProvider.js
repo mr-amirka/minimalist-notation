@@ -1,11 +1,8 @@
 /**
  * @overview minimalist-notation/selectors
  * Генеририрует селекторы в Minimalist Notation
- * @author Absolutely Amir <mr.amirka@ya.ru>
+ * @author Amir Absolutely <mr.amirka@ya.ru>
  *
- * // изменил порядок деления контекста на родительскиеи дочериние,
- * чтобы было удобнее в нотации юзать такие штуки:
- * //(cF<.parent1|f30<.parent2)>.child1
  */
 
 const {
@@ -93,7 +90,7 @@ const selectorsCompileProvider = module.exports = (instance) => {
     return __joinEmpty(reduce(splitSelector(partName, separators), (output, selector, index) => {
       const mediaParts = splitMedia(selector);
       push(output, mediaParts[0] + (separators[index] || ''));
-      mediaParts.length > 1 && push(mediaNames, mediaParts[1]);
+      mediaParts.length > 1 && push(mediaNames, escapeCss(mediaParts[1]));
       return output;
     }, []));
   };

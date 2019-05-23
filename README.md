@@ -42,7 +42,7 @@ Output:
 
 * [CLI](#cli)  
 * [Usage with Webpack](#usage-with-webpack)   
-* [Usage with Node.js](#usage-with-node.js)   
+* [Usage with Node.js](#usage-with-nodejs)   
 * [Runtime](#runtime)  
     * [Standalone](#standalone)  
     * [Integration](#integration)  
@@ -115,7 +115,8 @@ module.exports = {
           {
             loader: 'mn-loader',
             options: {
-              id: 'app'
+              id: 'app',
+              attrs: [ 'm' ]
             }
           }
         ]

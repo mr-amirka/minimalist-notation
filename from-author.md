@@ -1,12 +1,12 @@
-[Русский](https://github.com/mr-amirka/minimalist-notation/blob/master/src/from-author-ru.md)
+[Русский](https://github.com/mr-amirka/minimalist-notation/blob/master/from-author-ru.md)
 
 
 # From the author
 
 
 
-    * [How it started](#how-it-started)  
-    * [Minimalism](#minimalism)   
+* [How it started](#how-it-started)  
+* [Minimalism](#minimalism)   
 
 
 
@@ -17,7 +17,7 @@
 
 
 Try this tests:
-* https://jsfiddle.net/dzgj2sL3/ 
+* https://jsfiddle.net/dzgj2sL3/
 * https://jsfiddle.net/j6d8aozy/46/  
 
 Home page: http://minimalist-notation.org

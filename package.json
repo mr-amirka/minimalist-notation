@@ -1,6 +1,6 @@
 {
   "name": "minimalist-notation",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Minimalist Notation",
   "main": "./index.js",
   "keywords": [
@@ -13,7 +13,7 @@
     "functional"
   ],
   "author": {
-    "name": "Absolutely Amir",
+    "name": "Amir Absolutely",
     "email": "mr.amirka@ya.ru",
     "url": "https://github.com/mr-amirka"
   },
