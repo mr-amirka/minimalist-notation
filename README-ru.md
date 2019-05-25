@@ -178,7 +178,7 @@ PS: see node-mn/index.d.ts
 ## Runtime
 
 ```js
-const mn = require("services/mn")
+const mn = require("mn-services/mn")
   .setPresets([
     require('mn-presets/medias'),
     require('mn-presets/runtimePrefixes'),
@@ -212,7 +212,7 @@ require('mn-services/ready')(() => {
 
 ```ts
 
-import * as mn from 'services/mn';
+import * as mn from 'mn-services/mn';
 import * as mnMedias from 'mn-presets/medias';
 import * as mnPrefixes from 'mn-presets/runtimePrefixes';
 import * as mnStyles from 'mn-presets/styles';
