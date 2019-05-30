@@ -649,7 +649,7 @@ params.i = params.ni ? '' : '!important';
 
 
 
-PS: см. функцию **mn-utils/route-parse-provider**
+PS: см. функцию **mn-utils/routeParseProvider**
 
 
 #### Generating the essences of styles
