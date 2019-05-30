@@ -938,7 +938,7 @@ mn.states.i = [
 
 
 ```html
-<input class="cA:i" placeholder="имя"/>
+<input m="cA:i" placeholder="имя"/>
 ```  
 
 Output:
