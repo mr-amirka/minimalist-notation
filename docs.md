@@ -655,7 +655,7 @@ Into functions that you specify to generate essences of  styles, are input the p
 
 ```js
 params.ni || (params.ni = '');
-params.i = params.ni ? '' : '';
+params.i = params.ni ? '!important' : '';
 ```
 
 
