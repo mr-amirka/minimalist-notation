@@ -16,6 +16,7 @@ const {
   isPlainObject,
   isObject,
   isArray,
+  isNumber,
   set,
   get,
   aggregate,
@@ -54,13 +55,13 @@ const
 
 const __values = Object.values;
 const __sort = (a, b) => a.priority - b.priority;
-const __updateIteratee = item => item.updated = true;
+const __updateClearIteratee = item => item.updated = false;
 
 module.exports = () => {
 
   const styleRender = () => {
     emit(__values($$stylesMap).sort(__sort));
-    forIn($$stylesMap, __updateIteratee);
+    forIn($$stylesMap, __updateClearIteratee);
   };
 
   const mn = (essencePath, extendedEssence, paramsMatchPath) => {
@@ -132,6 +133,7 @@ module.exports = () => {
       updateSelector(parseComboName(comboName))
     });
   }, mn);
+
   mn.recompileFrom = withResult((attrsMap, options) => {
     options || (options = {});
 
@@ -143,6 +145,7 @@ module.exports = () => {
     forIn($$root, __mode);
     styleRender();
   }, mn);
+
   const __compileProvider = (attrName) => {
     const instance = (v) => {
       v && forEach(splitSpace(v), checkOne);
@@ -187,7 +190,8 @@ module.exports = () => {
     $$stylesMap[name] = {
       name,
       priority: priority || 0,
-      content: content || ''
+      content: content || '',
+      updated: true
     };
     $$updated = true;
     return mn;
@@ -229,13 +233,22 @@ module.exports = () => {
       };
     }
 
+    // get media priority
+    const priorityParts = mediaName.split('^');
+    if (priorityParts.length > 1) {
+      const mediaPriority = parseInt(priorityParts.pop());
+      if (!isNaN(mediaPriority)) {
+        mediaName = priorityParts.join('^');
+        priority = mediaPriority;
+      }
+    }
+
     if (priority === 0) priority--;
 
     try {
       if (mediaName === 'x') throw 'empty parts';
       const mediaParts = mediaName.split('x');
       let v, mp;
-      query = '';
 
       if (mp = parseMediaPart(mediaParts[0])) {
         if (v = mp.min) {
@@ -260,16 +273,13 @@ module.exports = () => {
         }
       }
     } catch (ex) {
-      return {
-        query: mediaName,
-        selector,
-        priority: defaultPriority
-      };
+      query = mediaName;
     }
 
     priority || (priority = defaultPriority);
     priority++;
-    return {query, selector, priority};
+
+    return { query, selector, priority };
   };
 
   const __mode = (context, mediaName) => {
@@ -395,13 +405,14 @@ module.exports = () => {
     __childsHandle(essence.childs, '.');
     __childsHandle(essence.media, '@', true);
   };
+
   const compileMixedEssence = (dst, src, excludes) => {
     const include = src.include;
     const length = include && include.length;
     if (length) {
       let mergingMixins = new Array(length + 1);
       mergingMixins[length] = src;
-      for (let i = length; i--;) mergingMixins[i] = updateEssence(include[i], {}, 'all', excludes);
+      for (let i = length; i--;) mergingMixins[i] = updateEssence(include[i], {}, '', excludes);
       __mergeDepth(mergingMixins, dst);
     } else {
       extend(dst, src);

@@ -70,14 +70,13 @@ const selectorsCompileProvider = module.exports = (instance) => {
             const part = getPart(partName, ' ');
             return joinMaps({}, selectors, getParents(mediaNames, part.name), part.prefix);
           }, getParents(mediaNames, parts.shift(), targetName)),
-          mediaName: mediaNames[0] || 'all'
+          mediaName: mediaNames[0] || ''
         });
         return items;
       },
       []
     );
   };
-
 
   const getMap = (name) => {
     const synonyms = {};

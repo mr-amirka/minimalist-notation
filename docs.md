@@ -364,7 +364,7 @@ Thus, we get the desired:
 
 
 
-### Media queries generation  
+### Media-queries generation  
 
 
 By default, the media query name is generated in CSS as it is, for example:  
@@ -425,7 +425,8 @@ OUTPUT:
 
 
 If in the media query name recognized the abbreviated entry matching the pattern:
-``` {min-width?:number}-{max-width?:number}x{min-height?:number}-{max-height?:number} ```
+``` {min-width?:number}-{max-width?:number}x{min-height?:number}-{max-height?:number}^{media-priority?:number} ```
+
 
 then media queries be generated, for example:
 INPUT:  

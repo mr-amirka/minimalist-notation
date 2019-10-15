@@ -102,7 +102,14 @@ module.exports = {
   /* ... */
   module: {
     rules: [
-
+      { // for hot-reload MN presets (but cached including)
+        test: /\/mn-presets\/.*\.js$/,
+        use: [
+          {
+            loader: 'mn-loader/reload'
+          }
+        ]
+      },
       {
         test: /\.jsx?$/,
         use: [
@@ -142,6 +149,9 @@ module.exports = {
   /* ... */
 };
 ```
+
+
+## Other
 
 
 ### Usage with Node.js

@@ -414,18 +414,20 @@ OUTPUT:
 
 
 Если в имени медиа-запроса будет распознана сокращенная запись подпадающая под шаблон:
-``` {min-width?:number}-{max-width?:number}x{min-height?:number}-{max-height?:number} ```
+```
+{min-width?:number}-{max-width?:number}x{min-height?:number}-{max-height?:number}^{media-priority?:number}
+```
 
 Тогда будут сгенерированы соответствующие медиа-запросы, например:  
 INPUT:  
 ```html
-<div m="f20@768-992x300-600">текст</div>
+<div m="f20@768-992x300-600^2">текст</div>
 ```  
 
 OUTPUT:  
 ```css
 @media (min-width: 768px) and (max-width: 992px) and (min-height: 300px) and (max-height: 600px) {
-  [m~='f20@768-992x300-600'] {
+  [m~='f20@768-992x300-600^2'] {
     font-size: 20px;
   }
 }
