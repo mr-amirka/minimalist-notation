@@ -1,24 +1,14 @@
-/**
- * @overview minimalist-notation/selectors
- * Генеририрует селекторы в Minimalist Notation
- * @author Amir Absolutely <mr.amirka@ya.ru>
- *
- */
-
-const {
-  extend,
-  unslash,
-  escapedSplitProvider,
-  joinMaps,
-  escapedBreakupProvider,
-  variance,
-  reduce,
-  push,
-  joinProvider,
-  escapeQuote,
-  escapeCss
-} = require('mn-utils');
-const baseVariance = variance.base;
+const extend = require('mn-utils/extend');
+const unslash = require('mn-utils/unslash');
+const escapedSplitProvider = require('mn-utils/escapedSplitProvider');
+const joinMaps = require('mn-utils/joinMaps');
+const escapedBreakupProvider = require('mn-utils/escapedBreakupProvider');
+const variantsBase = require('mn-utils/variants').base;
+const reduce = require('mn-utils/reduce');
+const push = require('mn-utils/push');
+const joinProvider = require('mn-utils/joinProvider');
+const escapeQuote = require('mn-utils/escapeQuote');
+const escapeCss = require('mn-utils/escapeCss');
 
 const __join = joinProvider('*');
 const __joinEmpty = joinProvider('');
@@ -60,7 +50,7 @@ const selectorsCompileProvider = module.exports = (instance) => {
       }
     }
     return reduce(
-      reduce(baseVariance(comboName), suffixesReduce, {}),
+      reduce(variantsBase(comboName), suffixesReduce, {}),
       (items, essences, suffix) => {
         const mediaNames = [];
         const parts = splitChild(__joinEmpty(splitReverse(suffix).reverse()));

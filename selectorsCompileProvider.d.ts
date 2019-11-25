@@ -1,10 +1,17 @@
-import { FlagsMap } from 'mn-utils';
+/**
+ * @overview minimalist-notation/selectorsCompileProvider
+ * Генеририрует селекторы в Minimalist Notation
+ * @author Amir Absolutely <mr.amirka@ya.ru>
+ */
+
+
+import { IFlagsMap } from 'mn-utils/global';
 import { escapedBreakupCore } from 'mn-utils/escapedBreakupProvider'
 declare namespace selectorsCompileProvider {
 
   interface essenceOptions {
-    essences: FlagsMap;
-    selectors: FlagsMap;
+    essences: IFlagsMap;
+    selectors: IFlagsMap;
     mediaName: string;
   }
 
@@ -24,8 +31,8 @@ declare namespace selectorsCompileProvider {
     parseAttrProvider: (attrName: string) => parseMethod;
     parseId: parseMethod;
     parseClass: parseMethod;
-    getParents: (mediaNames: string[], name: string, targetName?: string) => FlagsMap;
-    getEssence: (input: string) => { selector: string, states: FlagsMap };
+    getParents: (mediaNames: string[], name: string, targetName?: string) => IFlagsMap;
+    getEssence: (input: string) => { selector: string, states: IFlagsMap };
   }
 
   export interface selectorsCompileProvider {

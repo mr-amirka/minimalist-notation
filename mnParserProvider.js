@@ -1,37 +1,44 @@
 const isArray = require("mn-utils/isArray");
+const isObject = require("mn-utils/isObject");
 const isString = require("mn-utils/isString");
 const unslash = require("mn-utils/unslash");
+const reduce = require("mn-utils/reduce");
+const forEach = require("mn-utils/forEach");
+const filter = require("mn-utils/filter");
+const isEmpty = require("mn-utils/isEmpty");
+const getKeys = require("mn-utils/keys");
+const splitProvider = require("mn-utils/splitProvider");
 
-module.exports = (attrs) => {
-  attrs = getAttrs(attrs);
-  if (!attrs) return null;
-  // const regexp = /m=\{?("([^"]+)"|'([^']+)')/gm;
+const splitSpace = splitProvider(/\s+/);
+const splitAttrs = splitProvider(/[\s|,]+/);
+
+const parser = module.exports = (attrs) => {
+  if (isEmpty(attrs = getAttrs(attrs))) return null;
+
   /*
+    desctiption for
     \{? - minifixed for JSX
     example:
       <div m={'rlv st1' + m}>
         ...
       </div>
-  */
 
-  /*
     (:\\s+((\\\\"([^"]+)\\\\")|("([^"]+)"))) - fixed for dist js
     example:
-      _.dom("div\, {m: "abs s ovxHidden ovScroll", null})
-  */
+      React.createElement("div", {m: "abs s ovxHidden ovScroll"}, null)
 
-  /*
     (\\\\"([^"]+)\\\\") - fixed for dev dist js
     example:
-      eval(" ... _.dom(\"div\", {\n    m: \"abs s ovxHidden ovScroll\"\n  }, null) ...")
+      eval(" ... React.createElement(\"div\", {m: \"abs s ovxHidden ovScroll\"}, null) ...")
   */
-  const attrName = '(' + attrs.join('|') + ')';
-  const regexp = new RegExp('(\\s+|\\{)' + attrName + '((=\\{?("([^"]+)"|\'([^\']+)\'))|(:\\s*(\\\\"([^"]+)\\\\"|"([^"]+)")))', 'gm');
+  const attrNames = '(' + getKeys(attrs).join('|') + ')';
+  const regexp = new RegExp('(\\s+|\\{)' + attrNames + '((=\\{?(\\s*"([^"]+)"|\'([^\']+)\'))|(:\\s*(\\\\"([^"]+)\\\\"|"([^"]+)")))', 'gm');
   return (dst, text) => {
     let count = 0;
     text.replace(regexp, (all, prefix, attrName, withQuoteValueAll, vvWrap1, vWrap1, v1, v2, vvWrap2, vWrap2, v3, v4) => {
-      const essencesMap = dst[attrName] || (dst[attrName] = {});
-      (v3 ? unslash(v3) : (v1 || v2 || v4)).split(regexpSpace).forEach((name) => {
+      const targetAttrName = attrs[attrName];
+      const essencesMap = dst[targetAttrName] || (dst[targetAttrName] = {});
+      forEach(splitSpace(v3 ? unslash(v3) : (v1 || v2 || v4)), (name) => {
         count++;
         (essencesMap[name] || (essencesMap[name] = {
           name,
@@ -42,14 +49,11 @@ module.exports = (attrs) => {
     return count;
   };
 };
-const regexpSpace = /\s+/;
-const regexpAttrsSplit = /[\s|,]+/;
-const __attrFilter = v => v;
-const getAttrs = module.exports.getAttrs = (attrs) => {
-  if (!attrs) return null;
-  isString(attrs) && (attrs = attrs.split(regexpAttrsSplit));
-  if (!isArray(attrs)) return null;
-  attrs = attrs.filter(__attrFilter);
-  if (attrs.length < 1) return null;
-  return attrs;
+const getAttrs = parser.getAttrs = (attrs) => {
+  isString(attrs) && (attrs = splitAttrs(attrs));
+  if (!isObject(attrs)) return null;
+  return isArray(attrs) ? reduce(filter(attrs), (output, name) => {
+    output[name] = name;
+    return output;
+  }, {}) : attrs;
 };

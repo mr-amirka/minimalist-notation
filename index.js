@@ -1,49 +1,109 @@
-/**
- * @overview minimalist-notation
- * @author Amir Absolutely <mr.amirka@ya.ru>
- */
-const emitterProvider = require('mn-emitter');
 const selectorsCompileProvider = require('./selectorsCompileProvider');
 
+const emitterProvider = require('mn-utils/emitterProvider');
+const extend = require('mn-utils/extend');
+const isPlainObject = require('mn-utils/isPlainObject');
+const isObject = require('mn-utils/isObject');
+const isArray = require('mn-utils/isArray');
+const isNumber = require('mn-utils/isNumber');
+const set = require('mn-utils/set');
+const get = require('mn-utils/get');
+const aggregate = require('mn-utils/aggregate');
+const eachApply = require('mn-utils/eachApply');
+const eachTry = require('mn-utils/eachTry');
+const extendDepth = require('mn-utils/extendDepth');
+const mergeDepth = require('mn-utils/mergeDepth');
+const flags = require('mn-utils/flags');
+const joinMaps = require('mn-utils/joinMaps');
+const routeParseProvider = require('mn-utils/routeParseProvider');
+const forIn = require('mn-utils/forIn');
+const forEach = require('mn-utils/forEach');
+const reduce = require('mn-utils/reduce');
+const cssPropertiesStringifyProvider = require('mn-utils/cssPropertiesStringifyProvider');
+const cssPropertiesParse = require('mn-utils/cssPropertiesParse');
+const push = require('mn-utils/push');
+const pushArray = require('mn-utils/pushArray');
+const splitProvider = require('mn-utils/splitProvider');
+const joinProvider = require('mn-utils/joinProvider');
+const withDefer = require('mn-utils/withDefer');
+const withResult = require('mn-utils/withResult');
+const map = require('mn-utils/map');
+const __values = require('mn-utils/values');
+const merge = require('mn-utils/merge');
+const isString = require('mn-utils/isString');
 
-const utils = {
-  ...require('mn-utils'),
-  color: require('mn-utils/color')
-};
-
-const {
-  extend,
-  isPlainObject,
-  isObject,
-  isArray,
-  isNumber,
-  set,
-  get,
-  aggregate,
-  eachApply,
-  eachTry,
-  cloneDepth,
-  extendDepth,
-  mergeDepth,
-  flags,
-  joinMaps,
-  routeParseProvider,
-  forIn,
-  forEach,
-  reduce,
-  cssPropertiesStringifyProvider,
-  cssPropertiesParse,
-  push,
-  pushArray,
-  splitProvider,
-  joinProvider,
-  withDefer,
-  withResult,
-  trim,
-  map,
-  breakup
-} = utils;
-
+const utils = merge([
+  {
+    emitterProvider: emitterProvider,
+    color: require('mn-utils/color'),
+    colorGetBackground: require('mn-utils/colorGetBackground'),
+    trim: require('mn-utils/trim'),
+    breakup: require('mn-utils/breakup'),
+    unslash: require('mn-utils/unslash'),
+    noop: require('mn-utils/noop'),
+    support: require('mn-utils/support'),
+    size: require('mn-utils/size'),
+    extend,
+    merge,
+    isPlainObject,
+    isObject,
+    isArray,
+    isNumber,
+    isString,
+    isNumber: require('mn-utils/isNumber'),
+    isObjectLike: require('mn-utils/isObjectLike'),
+    isPromise: require('mn-utils/isPromise'),
+    isIndex: require('mn-utils/isIndex'),
+    isLength: require('mn-utils/isLength'),
+    isEmpty: require('mn-utils/isEmpty'),
+    once: require('mn-utils/once'),
+    delay: require('mn-utils/delay'),
+    immediate: require('mn-utils/immediate'),
+    removeOf: require('mn-utils/removeOf'),
+    addOf: require('mn-utils/addOf'),
+    set,
+    get,
+    aggregate,
+    eachApply,
+    eachTry,
+    extendDepth,
+    mergeDepth,
+    flags,
+    flagsSet: require('mn-utils/flagsSet'),
+    joinMaps,
+    joinArrays: require('mn-utils/joinArrays'),
+    routeParseProvider,
+    forIn,
+    forEach,
+    reduce,
+    filter: require('mn-utils/filter'),
+    cssPropertiesStringifyProvider,
+    cssPropertiesParse,
+    push,
+    pushArray,
+    splitProvider,
+    joinProvider,
+    withDefer,
+    withResult,
+    map,
+    values: __values,
+    keys: require('mn-utils/keys'),
+    escapedSplitProvider: require('mn-utils/escapedSplitProvider'),
+    mapperProvider: require('mn-utils/mapperProvider'),
+    regexpMapperProvider: require('mn-utils/regexpMapperProvider'),
+    variants: require('mn-utils/variants'),
+    escapeQuote: require('mn-utils/escapeQuote'),
+    escapeRegExp: require('mn-utils/escapeRegExp'),
+    escapeCss: require('mn-utils/escapeCss'),
+    escapedBreakupProvider: require('mn-utils/escapedBreakupProvider'),
+    upperFirst: require('mn-utils/upperFirst'),
+    lowerFirst: require('mn-utils/lowerFirst'),
+    camelToKebabCase: require('mn-utils/camelToKebabCase'),
+    kebabToCamelCase: require('mn-utils/kebabToCamelCase'),
+    defer: require('mn-utils/defer'),
+  },
+  require('mn-utils/anyval')
+]);
 
 const
   OBJECT = 'object',
@@ -53,7 +113,6 @@ const
   baseSet = set.base,
   baseGet = get.base;
 
-const __values = Object.values;
 const __sort = (a, b) => a.priority - b.priority;
 const __updateClearIteratee = item => item.updated = false;
 
@@ -112,7 +171,7 @@ module.exports = () => {
     $$staticsEssences[essenceName] || ($$staticsEssences[essenceName] = __normalize({
       inited: true
     }));
-    for (let i = 1, l = essencePath.length; i < l; i++) path.push('childs', essencePath[i]);
+    for (let i = 1, l = essencePath.length; i < l; i++) push(path, 'childs', essencePath[i]);
     baseSet($$staticsEssences, path, __mergeDepth([
       baseGet($$staticsEssences, path),
       __normalize(extendedEssence)
@@ -136,7 +195,6 @@ module.exports = () => {
 
   mn.recompileFrom = withResult((attrsMap, options) => {
     options || (options = {});
-
     __clear();
     keyframesRender();
     setStyle('css', joinOnly(reduce($$css.map, __cssReducer, [])), defaultCCSPriority);
@@ -147,9 +205,16 @@ module.exports = () => {
   }, mn);
 
   const __compileProvider = (attrName) => {
-    const instance = (v) => {
-      v && forEach(splitSpace(v), checkOne);
-    };
+    function instance(v) {
+      if (!v) return;
+      let vls = splitSpace(v), i = 0, l = vls.length;
+      for (;i < l; i++) {
+        if ((v = vls[i]) && !cache[v]) {
+          cache[v] = true;
+          push(newValues, v);
+        }
+      }
+    }
     (instance.clear = () => {
       cache = instance.cache = {};
       newValues = [];
@@ -162,29 +227,34 @@ module.exports = () => {
     instance._recompile = () => {
       updateAttrByMap(cache, attrName);
     };
-    const checkOne = instance.checkOne = (v) => {
-      if (!v || cache[v]) return;
-      cache[v] = true;
-      push(newValues, v);
-    };
-    const checkNode = instance.checkNode = (node) => {
+    instance.checkNode = (node) => {
       node.getAttribute && instance(node.getAttribute(attrName));
     };
-    const recursiveCheckNode = (node) => {
-      checkNode(node);
-      forEach(node.children, recursiveCheckNode);
-    };
-    const __recursiveCheckNode = (node) => {
-      checkNode(node);
-      forEach(node.childNodes, __recursiveCheckNode);
-    };
-    instance.recursiveCheck = (node) => {
-      node.children ? recursiveCheckNode(node) : __recursiveCheckNode(node);
-      return mn;
+    const recursiveCheckNode = instance.recursiveCheck = (node) => {
+      node.getAttribute && instance(node.getAttribute(attrName));
+      forEach(node.childNodes, recursiveCheckNode);
     };
     return instance;
   };
-  mn.getCompiler = (attrName) => $$compilers[attrName] || ($$compilers[attrName] = __compileProvider(attrName));
+  const getCompiler = mn.getCompiler = (attrName) => $$compilers[attrName] || ($$compilers[attrName] = __compileProvider(attrName));
+
+  mn.recursiveCheckByAttrs = withResult((node, attrs) => {
+    eachApply(
+        map(map(isString(attrs) ? [ attrs ] : attrs, getCompiler), 'recursiveCheck'),
+        [ node ],
+    );
+  }, mn);
+  mn.checkOneNodeByAttrs = withResult((node, attrs) => {
+    eachApply(
+        map(map(isString(attrs) ? [ attrs ] : attrs, getCompiler), 'checkNode'),
+        [ node ],
+    );
+  }, mn);
+  mn.checkByAttrs = withResult((v, attrs) => {
+    isString(attrs)
+        ? getCompiler(attrs)(v)
+        : eachApply(map(attrs, getCompiler), [ v ]);
+  }, mn);
 
   const setStyle = (name, content, priority) => {
     $$stylesMap[name] = {
@@ -685,7 +755,6 @@ const getEessenceSelectors = (selectorsMap) => {
   return outputSelectors;
 };
 
-const __extendDepth = (dst, src) => extendDepth(dst, src, $$mergeDepth);
-const __mergeDepth = (src, dst) => mergeDepth(src, dst, $$mergeDepth);
-const $$mergeDepth = 50;
-//const reNgClass = /"([^"]+)"|'([^']+)'|([A-Za-z0-9_]+)\s*\:/;
+const __extendDepth = (dst, src) => extendDepth(dst, src, MN_MERGE_DEPTH);
+const __mergeDepth = (src, dst) => mergeDepth(src, dst, MN_MERGE_DEPTH);
+const MN_MERGE_DEPTH = 50;

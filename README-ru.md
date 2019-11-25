@@ -36,11 +36,6 @@ Output:
 * [Usage with Node.js](#usage-with-nodejs)   
 * [Runtime](#runtime)  
     * [Standalone](#standalone)  
-    * [Integration](#integration)  
-        * [Integrating "Minimalist Notation" into Angular 6](#integrating-minimalist-notation-into-angular-6)  
-        * [Integrating "Minimalist Notation" into AngularJS](#integrating-minimalist-notation-into-angularjs)  
-        * [Integrating "Minimalist Notation" into React](#integrating-minimalist-notation-into-react)  
-
 
 
 * [Подробная документация](https://github.com/mr-amirka/minimalist-notation/blob/master/docs-ru.md)  
@@ -90,17 +85,17 @@ npm install mn-loader --save-dev
 
 
 ```js
-const { MnPlugin } = require('mn-loader');
+const { MnPlugin } = require('minimalist-notation/webpack-loader');
 
 module.exports = {
   /* ... */
   module: {
     rules: [
       { // for hot-reload MN presets (but cached including)
-        test: /\/mn-presets\/.*\.js$/,
+        test: /\.mn\.js$/,
         use: [
           {
-            loader: 'mn-loader/reload'
+            loader: 'minimalist-notation/webpack-loader/reload'
           }
         ]
       },
@@ -114,7 +109,7 @@ module.exports = {
             }
           },
           {
-            loader: 'mn-loader',
+            loader: 'minimalist-notation/webpack-loader',
             options: {
               id: 'app',
               attrs: [ 'm' ]
@@ -147,48 +142,10 @@ module.exports = {
 
 ## Other
 
-
-### Usage with Node.js
-
-```sh
-npm install node-mn --save
-```
-
-
-```js
-const { compileSource } = require('node-mn');
-
-compileSource({
-  watch: true,
-  path: './src',
-  entry: {
-    './dist/styles': './src',
-    './dist/other': './other',
-    './dist/market.app': {
-       include: [ /^.*?market\.app\/.*\.(html?|jsx?)$/ ]
-     }
-  },
-  exclude: [ /^.*\/node_modules\/.*$/ ],
-  presets: [
-    require('mn-presets/medias'),
-    require('mn-presets/prefixes'),
-    require('mn-presets/styles'),
-    require('mn-presets/states'),
-    require('mn-presets/theme')
-  ]
-});
-
-```
-
-
-PS: see node-mn/index.d.ts
-
-
-
 ## Runtime
 
 ```js
-const mn = require("mn-services/mn")
+const mn = require("minimalist-notation/browser")
   .setPresets([
     require('mn-presets/medias'),
     require('mn-presets/runtimePrefixes'),
@@ -196,13 +153,12 @@ const mn = require("mn-services/mn")
     require('mn-presets/states'),
     require('mn-presets/theme')
   ]);
-require('mn-services/ready')(() => {
+require('mn-utils/browser/ready')(() => {
   mn.getCompiler('m').recursiveCheck(document)
   mn.compile();
 
   console.log('minimalistNotation', mn.data);
 });
-
 ```
 
 
@@ -212,136 +168,3 @@ require('mn-services/ready')(() => {
 ```html
 <script src="https://dartline.ru/assets/last-standalone-mn.js" async></script>
 ```
-
-
-## Integration
-
-
-### Integrating "Minimalist Notation" into Angular 6
-
-
-```ts
-
-import * as mn from 'mn-services/mn';
-import * as mnMedias from 'mn-presets/medias';
-import * as mnPrefixes from 'mn-presets/runtimePrefixes';
-import * as mnStyles from 'mn-presets/styles';
-import * as mnStates from 'mn-presets/states';
-import * as mnTheme from 'mn-presets/theme';
-
-mn.setPresets([
-  mnMedias,
-  mnPrefixes,
-  mnStyles,
-  mnStates,
-  mnTheme
-]);
-
-//DIRECTIVES
-import { MDirective } from 'angular-mn';
-
-@NgModule({
-  imports: [
-    /* ... */
-  ],
-  declarations: [
-    MDirective,
-    /* ... */
-  ],
-  bootstrap: [
-    //RootComponent
-  ]
-})
-export class AppModule {}
-
-
-```
-
-
-### Integrating "Minimalist Notation" into AngularJS
-
-
-```js
-
-require("mn-services/mn").setPresets([
-  require('mn-presets/medias'),
-  require('mn-presets/runtimePrefixes'),
-  require('mn-presets/styles'),
-  require('mn-presets/states'),
-  require('mn-presets/theme')
-]);
-
-const app = angular.module('app', [ /* ...*/ ]);
-require('angularjs-mn')(app);
-//...
-
-
-
-```
-
-
-### Integrating "Minimalist Notation" into  React
-
-Example:
-
-```js
-// index.jsx
-const React = require('react');
-const { render } = require('react-dom');
-const Root = require('./components/root');
-
-require("mn-services/mn").setPresets([
-  require('mn-presets/medias'),
-  require('mn-presets/runtimePrefixes'),
-  require('mn-presets/styles'),
-  require('mn-presets/states'),
-  require('mn-presets/theme')
-]);
-
-require('mn-services/ready')(() => [].forEach.call(
-  document.querySelectorAll('[root]'),
-  node => render(<Root/>, node)
-));
-
-
-//root.jsx
-const React = require('react');
-const { Component } = React;
-const MyComponent = require('./my-component');
-
-class Root extends Component {
-	render() {
-		return (<MyComponent/>);
-	}
-}
-
-module.exports = Root;
-
-
-// my-component.jsx
-const React = require('react');
-const { Component } = React;
-
-const { withMn, MnFrame } = require('react-mn');
-
-
-class _MyComponent extends Component {
-  render() {
-    return (
-      <div m="tbl c0F0 bg0 w h100vh tc f40">
-        <div>
-          <div>Hello React!</div>
-          <MnFrame m="b0 bc00 bsSolid">
-            <div m="sq10 bgF"></div>
-          </MnFrame>
-        </div>
-      </div>
-    );
-  }
-}
-
-module.exports = withMn(_MyComponent);
-
-```
-
-PS: MnFrame - the component that is displayed in the iframe
