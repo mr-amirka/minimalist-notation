@@ -36,7 +36,10 @@ const settings = {
 };
 
 try {
-  forIn(require(Path.resolve(config === true || !config ? './mn-config.js' : config)), (v, k) => v && (settings[k] = v));
+  forIn(
+      require(Path.resolve(config === true || !config ? './mn-config.js' : config)),
+      (v, k) => v && (settings[k] = v)
+  );
 } catch (ex) {
   console.warn('config file is not found');
 }

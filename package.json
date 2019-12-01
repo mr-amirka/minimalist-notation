@@ -1,16 +1,23 @@
 {
   "name": "minimalist-notation",
-  "version": "1.4.0",
+  "version": "1.4.19",
   "description": "Minimalist Notation",
   "main": "./index.js",
+  "bin": {
+    "mn": "./cli/index.js"
+  },
   "keywords": [
+    "MN",
     "CSS",
     "preprocessor",
     "parser",
     "minimalist",
     "notation",
+    "minimalist notation",
     "atomic",
-    "functional"
+    "functional",
+    "Atomic CSS",
+    "Functional CSS"
   ],
   "author": {
     "name": "Amir Absolutely",
@@ -22,10 +29,13 @@
     "url": "https://github.com/mr-amirka/amirka.git"
   },
   "license": "MIT",
+  "scripts": {
+    "lint": "eslint **/*.js*"
+  },
   "devDependencies": {},
   "dependencies": {
-    "mn-utils": "0.0.24",
-    "mn-presets": "0.0.12",
+    "mn-utils": "0.0.28",
+    "mn-presets": "0.0.18",
     "loader-utils": "*",
     "commander": "^2.18.0"
   }

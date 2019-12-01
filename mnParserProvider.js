@@ -1,13 +1,13 @@
-const isArray = require("mn-utils/isArray");
-const isObject = require("mn-utils/isObject");
-const isString = require("mn-utils/isString");
-const unslash = require("mn-utils/unslash");
-const reduce = require("mn-utils/reduce");
-const forEach = require("mn-utils/forEach");
-const filter = require("mn-utils/filter");
-const isEmpty = require("mn-utils/isEmpty");
-const getKeys = require("mn-utils/keys");
-const splitProvider = require("mn-utils/splitProvider");
+const isArray = require('mn-utils/isArray');
+const isObject = require('mn-utils/isObject');
+const isString = require('mn-utils/isString');
+const unslash = require('mn-utils/unslash');
+const reduce = require('mn-utils/reduce');
+const forEach = require('mn-utils/forEach');
+const filter = require('mn-utils/filter');
+const isEmpty = require('mn-utils/isEmpty');
+const getKeys = require('mn-utils/keys');
+const splitProvider = require('mn-utils/splitProvider');
 
 const splitSpace = splitProvider(/\s+/);
 const splitAttrs = splitProvider(/[\s|,]+/);
@@ -29,22 +29,44 @@ const parser = module.exports = (attrs) => {
 
     (\\\\"([^"]+)\\\\") - fixed for dev dist js
     example:
-      eval(" ... React.createElement(\"div\", {m: \"abs s ovxHidden ovScroll\"}, null) ...")
+      eval(" ... React.createElement(\"div\", {
+        m: \"abs s ovxHidden ovScroll\"
+      }, null) ...")
   */
   const attrNames = '(' + getKeys(attrs).join('|') + ')';
-  const regexp = new RegExp('(\\s+|\\{)' + attrNames + '((=\\{?(\\s*"([^"]+)"|\'([^\']+)\'))|(:\\s*(\\\\"([^"]+)\\\\"|"([^"]+)")))', 'gm');
+  const regexp = new RegExp('(\\s+|\\{\\s*)' + attrNames
+    + '((=\\{?\\s*("([^"]+)"|\'([^\']+)\'|`([^`]+)`))|(:\\s*(\\\\"([^"]+)\\\\"|"([^"]+)"|\'([^\']+)\'|`([^`]+)`)))', 'gm'); // eslint-disable-line
   return (dst, text) => {
     let count = 0;
-    text.replace(regexp, (all, prefix, attrName, withQuoteValueAll, vvWrap1, vWrap1, v1, v2, vvWrap2, vWrap2, v3, v4) => {
+    text.replace(regexp, (
+        all, prefix, attrName, withQuoteValueAll, vvWrap1, vWrap1,
+        doubleQuote, oneQuote, apostrophe, vvWrap2, vWrap2,
+        escapedDoubleQuoteAsValue,
+        doubleQuoteAsValue, oneQuoteAsValue, apostropheAsValue,
+    ) => {
       const targetAttrName = attrs[attrName];
       const essencesMap = dst[targetAttrName] || (dst[targetAttrName] = {});
-      forEach(splitSpace(v3 ? unslash(v3) : (v1 || v2 || v4)), (name) => {
-        count++;
-        (essencesMap[name] || (essencesMap[name] = {
-          name,
-          count: 0
-        })).count++;
-      });
+      forEach(
+          splitSpace(
+              escapedDoubleQuoteAsValue
+                ? unslash(escapedDoubleQuoteAsValue)
+                : (
+                  doubleQuote
+                    || oneQuote
+                    || apostrophe
+                    || doubleQuoteAsValue
+                    || oneQuoteAsValue
+                    || apostropheAsValue
+                ),
+          ),
+          (name) => {
+            count++;
+            (essencesMap[name] || (essencesMap[name] = {
+              name,
+              count: 0,
+            })).count++;
+          },
+      );
     });
     return count;
   };

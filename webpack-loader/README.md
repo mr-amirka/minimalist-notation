@@ -8,8 +8,7 @@ This is loader of MinimalistNotation for Webpack.
 
 ```js
 
-const { MnPlugin } = require('minimalist-notation/webpack-loader');
-
+const {MnPlugin} = require('minimalist-notation/webpack-loader');
 
 module.exports = {
   /* ... */
@@ -19,9 +18,9 @@ module.exports = {
         test: /\/mn-presets\/.*\.js$/,
         use: [
           {
-            loader: 'minimalist-notation/webpack-loader/reload'
-          }
-        ]
+            loader: 'minimalist-notation/webpack-loader/reload',
+          },
+        ],
       },
       {
         test: /\.jsx?$/,
@@ -30,20 +29,20 @@ module.exports = {
             loader: "babel-loader",
             options: {
               /* ... */
-            }
+            },
           },
           { // for parsing jsx files
-            loader: 'minimalist-notation/webpack-loader'',
+            loader: 'minimalist-notation/webpack-loader',
             options: {
               id: 'for-attr', // связывает вывод данных с точкой вывода (выводит данные в файл ./dist/app.css')
               attrs: [ 'm' ], // имя атрибутов, которые будут парситься в jsx файлах
             }
           },
           { // for parsing jsx files
-            loader: 'mn-loader',
+            loader: 'minimalist-notation/webpack-loader',
             options: {
               id: 'for-class', // связывает вывод данных с точкой вывода (выводит данные в файл ./dist/classic.css')
-              attrs: [ 'className' ], // имя атрибутов, которые будут парситься в jsx файлах
+              attrs: {className: 'class'}, // имя атрибутов, которые будут парситься в jsx файлах
             }
           }
         ]
@@ -52,7 +51,7 @@ module.exports = {
   plugins: [
     new MnPlugin({
       id: 'for-attr', // идентификатор точки вывода данных
-      attrs: [ 'm' ], // имя атрибутов, которые будут парситься в шаблоне ('./src/index.html')
+      attrs: [ 'm' ], // имена атрибутов, которые будут парситься в шаблоне ('./src/index.html')
       output: './dist/app.css',
       template: './src/index.html',
       presets: [
@@ -60,12 +59,12 @@ module.exports = {
         require('mn-presets/prefixes'),
         require('mn-presets/styles'),
         require('mn-presets/states'),
-        require('mn-presets/theme')
-      ]
+        require('mn-presets/theme'),
+      ],
     }),
     new MnPlugin({
       id: 'for-class', // идентификатор точки вывода данных
-      attrs: [ 'class' ], // имя атрибутов, которые будут парситься в шаблоне ('./src/indexWithClass.html')
+      attrs: [ 'class' ], // имена атрибутов, которые будут парситься в шаблоне ('./src/indexWithClass.html')
       output: './dist/classic.css',
       template: './src/indexWithClass.html',
       presets: [
@@ -74,7 +73,7 @@ module.exports = {
         require('mn-presets/styles'),
         require('mn-presets/states'),
         require('mn-presets/theme')
-      ]
+      ],
     }),
     /* ... */
   ],
@@ -100,10 +99,10 @@ module.exports = {
           {
             loader: 'minimalist-notation/webpack-loader/reload',
             options: {
-              id: 'app'
-            }
-          }
-        ]
+              id: 'app',
+            },
+          },
+        ],
       },
       //...
     ]
@@ -120,7 +119,7 @@ require('./mn-presets/theme');
 // ./src/mn-presets/theme.js
 module.exports = (mn) => {
   mn({
-    fCustom: 'f100'
+    fCustom: 'f100',
   });
 };
 ```
