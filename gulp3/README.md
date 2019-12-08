@@ -15,11 +15,11 @@ gulp.task('build', function() {
       selectorPrefix: '',
       presets: [
         require('mn-presets/medias'),
-      	require('mn-presets/prefixes'),
-      	require('mn-presets/styles'),
-      	require('mn-presets/states'),
-      	require('mn-presets/theme'),
-        require('./mn-my-preset'),
+        require('mn-presets/prefixes'),
+        require('mn-presets/styles'),
+        require('mn-presets/states'),
+        require('mn-presets/theme'),
+        // require('./mn-my-preset'), // custom preset
       ],
     }))
     .pipe(gulp.dest('./dest/'))

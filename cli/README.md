@@ -61,10 +61,10 @@ module.exports = {
   ],
   presets: [
     require('mn-presets/medias'),
-  	require('mn-presets/prefixes'),
-  	require('mn-presets/styles'),
-  	require('mn-presets/states'),
-  	require('mn-presets/theme'),
+    require('mn-presets/prefixes'),
+    require('mn-presets/styles'),
+    require('mn-presets/states'),
+    require('mn-presets/theme'),
   ]
 };
 
@@ -74,6 +74,7 @@ module.exports = {
 ```ts
 interface compileSourceOptions {
   path: string,
+  selectorPrefix: string,
   entry?: string | {
     [outputName: string]: string | compileSourceOptions
   },
@@ -91,6 +92,7 @@ interface compileSourceOptions {
 | option  | value                             |
 | ------- | --------------------------------- |
 | config  | './mn-config.js'                  |
+| prefix  | ''                                |
 | path    | './'                              |
 | entry   | './'                              |
 | output  | './mn.styles.css'                 |
