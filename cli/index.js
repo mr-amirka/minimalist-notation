@@ -7,13 +7,13 @@ const pkg = require("../package.json");
 const {compileSource, defaultSettings} = require('../node');
 
 program
-  .version(pkg.version, '-v, --version')
-  .option("-c, --compile [compile]", "set input path (./)")
-  .option("-w --watch [watch]", "set watch")
-  .option("-conf, --config [config]", "set config path (./mn-config.js)")
-  .option("-a, --attrs [attrs]", "set attrs (m|class)")
-  .option("-p, --prefix [prefix]", "set selectors prefix ('')")
-  .option("-o, --output [output]", "set output path (./mn.styles.css)");
+    .version(pkg.version, '-v, --version')
+    .option("-c, --compile [compile]", "set input path (./)")
+    .option("-w --watch [watch]", "set watch")
+    .option("-conf, --config [config]", "set config path (./mn-config.js)")
+    .option("-a, --attrs [attrs]", "set attrs (m|class)")
+    .option("-p, --prefix [prefix]", "set selectors prefix ('')")
+    .option("-o, --output [output]", "set output path (./mn.styles.css)");
 
 program.on("--help", () => {
   console.log("");
