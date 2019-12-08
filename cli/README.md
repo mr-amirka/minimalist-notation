@@ -29,15 +29,11 @@ mn --config ./mn-config.js
 #### Configuration example
 
 ```js
-//mn-config.js
+// mn-config.js
 module.exports = {
-  /*
-  input: './'
-  output: './styles.css',
-  */
   entry: {
-    styles: {
-      input: './',
+    styles: { // styles.css
+      path: './',
       attrs: [
         'class'
       ],
@@ -49,8 +45,13 @@ module.exports = {
       ],
       metrics: './mn-metrics.json'
     }
+    // other...
   },
-  //global options:
+  // global options:
+  /*
+  path: './'
+  output: './styles.css',
+  */
   attrs: [ 'class' ],
   include: [
     /^.*\.(html?|(js|ts)x?|vue)$/
@@ -63,7 +64,7 @@ module.exports = {
   	require('mn-presets/prefixes'),
   	require('mn-presets/styles'),
   	require('mn-presets/states'),
-  	require('mn-presets/theme')
+  	require('mn-presets/theme'),
   ]
 };
 
@@ -95,7 +96,7 @@ interface compileSourceOptions {
 | output  | './mn.styles.css'                 |
 | metrics | './mn-metrics.json' if true       |
 | attrs   | [ 'm' ]                           |
-| presets | [  require('mn-presets/medias'),  require('mn-presets/prefixes'),    require('mn-presets/styles'),     require('mn-presets/states'),     require('mn-presets/theme')   ] |
+| presets | [  require('mn-presets/medias'), require('mn-presets/prefixes'), require('mn-presets/styles'), require('mn-presets/states'), require('mn-presets/theme') ] |
 
 * include: ``` /^.*\.(html?|(js|ts)x?|vue)$/ ```
 * exclude: ``` /\/node_modules\/|(\.tmp\.)/  ```

@@ -10,7 +10,7 @@ const getKeys = require('mn-utils/keys');
 const splitProvider = require('mn-utils/splitProvider');
 
 const splitSpace = splitProvider(/\s+/);
-const splitAttrs = splitProvider(/[\s|,]+/);
+const splitAttrs = splitProvider(/[\s|,;]+/);
 
 const parser = module.exports = (attrs) => {
   if (isEmpty(attrs = getAttrs(attrs))) return null;

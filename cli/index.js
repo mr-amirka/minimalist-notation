@@ -6,6 +6,8 @@ const isString = require("mn-utils/isString");
 const pkg = require("../package.json");
 const {compileSource, defaultSettings} = require('../node');
 
+const DEFAULT_CONFIG_PATH = './mn-config.js';
+
 program
     .version(pkg.version, '-v, --version')
     .option("-c, --compile [compile]", "set input path (./)")
@@ -31,8 +33,6 @@ let output = program.output;
 let config = program.config;
 let attrs = program.attrs;
 
-if (!path) return program.help();
-
 const settings = {
   watch: watch || false,
   selectorPrefix: prefix || '',
@@ -41,7 +41,7 @@ const settings = {
 
 try {
   forIn(
-      require(Path.resolve(config === true || !config ? './mn-config.js' : config)),
+      require(Path.resolve(config === true || !config ? DEFAULT_CONFIG_PATH' : config)),
       (v, k) => v && (settings[k] = v)
   );
 } catch (ex) {
@@ -52,8 +52,10 @@ path && isString(path) && (settings.path = path);
 output && isString(output) && (settings.output = output);
 attrs && isString(attrs) && (settings.attrs = attrs);
 
+if (!settins.path) return program.help();
+
 settings.each = (path, count) => {
-  console.log('MN parsed', count, 'in', path);
+  // console.log('MN parsed', count, 'in', path);
 };
 settings.finish = () => {
   console.log('MN finished!');

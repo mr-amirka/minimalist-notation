@@ -176,7 +176,7 @@ function buildProvider(data, name, compile, hasMetrics) {
   const metricsFilesPath = name + '.mn-metrics-files.json';
   const metricsPath = name + '.mn-metrics.json';
   function onFinally(err) {
-    err ? console.error(err) : console.log('mn output:', name);
+    err && console.error(err);
   }
   return () => {
     const mergedData = {};
