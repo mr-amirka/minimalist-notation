@@ -204,47 +204,30 @@ require('mn-utils/browser/ready')(() => {
 Example:
 
 ```js
-// index.jsx
 const React = require('react');
 const {render} = require('react-dom');
-const Root = require('./components/root');
 
 const reactCreateElementPatch = require('minimalist-notation/browser/reactCreateElementPatch');
 const mn = require('minimalist-notation')({
   // selectorPrefix: '.mn-scope ',
+  presets: [
+    require('mn-presets/medias'),
+    require('mn-presets/runtimePrefixes'),
+    require('mn-presets/styles'),
+    require('mn-presets/states'),
+    require('mn-presets/theme'),
+    ...(window.mnPresets || []),
+  ],
 });
 
-const MN_PRESETS = [
-  require('mn-presets/medias'),
-  require('mn-presets/runtimePrefixes'),
-  require('mn-presets/styles'),
-  require('mn-presets/states'),
-  require('mn-presets/theme'),
-];
-
-mn.emitter.on(
-    require('mn-utils/browser/stylesRenderProvider')(document, 'mn.'),
-);
+mn.emitter.on(require('mn-utils/browser/stylesRenderProvider')(document, 'mn.'));
 
 React.createElement = reactCreateElementPatch(React.createElement, {
   className: 'class',
 }, mn);
 
-mn.setPresets([
-  ...(window.mnPresets || []),
-  ...MN_PRESETS,
-]);
 
-render(<Root/>, document.querySelector('#root'));
-
-```
-
-```js
-
-// root.jsx
-const React = require('react');
-
-class Root extends React.Component {
+class App extends React.Component {
   render() {
     return (
       <div className="tbl c0F0 bg0 w h100vh tc f40">
@@ -257,7 +240,7 @@ class Root extends React.Component {
   }
 }
 
-module.exports = Root;
+render(<App/>, document.querySelector('#app'));
 
 ```
 
