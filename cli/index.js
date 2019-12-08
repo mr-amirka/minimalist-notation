@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const fs = require("fs");
 const Path = require("path");
 const program = require("commander");
 const forIn = require("mn-utils/forIn");
@@ -39,20 +40,26 @@ const settings = {
   ...defaultSettings
 };
 
+
+const configPath = Path.resolve(config === true || !config ? DEFAULT_CONFIG_PATH : config);
+let hasFile;
 try {
-  forIn(
-      require(Path.resolve(config === true || !config ? DEFAULT_CONFIG_PATH' : config)),
-      (v, k) => v && (settings[k] = v)
-  );
-} catch (ex) {
+  fs.accessSync(onfigPath, fs.constants.R_OK);
+  hasFile = true;
+} catch (err) {
   console.warn('config file is not found');
+}
+try {
+  forIn(require(configPath), (v, k) => v && (settings[k] = v));
+} catch (err) {
+  console.error(err);
 }
 
 path && isString(path) && (settings.path = path);
 output && isString(output) && (settings.output = output);
 attrs && isString(attrs) && (settings.attrs = attrs);
 
-if (!settins.path) return program.help();
+if (!settings.path) return program.help();
 
 settings.each = (path, count) => {
   // console.log('MN parsed', count, 'in', path);
