@@ -1,7 +1,8 @@
 # Usage with Node.js
 
+### Example
 ```js
-const { compileSource } = require('minimalist-notation/node');
+const {compileSource} = require('minimalist-notation/node');
 
 compileSource({
   watch: true,

@@ -1,7 +1,7 @@
 # minimalist-notation/webpack-loader
 
 
-This is loader of MinimalistNotation for Webpack.
+This is loader of the MinimalistNotation for the Webpack 4.
 
 
 ### Example

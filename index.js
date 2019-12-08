@@ -113,6 +113,10 @@ const // eslint-disable-line
   baseGet = get.base;
 
 module.exports = (options) => {
+
+  function setPresets(presets) {
+    eachTry(presets, [mn]);
+  }
   function styleRender() {
     emit(__values($$stylesMap).sort(__priotitySort));
     forIn($$stylesMap, __updateClearIteratee);
@@ -135,7 +139,6 @@ module.exports = (options) => {
     return mn;
   };
   mn.set = mn;
-  mn.options = options || {};
 
   function mnBaseSet(extendedEssence, essencePath, paramsMatchPath) {
     const type = typeof(extendedEssence);
@@ -678,10 +681,13 @@ module.exports = (options) => {
       : baseSetCSS(css, selector);
     $$css.updated = true;
   }, mn);
-  mn.setPresets = withResult((presets) => {
-    eachTry(presets, [mn]);
-  }, mn);
+
+  mn.setPresets = withResult(setPresets, mn);
   mn.utils = utils;
+
+  options = mn.options = options || {};
+  isArray(options.presets) && setPresets(options.presets);
+
   return mn;
 };
 

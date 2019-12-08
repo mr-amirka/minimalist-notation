@@ -1,19 +1,10 @@
 const minimalistNotationProvider = require('./index');
 const isArray = require('mn-utils/isArray');
-module.exports = ({presets, ...options} = {}) => {
-  const mn = minimalistNotationProvider();
-  const {
-    setPresets,
-    recompileFrom,
-    emitter,
-  } = mn;
-  mn.options = options;
-  isArray(presets) && setPresets(presets);
+const map = require('mn-utils/map');
+module.exports = (options) => {
+  const {recompileFrom, emitter} = minimalistNotationProvider(options);
   return (attrsMap) => {
     recompileFrom(attrsMap);
-    return emitter.getValue().map(__itemMap).join('');
+    return map(emitter.getValue(), 'content').join('');
   };
 };
-function __itemMap(item) {
-  return item.content;
-}

@@ -15,8 +15,8 @@ const dynamicPresetsScope = {};
 const __exports = module.exports = function(source) {
   const settings = merge([
     __exports.defaultLoaderSettings,
-    loaderUtils.getOptions(this)],
-  );
+    loaderUtils.getOptions(this),
+  ]);
   const id = settings.id || '';
   parserProvider(settings.attrs)(
       (scope[id] || (scope[id] = {}))[this.resourcePath] = {},
@@ -28,8 +28,8 @@ const __exports = module.exports = function(source) {
 __exports.defaultPluginSettings = {
   output: './dist/app.css',
   attrs: {
-    className: 'class',
-    m: 'm',
+    'class': 'class',
+    'm': 'm',
   },
   presets: [
     require('mn-presets/medias'),
@@ -41,8 +41,9 @@ __exports.defaultPluginSettings = {
 };
 __exports.defaultLoaderSettings = {
   attrs: {
-    className: 'class',
-    m: 'm',
+    'className': 'class',
+    'class': 'class',
+    'm': 'm',
   },
 };
 
@@ -103,7 +104,7 @@ function MnPlugin(options) {
             const content = compile(attrsMap);
             eachAsync(outputs, (outputFileName, i, done) => {
               mkdir(outputFileName, () => {
-                fs.writeFile(outputFileName, content, done);
+                fs.writeFile(outputFileName, content, 'utf8', done);
               });
             }).then(callback);
           });

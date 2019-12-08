@@ -35,11 +35,10 @@ let config = program.config;
 let attrs = program.attrs;
 
 const settings = {
+  ...defaultSettings,
   watch: watch || false,
   selectorPrefix: prefix || '',
-  ...defaultSettings
 };
-
 
 const configPath = Path.resolve(config === true || !config ? DEFAULT_CONFIG_PATH : config);
 let hasFile;
@@ -65,7 +64,7 @@ settings.each = (path, count) => {
   // console.log('MN parsed', count, 'in', path);
 };
 settings.finish = () => {
-  console.log('MN finished!');
+  console.log('MN finished: ' + (new Date()));
 };
 
 compileSource(settings);

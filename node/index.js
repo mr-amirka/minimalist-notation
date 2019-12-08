@@ -23,7 +23,12 @@ const defaultSettings = exports.defaultSettings = {
   output: './mn.styles.css',
   include: /^.*\.(html?|(js|ts)x?|vue)$/,
   exclude: /\/node_modules\/|\.tmp\./,
-  attrs: ['class', 'm'],
+  attrs: {
+    'className': 'class',
+    'class': 'class',
+    'm': 'm',
+  },
+  watch: false,
   metrics: false,
   presets: [
     require('mn-presets/medias'),
