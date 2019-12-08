@@ -44,7 +44,7 @@ const settings = {
 const configPath = Path.resolve(config === true || !config ? DEFAULT_CONFIG_PATH : config);
 let hasFile;
 try {
-  fs.accessSync(onfigPath, fs.constants.R_OK);
+  fs.accessSync(configPath, fs.constants.R_OK);
   hasFile = true;
 } catch (err) {
   console.warn('config file is not found');
