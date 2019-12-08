@@ -8,7 +8,6 @@ const values = require('mn-utils/values');
 const reduce = require('mn-utils/reduce');
 const isArray = require('mn-utils/isArray');
 const isObject = require('mn-utils/isObject');
-const flags = require('mn-utils/flags');
 const eachApply = require('mn-utils/eachApply');
 const extend = require('mn-utils/extend');
 const merge = require('mn-utils/merge');
@@ -36,8 +35,8 @@ const defaultSettings = exports.defaultSettings = {
 };
 
 exports.compileSource = (__options) => {
-  const settings = merge([ defaultSettings, __options ]);
-  const { path, entry } = settings;
+  const settings = merge([defaultSettings, __options]);
+  const {path, entry} = settings;
   isObject(entry)
     ? parseSource(path, settings, entry)
     : parseSource(path, settings, {

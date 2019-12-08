@@ -9,7 +9,7 @@ const {compileSource, defaultSettings} = require('../node');
 program
     .version(pkg.version, '-v, --version')
     .option("-c, --compile [compile]", "set input path (./)")
-    .option("-w --watch [watch]", "set watch")
+    .option("-w, --watch [watch]", "set watch")
     .option("-conf, --config [config]", "set config path (./mn-config.js)")
     .option("-a, --attrs [attrs]", "set attrs (m|class)")
     .option("-p, --prefix [prefix]", "set selectors prefix ('')")
@@ -24,6 +24,8 @@ program.on("--help", () => {
 
 program.parse(process.argv);
 
+let watch = program.watch;
+let prefix = program.prefix;
 let path = program.compile;
 let output = program.output;
 let config = program.config;
@@ -32,6 +34,8 @@ let attrs = program.attrs;
 if (!path) return program.help();
 
 const settings = {
+  watch: watch || false,
+  selectorPrefix: prefix || '',
   ...defaultSettings
 };
 
