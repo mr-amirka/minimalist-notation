@@ -24,7 +24,7 @@ const defaultSettings = exports.defaultSettings = {
   output: './mn.styles.css',
   include: /^.*\.(html?|(js|ts)x?|vue)$/,
   exclude: /\/node_modules\/|\.tmp\./,
-  attrs: [ 'm' ],
+  attrs: ['class', 'm'],
   metrics: false,
   presets: [
     require('mn-presets/medias'),
