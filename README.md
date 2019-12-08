@@ -195,7 +195,7 @@ require('mn-utils/browser/ready')(() => {
     });
   })
 </script>
-<script src="https://dartline.ru/assets/standalone-mn.1.4.20.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.4.38.js" async></script>
 ```
 
 
