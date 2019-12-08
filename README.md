@@ -41,10 +41,10 @@ Output:
 
 
 * [CLI](#cli)  
-* [Usage with Webpack](#usage-with-webpack)   
-* [Usage with Node.js](#usage-with-nodejs)   
+* [Usage with Webpack](#usage-with-webpack)    
 * [Runtime](#runtime)  
     * [Standalone](#standalone)  
+    * [Integrating "Minimalist Notation" into  React](#integrating-minimalist-notation-into-react)
 
 * [More documentation](https://github.com/mr-amirka/minimalist-notation/blob/master/docs.md)  
 * [Presets](https://github.com/mr-amirka/mn-presets/blob/master/README.md)  
@@ -56,48 +56,52 @@ Try this tests:
 * https://jsfiddle.net/dzgj2sL3/
 * https://jsfiddle.net/j6d8aozy/46/  
 
-Home page: http://minimalist-notation.org  
-
 
 The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
-
 
 
 I would be grateful for your feedback and comments. Write me in a [telegram](https://t.me/mr_amirka).  
 With love, your mr.Amirka :)
 
 
-Are you interested in the development of this project? Do your [bit](https://yasobe.ru/na/notation).  
-
-
 
 ### CLI
 ```sh
-npm install -g mn-cli
+npm install -g minimalist-notation
 ```
 
 ```sh
 mn --compile ./src --output ./dist/styles.css
 ```
 
-[More about CLI](https://github.com/mr-amirka/mn-cli)
+[More about CLI](https://github.com/mr-amirka/minimalist-notation/blob/master/cli/README.md)
 
 
 ### Usage with Webpack
 
 ```sh
-npm install mn-loader --save-dev
+npm install minimalist-notation --save-dev
 ```
 
 
 ```js
-const { MnPlugin } = require('minimalist-notation/webpack-loader');
+const {MnPlugin} = require('minimalist-notation/webpack-loader');
 
 module.exports = {
   /* ... */
   module: {
     rules: [
-      { // for hot-reload MN presets (but cached including)
+      {
+        /*
+         * To hot reload the presets.
+         * Connects only to the loader.
+         * These does not get into the bundle file.
+         *
+         * Attention!
+         * May be there is a bug when deleting a files,
+         * because the files are cached,
+         * and the file deletion event is not catching.
+         */
         test: /\.mn\.js$/,
         use: [
           {
@@ -118,7 +122,10 @@ module.exports = {
             loader: 'minimalist-notation/webpack-loader',
             options: {
               id: 'app',
-              attrs: [ 'm' ]
+              attrs: { // for jsx parsing
+                className: 'class',
+                // m: 'm',
+              },
             }
           }
         ]
@@ -127,9 +134,19 @@ module.exports = {
   plugins: [
     new MnPlugin({
       id: 'app',
-      attrs: [ 'm' ],
-      output: './dist/app.css',
-      template: './src/index.html',
+
+      attrs: { // for templates (html) parsing
+        className: 'class',
+        // m: 'm',
+      },
+      output: [
+        './dist/app.css',
+        './public/app.css',
+      ],
+      template: [
+        './src/index.html',
+        // './src/other.html',
+      ],
       presets: [
         require('mn-presets/medias'),
         require('mn-presets/prefixes'),
@@ -144,9 +161,6 @@ module.exports = {
   /* ... */
 };
 ```
-
-
-## Other
 
 
 ## Runtime
@@ -164,7 +178,7 @@ require('mn-utils/browser/ready')(() => {
   mn.getCompiler('m').recursiveCheck(document)
   mn.compile();
 
-  console.log('minimalistNotation', mn.data);
+  console.log('Minimalist Notation:', mn.data);
 });
 ```
 
@@ -173,5 +187,79 @@ require('mn-utils/browser/ready')(() => {
 
 
 ```html
-<script src="https://dartline.ru/assets/last-standalone-mn.js" async></script>
+<script>
+  (window.mnPresets || (window.mnPresets = [])).push(function(mn) {
+    mn({
+      fCustom: 'f50',
+      fCustomBig: 'f100'
+    });
+  })
+</script>
+<script src="https://dartline.ru/assets/standalone-mn.1.4.20.js" async></script>
 ```
+
+
+### Integrating "Minimalist Notation" into  React
+
+Example:
+
+```js
+// index.jsx
+const React = require('react');
+const {render} = require('react-dom');
+const Root = require('./components/root');
+
+const reactCreateElementPatch = require('minimalist-notation/browser/reactCreateElementPatch');
+const mn = require('minimalist-notation')({
+  // selectorPrefix: '.mn-scope ',
+});
+
+const MN_PRESETS = [
+  require('mn-presets/medias'),
+  require('mn-presets/runtimePrefixes'),
+  require('mn-presets/styles'),
+  require('mn-presets/states'),
+  require('mn-presets/theme'),
+];
+
+mn.emitter.on(
+    require('mn-utils/browser/stylesRenderProvider')(document, 'mn.'),
+);
+
+React.createElement = reactCreateElementPatch(React.createElement, {
+  className: 'class',
+}, mn);
+
+mn.setPresets([
+  ...(window.mnPresets || []),
+  ...MN_PRESETS,
+]);
+
+render(<Root/>, document.querySelector('#root'));
+
+```
+
+```js
+
+// root.jsx
+const React = require('react');
+
+class Root extends React.Component {
+  render() {
+    return (
+      <div className="tbl c0F0 bg0 w h100vh tc f40">
+        <div>
+          <div>Hello React!</div>
+          <div className="sq10 bgF"></div>
+        </div>
+      </div>
+    );
+  }
+}
+
+module.exports = Root;
+
+```
+
+
+Are you interested in the development of this project? Do your [bit](https://yasobe.ru/na/notation).  

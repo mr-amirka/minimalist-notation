@@ -1,6 +1,6 @@
 {
   "name": "minimalist-notation",
-  "version": "1.4.19",
+  "version": "1.4.20",
   "description": "Minimalist Notation",
   "main": "./index.js",
   "bin": {
@@ -10,14 +10,39 @@
     "MN",
     "CSS",
     "preprocessor",
+    "CSS preprocessor",
+    "MN preprocessor",
+    "cli",
+    "MN cli",
+    "loader",
+    "webpack",
+    "MN webpack loader",
+    "runtime",
+    "MN runtime",
+    "build",
+    "MN build",
     "parser",
+    "MN parser",
     "minimalist",
     "notation",
     "minimalist notation",
     "atomic",
     "functional",
     "Atomic CSS",
-    "Functional CSS"
+    "Functional CSS",
+    "inline styles 2.0",
+    "autoprefixes",
+    "minify",
+    "minifier",
+    "optimise",
+    "optimiser",
+    "optimisation",
+    "CSS zero",
+    "style",
+    "sheet",
+    "stylesheet",
+    "components",
+    "framework"
   ],
   "author": {
     "name": "Amir Absolutely",
@@ -26,7 +51,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mr-amirka/amirka.git"
+    "url": "https://github.com/mr-amirka/minimalist-notation.git"
   },
   "license": "MIT",
   "scripts": {
@@ -34,7 +59,7 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "mn-utils": "0.0.28",
+    "mn-utils": "0.0.29",
     "mn-presets": "0.0.18",
     "loader-utils": "*",
     "commander": "^2.18.0"

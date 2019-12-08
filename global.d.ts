@@ -4,7 +4,7 @@
  */
 
 import {IFlagsMap} from 'mn-utils/global';
-import {Emitter} from 'mn-utils/emitterProvider/emitter';
+import {Emitter} from 'mn-utils/Emitter/emitter';
 import {
   cssPropertiesStringify,
   CssProps

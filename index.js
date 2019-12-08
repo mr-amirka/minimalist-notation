@@ -1,5 +1,5 @@
 const selectorsCompileProvider = require('./selectorsCompileProvider');
-const emitterProvider = require('mn-utils/emitterProvider');
+const Emitter = require('mn-utils/Emitter');
 const extend = require('mn-utils/extend');
 const isPlainObject = require('mn-utils/isPlainObject');
 const isObject = require('mn-utils/isObject');
@@ -34,7 +34,7 @@ const noop = require('mn-utils/noop');
 
 const utils = merge([
   {
-    emitterProvider: emitterProvider,
+    Emitter: Emitter,
     color: require('mn-utils/color'),
     colorGetBackground: require('mn-utils/colorGetBackground'),
     trim: require('mn-utils/trim'),
@@ -112,10 +112,14 @@ const // eslint-disable-line
   baseSet = set.base,
   baseGet = get.base;
 
-module.exports = () => {
+module.exports = (options) => {
   function styleRender() {
     emit(__values($$stylesMap).sort(__priotitySort));
     forIn($$stylesMap, __updateClearIteratee);
+  }
+  function updateOptions() {
+    const options = mn.options || {};
+    $$selectorPrefix = options.selectorPrefix || '';
   }
   function mn(essencePath, extendedEssence, paramsMatchPath) {
     const type = typeof essencePath;
@@ -131,6 +135,7 @@ module.exports = () => {
     return mn;
   };
   mn.set = mn;
+  mn.options = options || {};
 
   function mnBaseSet(extendedEssence, essencePath, paramsMatchPath) {
     const type = typeof(extendedEssence);
@@ -192,9 +197,9 @@ module.exports = () => {
     });
   }, mn);
 
-  mn.recompileFrom = withResult((attrsMap, options) => {
-    options || (options = {});
+  mn.recompileFrom = withResult((attrsMap) => {
     __clear();
+    updateOptions();
     keyframesRender();
     setStyle(
         'css',
@@ -202,7 +207,6 @@ module.exports = () => {
         MN_DEFAULT_CSS_PRIORITY,
     );
     forIn(attrsMap, updateAttrByMap);
-    $$selectorPrefix = options.selectorPrefix || '';
     forIn($$root, __mode);
     styleRender();
   }, mn);
@@ -278,7 +282,7 @@ module.exports = () => {
   const $$compilers = $$data.compilers = {};
   const cssPropertiesStringify = mn.propertiesStringify
     = cssPropertiesStringifyProvider();
-  const emit = (mn.emitter = emitterProvider([])).emit;
+  const emit = (mn.emitter = new Emitter([])).emit;
   let $$updated;
   let $$essences;
   let $$root;
@@ -389,11 +393,11 @@ module.exports = () => {
     }
     if (isContinue) return;
 
-    output = map(__values(context).sort(__priotitySort), 'content');
-    if (mediaQuery) {
-      output = ['@media ', mediaQuery, '{', joinOnly(output), '}'];
+    output = joinOnly(map(__values(context).sort(__priotitySort), 'content'));
+    if (mediaQuery && output) {
+      output = joinOnly(['@media ', mediaQuery, '{', output, '}']);
     }
-    setStyle('media.' + mediaName, joinOnly(output), mediaPriority);
+    setStyle('media.' + mediaName, output, mediaPriority);
   }
 
   function __assignCore(comboNames, selectors, defaultMediaName, excludes) {
@@ -525,6 +529,7 @@ module.exports = () => {
   ) {
     const excludes = extend({}, _excludes);
     if (excludes[essenceName]) return;
+    mediaName || (mediaName = 'all');
     excludes[essenceName] = true;
     essence || (essence = $$essences[essenceName]
       || ($$essences[essenceName] = {}));
@@ -616,6 +621,7 @@ module.exports = () => {
     setStyle('css', joinOnly(reduce($$css.map, __cssReducer, [])), MN_DEFAULT_CSS_PRIORITY);
   }, mn);
   const __render = mn.compile = withResult(() => {
+    updateOptions();
     $$keyframes.updated && keyframesRender();
     $$css.updated && cssRender();
     if ($$force) {
@@ -624,7 +630,6 @@ module.exports = () => {
     } else {
       forIn($$compilers, __compilerCompile);
     }
-    $$selectorPrefix = '';
     forIn($$root, __mode);
     $$updated && styleRender();
     $$updated = $$force = false;

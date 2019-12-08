@@ -23,7 +23,8 @@ const regexpScope = /^(.*?)\[(.*)\]$/;
 const regexpAttrEscape = /\[([^\]]*)\]/g;
 const regexpDepth = /^(\d+)(.*)$/;
 const regexpFix = /^(.*)([~+])$/;
-const regexpClassSubstr = /\.\*([A-Za-z0-9-_$]+)/;
+const regexpClassSubstr = /\.\*([A-Za-z0-9-_$]+)/g;
+const regexpIdSubstr = /\#\*([A-Za-z0-9-_$]+)/g;
 const regexpMultiplier = /^(.*)\*([0-9]+)$/;
 
 function replacerEscape(_, v) {
@@ -83,7 +84,9 @@ module.exports = (instance) => {
         (items, essences, suffix) => {
           const mediaNames = [];
           const parts = splitChild(__joinEmpty(splitReverse(
-              suffix.replace(regexpClassSubstr, '[class*=$1]'),
+              suffix
+                  .replace(regexpClassSubstr, '[class*=$1]')
+                  .replace(regexpIdSubstr, '[id*=$1]'),
           ).reverse()));
           push(items, {
             essences,
