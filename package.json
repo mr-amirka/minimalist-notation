@@ -1,6 +1,6 @@
 {
   "name": "minimalist-notation",
-  "version": "1.4.38",
+  "version": "1.4.39",
   "description": "Minimalist Notation",
   "main": "./index.js",
   "bin": {
@@ -42,7 +42,12 @@
     "sheet",
     "stylesheet",
     "components",
-    "framework"
+    "framework",
+    "responsive",
+    "adaptive",
+    "media query",
+    "priority",
+    "selectors"
   ],
   "author": {
     "name": "Amir Absolutely",
@@ -59,7 +64,7 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "mn-utils": "0.0.29",
+    "mn-utils": "0.0.30",
     "mn-back-utils": "0.0.4",
     "mn-presets": "0.0.18",
     "loader-utils": "1.2.3",

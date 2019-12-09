@@ -4,6 +4,11 @@
 This is loader of the MinimalistNotation for the Webpack 4.
 
 
+```sh
+npm install minimalist-notation --save-dev
+```
+
+
 ### Example
 
 ```js

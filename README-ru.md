@@ -32,10 +32,12 @@ Output:
 ```
 
 * [CLI](#cli)  
-* [Usage with Webpack](#usage-with-webpack)   
-* [Usage with Node.js](#usage-with-nodejs)   
+* [Usage with Webpack](#usage-with-webpack)    
+* [Usage with Gulp3](#usage-with-gulp3)    
 * [Runtime](#runtime)  
     * [Standalone](#standalone)  
+    * [Integrating "Minimalist Notation" into  React](#integrating-minimalist-notation-into-react)
+
 
 
 * [Подробная документация](https://github.com/mr-amirka/minimalist-notation/blob/master/docs-ru.md)  
@@ -49,49 +51,48 @@ Try this tests:
 * https://jsfiddle.net/j6d8aozy/46/  
 
 
-Home page: http://minimalist-notation.org  
-
-
 The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
 
-
-
-Буду благодарен за Ваши отзывы и замечания. Пишите мне в [telegram](https://t.me/mr_amirka).    
-С любовью, Ваш mr.Amirka :)  
-
-
-Вы заинтересованы в развитии проекта? Внесите свою [лепту](https://yasobe.ru/na/notation).  
 
 
 
 ### CLI
 ```sh
-npm install -g mn-cli
+npm install -g minimalist-notation
 ```
 
 ```sh
 mn --compile ./src --output ./dist/styles.css
 ```
 
-[More about CLI](https://github.com/mr-amirka/mn-cli)
-
+[More about CLI](https://github.com/mr-amirka/minimalist-notation/blob/master/cli/README.md)
 
 
 ### Usage with Webpack
 
 ```sh
-npm install mn-loader --save-dev
+npm install minimalist-notation --save-dev
 ```
 
-
+Example:
 ```js
-const { MnPlugin } = require('minimalist-notation/webpack-loader');
+const {MnPlugin} = require('minimalist-notation/webpack-loader');
 
 module.exports = {
   /* ... */
   module: {
     rules: [
-      { // for hot-reload MN presets (but cached including)
+      {
+        /*
+         * To hot reload the presets.
+         * Connects only to the loader.
+         * These does not get into the bundle file.
+         *
+         * Attention!
+         * May be there is a bug when deleting a files,
+         * because the files are cached,
+         * and the file deletion event is not catching.
+         */
         test: /\.mn\.js$/,
         use: [
           {
@@ -112,7 +113,10 @@ module.exports = {
             loader: 'minimalist-notation/webpack-loader',
             options: {
               id: 'app',
-              attrs: [ 'm' ]
+              attrs: { // for jsx parsing
+                className: 'class',
+                // m: 'm',
+              },
             }
           }
         ]
@@ -121,9 +125,19 @@ module.exports = {
   plugins: [
     new MnPlugin({
       id: 'app',
-      attrs: [ 'm' ],
-      output: './dist/app.css',
-      template: './src/index.html',
+
+      attrs: { // for templates (html) parsing
+        className: 'class',
+        // m: 'm',
+      },
+      output: [
+        './dist/app.css',
+        './public/app.css',
+      ],
+      template: [
+        './src/index.html',
+        // './src/other.html',
+      ],
       presets: [
         require('mn-presets/medias'),
         require('mn-presets/prefixes'),
@@ -140,10 +154,41 @@ module.exports = {
 ```
 
 
-## Other
+### Usage with Gulp3
+
+```sh
+npm install minimalist-notation --save-dev
+```
+
+Example:
+```js
+const gulp = require('gulp');
+const gulpMN = require('minimalist-notation/gulp3');
+
+gulp.task('build', function() {
+  return gulp.src('./src/**/*.(html?|jsx?)')
+    .pipe(gulpMN('./dest/app.css', {
+      // selectorPrefix: '',
+      // attrs: {'class': 'class'},
+      presets: [
+        require('mn-presets/medias'),
+        require('mn-presets/prefixes'),
+        require('mn-presets/styles'),
+        require('mn-presets/states'),
+        require('mn-presets/theme'),
+        // require('./mn-my-preset'), // custom preset
+      ],
+    }))
+    .pipe(gulp.dest('./dest/'))
+});
+```
+
+[More about Gulp3](https://github.com/mr-amirka/minimalist-notation/blob/master/gulp3/README.md)
+
 
 ## Runtime
 
+Example:
 ```js
 const mn = require("minimalist-notation/browser")
   .setPresets([
@@ -157,14 +202,75 @@ require('mn-utils/browser/ready')(() => {
   mn.getCompiler('m').recursiveCheck(document)
   mn.compile();
 
-  console.log('minimalistNotation', mn.data);
+  console.log('Minimalist Notation:', mn.data);
 });
 ```
 
 
 ### Standalone
 
-
+Example:
 ```html
-<script src="https://dartline.ru/assets/last-standalone-mn.js" async></script>
+<script>
+  (window.mnPresets || (window.mnPresets = [])).push(function(mn) {
+    mn({
+      fCustom: 'f50',
+      fCustomBig: 'f100'
+    });
+  })
+</script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.4.38.js" async></script>
 ```
+
+
+### Integrating "Minimalist Notation" into  React
+
+Example:
+
+```js
+const React = require('react');
+const {render} = require('react-dom');
+
+const reactCreateElementPatch = require('minimalist-notation/browser/reactCreateElementPatch');
+const mn = require('minimalist-notation')({
+  // selectorPrefix: '.mn-scope ',
+  presets: [
+    require('mn-presets/medias'),
+    require('mn-presets/runtimePrefixes'),
+    require('mn-presets/styles'),
+    require('mn-presets/states'),
+    require('mn-presets/theme'),
+    ...(window.mnPresets || []),
+  ],
+});
+
+mn.emitter.on(require('mn-utils/browser/stylesRenderProvider')(document, 'mn.'));
+
+React.createElement = reactCreateElementPatch(React.createElement, {
+  className: 'class',
+}, mn);
+
+
+class App extends React.Component {
+  render() {
+    return (
+      <div className="tbl c0F0 bg0 w h100vh tc f40">
+        <div>
+          <div>Hello React!</div>
+          <div className="sq10 bgF"></div>
+        </div>
+      </div>
+    );
+  }
+}
+
+render(<App/>, document.querySelector('#app'));
+
+```
+
+
+Буду благодарен за Ваши отзывы и замечания. Пишите мне в [telegram](https://t.me/mr_amirka).    
+С любовью, Ваш mr.Amirka :)  
+
+
+Вы заинтересованы в развитии проекта? Внесите свою [лепту](https://yasobe.ru/na/notation).  

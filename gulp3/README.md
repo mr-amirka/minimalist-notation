@@ -3,6 +3,11 @@
 This is plugin of the Minimalist Notation for the Gulp 3.
 
 
+```sh
+npm install minimalist-notation --save-dev
+```
+
+
 ### Example
 
 ```js
@@ -12,7 +17,8 @@ const gulpMN = require('minimalist-notation/gulp3');
 gulp.task('build', function() {
   return gulp.src('./src/**/*.(html?|jsx?)')
     .pipe(gulpMN('./dest/app.css', {
-      selectorPrefix: '',
+      // selectorPrefix: '',
+      // attrs: {'class': 'class'},
       presets: [
         require('mn-presets/medias'),
         require('mn-presets/prefixes'),
@@ -25,3 +31,24 @@ gulp.task('build', function() {
     .pipe(gulp.dest('./dest/'))
 });
 ```
+
+
+## Interface
+```ts
+interface gulpMNOptions {
+  selectorPrefix?: string,
+  output?: string | null,
+  attrs?: string | string[] | {[fromName:string]: string},
+  presets?: MnPreset[]
+}
+```
+
+
+## Default options
+
+| option          | value                                            |
+| --------------- | ------------------------------------------------ |
+| selectorPrefix  | ''                                               |
+| output          | './mn.styles.css'                                |
+| attrs           | {'class': 'class', 'className': 'class', m: 'm'} |
+| presets         | [  require('mn-presets/medias'), require('mn-presets/prefixes'), require('mn-presets/styles'), require('mn-presets/states'), require('mn-presets/theme') ] |

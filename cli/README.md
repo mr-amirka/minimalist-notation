@@ -74,15 +74,15 @@ module.exports = {
 ```ts
 interface compileSourceOptions {
   path: string,
-  selectorPrefix: string,
+  selectorPrefix?: string,
   entry?: string | {
     [outputName: string]: string | compileSourceOptions
   },
-  output?: string | undefined | null,
+  output?: string | null,
   include?: RegExp | RegExp[],
   exclude?: RegExp | RegExp[],
-  attrs: string | string[],
-  presets: MnPreset[]
+  attrs?: string | string[] | {[fromName:string]: string},
+  presets?: MnPreset[]
 }
 ```
 

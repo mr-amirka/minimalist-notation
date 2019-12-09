@@ -12,7 +12,7 @@ const splitProvider = require('mn-utils/splitProvider');
 const splitSpace = splitProvider(/\s+/);
 const splitAttrs = splitProvider(/[\s|,;]+/);
 
-const parser = module.exports = (attrs) => {
+function parser(attrs) {
   if (isEmpty(attrs = getAttrs(attrs))) return null;
 
   /*
@@ -70,12 +70,15 @@ const parser = module.exports = (attrs) => {
     });
     return count;
   };
-};
-const getAttrs = parser.getAttrs = (attrs) => {
+}
+function getAttrs(attrs) {
   isString(attrs) && (attrs = splitAttrs(attrs));
   if (!isObject(attrs)) return null;
   return isArray(attrs) ? reduce(filter(attrs), (output, name) => {
     output[name] = name;
     return output;
   }, {}) : attrs;
-};
+}
+
+module.exports = parser;
+parser.getAttrs = getAttrs;

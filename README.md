@@ -42,6 +42,7 @@ Output:
 
 * [CLI](#cli)  
 * [Usage with Webpack](#usage-with-webpack)    
+* [Usage with Gulp3](#usage-with-gulp3)   
 * [Runtime](#runtime)  
     * [Standalone](#standalone)  
     * [Integrating "Minimalist Notation" into  React](#integrating-minimalist-notation-into-react)
@@ -58,10 +59,6 @@ Try this tests:
 
 
 The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
-
-
-I would be grateful for your feedback and comments. Write me in a [telegram](https://t.me/mr_amirka).  
-With love, your mr.Amirka :)
 
 
 
@@ -83,7 +80,7 @@ mn --compile ./src --output ./dist/styles.css
 npm install minimalist-notation --save-dev
 ```
 
-
+Example:
 ```js
 const {MnPlugin} = require('minimalist-notation/webpack-loader');
 
@@ -163,8 +160,41 @@ module.exports = {
 ```
 
 
+### Usage with Gulp3
+
+```sh
+npm install minimalist-notation --save-dev
+```
+
+Example:
+```js
+const gulp = require('gulp');
+const gulpMN = require('minimalist-notation/gulp3');
+
+gulp.task('build', function() {
+  return gulp.src('./src/**/*.(html?|jsx?)')
+    .pipe(gulpMN('./dest/app.css', {
+      // selectorPrefix: '',
+      // attrs: {'class': 'class'},
+      presets: [
+        require('mn-presets/medias'),
+        require('mn-presets/prefixes'),
+        require('mn-presets/styles'),
+        require('mn-presets/states'),
+        require('mn-presets/theme'),
+        // require('./mn-my-preset'), // custom preset
+      ],
+    }))
+    .pipe(gulp.dest('./dest/'))
+});
+```
+
+[More about Gulp3](https://github.com/mr-amirka/minimalist-notation/blob/master/gulp3/README.md)
+
+
 ## Runtime
 
+Example:
 ```js
 const mn = require("minimalist-notation/browser")
   .setPresets([
@@ -185,7 +215,7 @@ require('mn-utils/browser/ready')(() => {
 
 ### Standalone
 
-
+Example:
 ```html
 <script>
   (window.mnPresets || (window.mnPresets = [])).push(function(mn) {
@@ -243,6 +273,10 @@ class App extends React.Component {
 render(<App/>, document.querySelector('#app'));
 
 ```
+
+
+I would be grateful for your feedback and comments. Write me in a [telegram](https://t.me/mr_amirka).  
+With love, your mr.Amirka :)
 
 
 Are you interested in the development of this project? Do your [bit](https://yasobe.ru/na/notation).  
