@@ -1,6 +1,6 @@
 {
   "name": "minimalist-notation",
-  "version": "1.4.39",
+  "version": "1.4.40",
   "description": "Minimalist Notation",
   "main": "./index.js",
   "bin": {

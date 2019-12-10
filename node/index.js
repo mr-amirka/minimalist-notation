@@ -1,5 +1,5 @@
-const fs = require("fs");
-const Path = require("path");
+const fs = require('fs');
+const Path = require('path');
 const {scanPath, scanPathWatch} = require('mn-back-utils/scanPath');
 const finallyAll = require('mn-utils/finallyAll');
 const forIn = require('mn-utils/forIn');
@@ -13,8 +13,8 @@ const extend = require('mn-utils/extend');
 const merge = require('mn-utils/merge');
 const noop = require('mn-utils/noop');
 const isEmpty = require('mn-utils/isEmpty');
-const parserProvider = require("../mnParserProvider");
-const compileProvider = require("../mnCompileProvider");
+const parserProvider = require('../mnParserProvider');
+const compileProvider = require('../mnCompileProvider');
 
 const getAttrs = parserProvider.getAttrs;
 
@@ -32,11 +32,11 @@ const defaultSettings = exports.defaultSettings = {
   metrics: false,
   presets: [
     require('mn-presets/medias'),
-  	require('mn-presets/prefixes'),
-  	require('mn-presets/styles'),
-  	require('mn-presets/states'),
-  	require('mn-presets/theme')
-  ]
+    require('mn-presets/prefixes'),
+    require('mn-presets/styles'),
+    require('mn-presets/states'),
+    require('mn-presets/theme'),
+  ],
 };
 
 exports.compileSource = (__options) => {
@@ -45,8 +45,8 @@ exports.compileSource = (__options) => {
   isObject(entry)
     ? parseSource(path, settings, entry)
     : parseSource(path, settings, {
-        [settings.entry || settings.path]: settings
-      });
+      [settings.entry || settings.path]: settings,
+    });
 };
 
 function __sort(a, b) {
@@ -72,9 +72,9 @@ function __parseSource({path, attrs, each, callback, watch, exclude}) {
             setter(dst, __parse(dst, text || ''));
             dec();
           });
-        })
-      }
-    })
+        });
+      },
+    });
   }, callback);
 }
 
@@ -100,14 +100,15 @@ function parseSource(path, commonOptions, entries) {
     hasMetrics === false || hasMetrics === true || (hasMetrics = commonMetrics);
     const data = {};
     const _include = getInclude(entryOptions.include || include);
-    const _exclude = excludesMap[name] = getInclude(entryOptions.exclude || exclude);
+    const _exclude = excludesMap[name]
+    = getInclude(entryOptions.exclude || exclude);
     handlersMap[name] = {
       isExclude: wrapExclude(_exclude, _include),
       set: setDataProvider(data, attrsMap),
       build: buildProvider(data, entryOptions.output || name, compileProvider({
         presets: entryOptions.presets || presets,
-        selectorPrefix: entryOptions.selectorPrefix || selectorPrefix
-      }), hasMetrics)
+        selectorPrefix: entryOptions.selectorPrefix || selectorPrefix,
+      }), hasMetrics),
     };
   });
 
@@ -117,13 +118,14 @@ function parseSource(path, commonOptions, entries) {
     path: path,
     attrs: Object.keys(allAttrsMap),
     exclude: (path) => {
-      for (let name in excludesMap) {
+      let name;
+      for (name in excludesMap) {
         if (!excludesMap[name](path)) return false;
       }
       return true;
     },
     each: (path, parse) => {
-      let cache, started, finished, watchers = [];
+      let cache, started, finished, watchers = []; // eslint-disable-line
       forIn(handlersMap, ({isExclude, set, build}, name) => {
         if (isExclude(path)) return;
         function __build() {
@@ -151,7 +153,7 @@ function parseSource(path, commonOptions, entries) {
         build();
       });
       finish();
-    }
+    },
   });
 }
 
@@ -176,7 +178,7 @@ function buildProvider(data, name, compile, hasMetrics) {
   regexpCSS.test(name) || (name += '.css');
 
   const dirname = Path.dirname(name);
-  dirname && fs.mkdirSync(dirname, { recursive: true });
+  dirname && fs.mkdirSync(dirname, {recursive: true});
 
   const metricsFilesPath = name + '.mn-metrics-files.json';
   const metricsPath = name + '.mn-metrics.json';
@@ -200,12 +202,20 @@ function buildProvider(data, name, compile, hasMetrics) {
     fs.writeFile(name, compile(mergedData), onFinally);
 
     if (hasMetrics) {
-      fs.writeFile(metricsFilesPath, JSON.stringify(reduce(data, (dst, attrsMap, path) => {
-        isEmpty(attrsMap) || (dst[path] = map(attrsMap, __iterateeAttrsMap));
-        return dst;
-      }, {}), null, '  '), __onError);
-
-      fs.writeFile(metricsPath, JSON.stringify(map(mergedData, __iterateeAttrsMap), null, '  '), __onError);
+      fs.writeFile(metricsFilesPath, JSON.stringify(
+          reduce(data, (dst, attrsMap, path) => {
+            isEmpty(attrsMap)
+              || (dst[path] = map(attrsMap, __iterateeAttrsMap));
+            return dst;
+          }, {}),
+          null,
+          '  ',
+      ), __onError);
+      fs.writeFile(
+          metricsPath,
+          JSON.stringify(map(mergedData, __iterateeAttrsMap), null, '  '),
+          __onError,
+      );
     }
   };
 }

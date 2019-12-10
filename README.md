@@ -131,9 +131,8 @@ module.exports = {
   plugins: [
     new MnPlugin({
       id: 'app',
-
       attrs: { // for templates (html) parsing
-        className: 'class',
+        'class': 'class',
         // m: 'm',
       },
       output: [
@@ -150,7 +149,7 @@ module.exports = {
         require('mn-presets/styles'),
         require('mn-presets/states'),
         require('mn-presets/theme'),
-        require('./theme'),
+        // require('./custom-preset'),
       ]
     }),
     /* ... */
@@ -172,7 +171,7 @@ const gulp = require('gulp');
 const gulpMN = require('minimalist-notation/gulp3');
 
 gulp.task('build', function() {
-  return gulp.src('./src/**/*.(html?|jsx?)')
+  return gulp.src('./src/**/*.html')
     .pipe(gulpMN('./dest/app.css', {
       // selectorPrefix: '',
       // attrs: {'class': 'class'},

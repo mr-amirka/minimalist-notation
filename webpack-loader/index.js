@@ -1,5 +1,4 @@
 const fs = require('fs');
-const Path = require('path');
 const loaderUtils = require('loader-utils');
 const merge = require('mn-utils/merge');
 const forIn = require('mn-utils/forIn');
@@ -9,6 +8,9 @@ const isFunction = require('mn-utils/isFunction');
 const values = require('mn-utils/values');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
+const eachAsync = require('../build-utils/eachAsync');
+const checkDir = require('../build-utils/checkDir');
+
 const scope = {};
 const dynamicPresetsScope = {};
 
@@ -54,7 +56,9 @@ __exports.presetsReload = function(source) {
 
 __exports.MnPlugin = MnPlugin;
 
-const normalize = (v) => v ? (isArray(v) ? (v.length ? v : null) : [v]) : null;
+function normalize(v) {
+  return v ? (isArray(v) ? (v.length ? v : null) : [v]) : null;
+}
 
 function MnPlugin(options) {
   const settings = merge([__exports.defaultPluginSettings, options]);
@@ -102,31 +106,15 @@ function MnPlugin(options) {
       })
           .then(() => {
             const content = compile(attrsMap);
-            eachAsync(outputs, (outputFileName, i, done) => {
-              mkdir(outputFileName, () => {
-                fs.writeFile(outputFileName, content, 'utf8', done);
+            return eachAsync(outputs, (outputFileName, i, done) => {
+              checkDir(outputFileName, (err) => {
+                err
+                  ? done(err)
+                  : fs.writeFile(outputFileName, content, 'utf8', done);
               });
-            }).then(callback);
-          });
+            });
+          })
+          .then(callback);
     });
   };
 };
-function eachAsync(items, iteratee) {
-  return new Promise((resolve) => {
-    const length = items && items.length || 0;
-    let i = 0;
-    length < 1 ? resolve() : forEach(items, (item, index) => {
-      let called;
-      iteratee(item, index, (err) => {
-        err && console.error(err);
-        if (called) return;
-        called = true;
-        ++i < length || resolve();
-      });
-    });
-  });
-}
-function mkdir(outputFileName, callback) {
-  const dirname = Path.dirname(outputFileName);
-  dirname ? fs.mkdir(dirname, {recursive: true}, callback) : callback();
-}

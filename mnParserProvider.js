@@ -11,6 +11,7 @@ const splitProvider = require('mn-utils/splitProvider');
 
 const splitSpace = splitProvider(/\s+/);
 const splitAttrs = splitProvider(/[\s|,;]+/);
+const splitKeyValue = splitProvider(':');
 
 function parser(attrs) {
   if (isEmpty(attrs = getAttrs(attrs))) return null;
@@ -75,7 +76,9 @@ function getAttrs(attrs) {
   isString(attrs) && (attrs = splitAttrs(attrs));
   if (!isObject(attrs)) return null;
   return isArray(attrs) ? reduce(filter(attrs), (output, name) => {
-    output[name] = name;
+    const parts = splitKeyValue(name);
+    name = parts[0];
+    output[name] = parts[1] || name;
     return output;
   }, {}) : attrs;
 }

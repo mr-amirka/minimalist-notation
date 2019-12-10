@@ -5,13 +5,20 @@ const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
 const isObject = require('mn-utils/isObject');
 const isString = require('mn-utils/isString');
+const isArray = require('mn-utils/isArray');
+const eachAsync = require('../build-utils/eachAsync');
+const checkDir = require('../build-utils/checkDir');
 
-function gulpMN(outputFileName, options) {
-  if (isObject(outputFileName)) {
-    options = outputFileName;
-  } else {
+function normalize(v) {
+  return v ? (isArray(v) ? (v.length ? v : null) : [v]) : null;
+}
+
+function gulpMN(outputs, options) {
+  if (isString(outputs) || isArray(outputs)) {
     options || (options = {});
-    if (isString(outputFileName)) options.output = outputFileName;
+    options.output = outputs;
+  } else {
+    if (!options && isObject(outputs)) options = outputs;
   }
   const settings = {
     ...defaultSettings,
@@ -19,7 +26,7 @@ function gulpMN(outputFileName, options) {
   };
   const parse = parserProvider(settings.attrs);
   const compile = compileProvider(settings);
-  outputFileName = settings.output;
+  outputs = normalize(settings.output);
 
   let data = {};
   return through.obj(function(file, enc, cb) {
@@ -34,19 +41,15 @@ function gulpMN(outputFileName, options) {
     parse(data, file.contents.toString());
     cb(null, file);
   }, function(cb) {
-    const output = compile(data);
+    const content = compile(data);
     data = {};
-    fs.mkdir(Path.dirname(outputFileName), {recursive: true}, (err) => {
-      if (err) {
-        console.error(err);
-        return cb();
-      }
-      fs.writeFile(outputFileName, output, 'utf8', (err) => {
-        err && console.error(err);
-        cb();
+    eachAsync(outputs, (outputFileName, i, done) => {
+      checkDir(outputFileName, (err) => {
+        err
+          ? done(err)
+          : fs.writeFile(outputFileName, content, 'utf8', done);
       });
-    });
-
+    }).then(cb);
   });
 }
 const defaultSettings = gulpMN.defaultSettings = {
@@ -59,10 +62,10 @@ const defaultSettings = gulpMN.defaultSettings = {
   },
   presets: [
     require('mn-presets/medias'),
-  	require('mn-presets/prefixes'),
-  	require('mn-presets/styles'),
-  	require('mn-presets/states'),
-  	require('mn-presets/theme'),
+    require('mn-presets/prefixes'),
+    require('mn-presets/styles'),
+    require('mn-presets/states'),
+    require('mn-presets/theme'),
   ],
 };
 
