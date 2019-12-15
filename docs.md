@@ -1252,7 +1252,15 @@ mn('container', {
     paddingRight: '15px'
   },
   media: {
-    'm2-': { // вместо синонима можно указать сам медиа-запрос '(min-width: 768px)'
+    /*
+    '(min-width: 768px)': {
+      style: {
+        width: '750px'
+      }
+    },
+    */
+    // with synonyms:
+    'm2-': {
       style: {
         width: '750px'
       }

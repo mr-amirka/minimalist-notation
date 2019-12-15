@@ -11,8 +11,8 @@ compileSource({
     './dist/styles': './src',
     './dist/other': './other',
     './dist/market.app': {
-       include: [ /^.*?market\.app\/.*\.(html?|jsx?)$/ ]
-     }
+       include: [ /^.*?market\.app\/.*\.(html?|jsx?)$/ ],
+     },
   },
   exclude: [ /^.*\/node_modules\/.*$/ ],
   presets: [
@@ -20,8 +20,10 @@ compileSource({
     require('mn-presets/prefixes'),
     require('mn-presets/styles'),
     require('mn-presets/states'),
-    require('mn-presets/theme')
-  ]
+    // require('mn-presets/main'),
+    // require('mn-presets/normalize'), // normalize.css v8.0.1
+    // require('./mn-my-preset'), // custom preset
+  ],
 });
 
 ```

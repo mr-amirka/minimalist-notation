@@ -54,8 +54,12 @@ Output:
 
 
 Try this tests:
-* https://jsfiddle.net/dzgj2sL3/
-* https://jsfiddle.net/j6d8aozy/46/  
+* https://jsfiddle.net/qu12sdox/  
+* https://jsfiddle.net/pvLx62nh/  
+
+
+Try check how this work with using MN Viewer:  
+http://viewer.minimalist-notation.org/  
 
 
 The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
@@ -148,8 +152,9 @@ module.exports = {
         require('mn-presets/prefixes'),
         require('mn-presets/styles'),
         require('mn-presets/states'),
-        require('mn-presets/theme'),
-        // require('./custom-preset'),
+        // require('mn-presets/main'),
+        // require('mn-presets/normalize'), // normalize.css v8.0.1
+        // require('./mn-my-preset'), // custom preset
       ]
     }),
     /* ... */
@@ -180,7 +185,8 @@ gulp.task('build', function() {
         require('mn-presets/prefixes'),
         require('mn-presets/styles'),
         require('mn-presets/states'),
-        require('mn-presets/theme'),
+        // require('mn-presets/main'),
+        // require('mn-presets/normalize'), // normalize.css v8.0.1
         // require('./mn-my-preset'), // custom preset
       ],
     }))
@@ -195,16 +201,29 @@ gulp.task('build', function() {
 
 Example:
 ```js
-const mn = require("minimalist-notation/browser")
-  .setPresets([
+const mnProvider = require('minimalist-notation');
+const mn = mnProvider({
+  // selectorPrefix: '',
+  presets: [
     require('mn-presets/medias'),
     require('mn-presets/runtimePrefixes'),
     require('mn-presets/styles'),
     require('mn-presets/states'),
-    require('mn-presets/theme')
-  ]);
-require('mn-utils/browser/ready')(() => {
-  mn.getCompiler('m').recursiveCheck(document)
+    // require('mn-presets/main'),
+    // require('mn-presets/normalize'), // normalize.css v8.0.1
+    // require('./mn-my-preset'), // custom preset
+  ],
+});
+const onDocumentReady = require('mn-utils/browser/ready');
+const stylesRenderProvider = require('mn-utils/browser/stylesRenderProvider');
+const styleTagIdPrefix = 'mn.';
+const stylesRender = stylesRenderProvider(document, styleTagIdPrefix);
+
+mn.emitter.on(stylesRender);
+
+onDocumentReady(() => {
+  mn.getCompiler('class').recursiveCheck(document);
+  mn.getCompiler('m').recursiveCheck(document);
   mn.compile();
 
   console.log('Minimalist Notation:', mn.data);
@@ -224,7 +243,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.4.38.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.4.47.js" async></script>
 ```
 
 
@@ -237,19 +256,25 @@ const React = require('react');
 const {render} = require('react-dom');
 
 const reactCreateElementPatch = require('minimalist-notation/browser/reactCreateElementPatch');
-const mn = require('minimalist-notation')({
+const mnProvider = require('minimalist-notation');
+const mn = mnProvider({
   // selectorPrefix: '.mn-scope ',
   presets: [
     require('mn-presets/medias'),
     require('mn-presets/runtimePrefixes'),
     require('mn-presets/styles'),
     require('mn-presets/states'),
-    require('mn-presets/theme'),
+    // require('mn-presets/main'),
+    // require('mn-presets/normalize'), // normalize.css v8.0.1
+    // require('./mn-my-preset'), // custom preset
     ...(window.mnPresets || []),
   ],
 });
+const stylesRenderProvider = require('mn-utils/browser/stylesRenderProvider');
+const styleTagIdPrefix = 'mn.';
+const stylesRender = stylesRenderProvider(document, styleTagIdPrefix);
 
-mn.emitter.on(require('mn-utils/browser/stylesRenderProvider')(document, 'mn.'));
+mn.emitter.on(stylesRender);
 
 React.createElement = reactCreateElementPatch(React.createElement, {
   className: 'class',

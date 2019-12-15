@@ -6,7 +6,7 @@
 
 
 import { IFlagsMap } from 'mn-utils/global';
-import { escapedBreakupCore } from 'mn-utils/escapedBreakupProvider'
+import { escapedhalfCore } from 'mn-utils/escapedHalfProvider'
 declare namespace selectorsCompileProvider {
 
   interface essenceOptions {

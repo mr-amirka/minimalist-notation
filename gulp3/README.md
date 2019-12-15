@@ -24,7 +24,8 @@ gulp.task('build', function() {
         require('mn-presets/prefixes'),
         require('mn-presets/styles'),
         require('mn-presets/states'),
-        require('mn-presets/theme'),
+        // require('mn-presets/main'),
+        // require('mn-presets/normalize'), // normalize.css v8.0.1
         // require('./mn-my-preset'), // custom preset
       ],
     }))
@@ -51,4 +52,4 @@ interface gulpMNOptions {
 | selectorPrefix  | ''                                                 |
 | output          | './mn.styles.css'                                  |
 | attrs           | {'class': 'class', 'className': 'class', 'm': 'm'} |
-| presets         | [  require('mn-presets/medias'), require('mn-presets/prefixes'), require('mn-presets/styles'), require('mn-presets/states'), require('mn-presets/theme') ] |
+| presets         | [  require('mn-presets/medias'), require('mn-presets/prefixes'), require('mn-presets/styles'), require('mn-presets/states'), require('mn-presets/main') ] |

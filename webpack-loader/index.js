@@ -38,7 +38,7 @@ __exports.defaultPluginSettings = {
     require('mn-presets/prefixes'),
     require('mn-presets/styles'),
     require('mn-presets/states'),
-    require('mn-presets/theme'),
+    require('mn-presets/main'),
   ],
 };
 __exports.defaultLoaderSettings = {
@@ -99,9 +99,8 @@ function MnPlugin(options) {
       });
       eachAsync(templates, (tpl, i, done) => {
         fs.readFile(tpl, 'utf8', (err, text) => {
-          err && console.error(err);
           parse(attrsMap, text || '');
-          done();
+          done(err);
         });
       })
           .then(() => {

@@ -1,5 +1,4 @@
 const fs = require('fs');
-const Path = require('path');
 const {scanPath, scanPathWatch} = require('mn-back-utils/scanPath');
 const finallyAll = require('mn-utils/finallyAll');
 const forIn = require('mn-utils/forIn');
@@ -9,12 +8,12 @@ const reduce = require('mn-utils/reduce');
 const isArray = require('mn-utils/isArray');
 const isObject = require('mn-utils/isObject');
 const eachApply = require('mn-utils/eachApply');
-const extend = require('mn-utils/extend');
 const merge = require('mn-utils/merge');
 const noop = require('mn-utils/noop');
 const isEmpty = require('mn-utils/isEmpty');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
+const checkDir = require('../build-utils/checkDir');
 
 const getAttrs = parserProvider.getAttrs;
 
@@ -35,7 +34,7 @@ const defaultSettings = exports.defaultSettings = {
     require('mn-presets/prefixes'),
     require('mn-presets/styles'),
     require('mn-presets/states'),
-    require('mn-presets/theme'),
+    require('mn-presets/main'),
   ],
 };
 
@@ -84,31 +83,29 @@ function parseSource(path, commonOptions, entries) {
   const attrs = commonOptions.attrs || [];
   const presets = commonOptions.presets || [];
   const selectorPrefix = commonOptions.selectorPrefix || '';
-  const commonMetrics = commonOptions.metrics || false;
   const {include, exclude, watch} = commonOptions;
   const allAttrsMap = getAttrs(attrs);
   const handlersMap = {};
   const excludesMap = {};
   forIn(entries, (entryOptions, name) => {
     let attrsMap = getAttrs(entryOptions.attrs);
-    if (isEmpty(attrsMap)) {
-      attrsMap = allAttrsMap;
-    } else {
-      attrsMap = extend(extend({}, allAttrsMap), attrsMap);
-    }
-    let hasMetrics = entryOptions.metrics;
-    hasMetrics === false || hasMetrics === true || (hasMetrics = commonMetrics);
+    attrsMap = isEmpty(attrsMap)
+      ? allAttrsMap
+      : merge([allAttrsMap, attrsMap]);
     const data = {};
     const _include = getInclude(entryOptions.include || include);
     const _exclude = excludesMap[name]
-    = getInclude(entryOptions.exclude || exclude);
+      = getInclude(entryOptions.exclude || exclude);
     handlersMap[name] = {
       isExclude: wrapExclude(_exclude, _include),
       set: setDataProvider(data, attrsMap),
       build: buildProvider(data, entryOptions.output || name, compileProvider({
         presets: entryOptions.presets || presets,
         selectorPrefix: entryOptions.selectorPrefix || selectorPrefix,
-      }), hasMetrics),
+      }), {
+        ...commonOptions,
+        ...entryOptions,
+      }),
     };
   });
 
@@ -174,49 +171,48 @@ function getInclude(include) {
 function __iterateeAttrsMap(essences) {
   return values(essences).sort(__sort);
 }
-function buildProvider(data, name, compile, hasMetrics) {
-  regexpCSS.test(name) || (name += '.css');
-
-  const dirname = Path.dirname(name);
-  dirname && fs.mkdirSync(dirname, {recursive: true});
-
-  const metricsFilesPath = name + '.mn-metrics-files.json';
-  const metricsPath = name + '.mn-metrics.json';
-  function onFinally(err) {
-    err && console.error(err);
-  }
+function buildProvider(data, name, compile, options) {
+  const {metricsFiles, metrics} = options;
   return () => {
     const mergedData = {};
     function attrsIteratee(essencesNames, attrName) {
       const values = mergedData[attrName] || (mergedData[attrName] = {});
       forIn(essencesNames, (item, name) => {
         (values[name] || (values[name] = {
-          name, count: 0
+          name, count: 0,
         })).count += item.count;
       });
     }
     forIn(data, (srcAttrsMap) => {
       forIn(srcAttrsMap, attrsIteratee);
     });
-
-    fs.writeFile(name, compile(mergedData), onFinally);
-
-    if (hasMetrics) {
-      fs.writeFile(metricsFilesPath, JSON.stringify(
-          reduce(data, (dst, attrsMap, path) => {
-            isEmpty(attrsMap)
-              || (dst[path] = map(attrsMap, __iterateeAttrsMap));
-            return dst;
-          }, {}),
-          null,
-          '  ',
-      ), __onError);
-      fs.writeFile(
-          metricsPath,
-          JSON.stringify(map(mergedData, __iterateeAttrsMap), null, '  '),
-          __onError,
-      );
-    }
+    checkDir(name, (err) => {
+      err
+        ? onFinally(err)
+        : fs.writeFile(name, compile(mergedData), onFinally);
+    });
+    metricsFiles && checkDir(metricsFiles, (err) => {
+      err
+        ? onFinally(err)
+        : fs.writeFile(metricsFiles, JSON.stringify(
+            reduce(data, (dst, attrsMap, path) => {
+              isEmpty(attrsMap)
+                || (dst[path] = map(attrsMap, __iterateeAttrsMap));
+              return dst;
+            }, {}),
+            null,
+            '  ',
+        ), __onError);
+    });
+    metrics && checkDir(metrics, (err) => {
+      err
+        ? onFinally(err)
+        : fs.writeFile(
+            metrics,
+            JSON.stringify(map(mergedData, __iterateeAttrsMap), null, '  '),
+            __onError,
+        );
+    });
   };
 }
 function setDataProvider(data, attrsMap) {
@@ -230,4 +226,6 @@ function setDataProvider(data, attrsMap) {
     }
   };
 }
-const regexpCSS = /.*\.css$/;
+function onFinally(err) {
+  err && console.error(err);
+}

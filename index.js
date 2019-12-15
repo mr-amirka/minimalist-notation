@@ -31,6 +31,8 @@ const __values = require('mn-utils/values');
 const merge = require('mn-utils/merge');
 const isString = require('mn-utils/isString');
 const noop = require('mn-utils/noop');
+const variants = require('mn-utils/variants');
+const keys = require('mn-utils/keys');
 
 const utils = merge([
   {
@@ -38,7 +40,7 @@ const utils = merge([
     color: require('mn-utils/color'),
     colorGetBackground: require('mn-utils/colorGetBackground'),
     trim: require('mn-utils/trim'),
-    breakup: require('mn-utils/breakup'),
+    half: require('mn-utils/half'),
     unslash: require('mn-utils/unslash'),
     noop,
     support: require('mn-utils/support'),
@@ -87,15 +89,15 @@ const utils = merge([
     withResult,
     map,
     values: __values,
-    keys: require('mn-utils/keys'),
+    keys,
     escapedSplitProvider: require('mn-utils/escapedSplitProvider'),
     mapperProvider: require('mn-utils/mapperProvider'),
     regexpMapperProvider: require('mn-utils/regexpMapperProvider'),
-    variants: require('mn-utils/variants'),
+    variants,
     escapeQuote: require('mn-utils/escapeQuote'),
     escapeRegExp: require('mn-utils/escapeRegExp'),
     escapeCss: require('mn-utils/escapeCss'),
-    escapedBreakupProvider: require('mn-utils/escapedBreakupProvider'),
+    escapedHalfProvider: require('mn-utils/escapedHalfProvider'),
     upperFirst: require('mn-utils/upperFirst'),
     lowerFirst: require('mn-utils/lowerFirst'),
     camelToKebabCase: require('mn-utils/camelToKebabCase'),
@@ -111,9 +113,121 @@ const // eslint-disable-line
   STRING = 'string',
   baseSet = set.base,
   baseGet = get.base;
+const MN_MERGE_DEPTH = 50;
+const MN_KEYFRAMES_TOKEN = 'keyframes';
+const MN_DEFAULT_PRIORITY = -2000;
+const MN_DEFAULT_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 2000;
+const MN_DEFAULT_OTHER_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 4000;
+const splitSpace = splitProvider(/\s+/);
+const splitSelector = splitProvider(/\s*,+\s*/);
+const joinOnly = joinProvider('');
+const joinComma = joinProvider(',');
+const __matchName = routeParseProvider('^([a-z]+):name(.*?):suffix$');
+const __matchImportant = routeParseProvider('^(.*?):prefix(-i):ni$');
+// eslint-disable-next-line
+const __matchValue = routeParseProvider('^(([A-Z][a-z]+):camel|((\\-):negative?[0-9\\.]+):num):value([a-z%]+):unit?(.*?):other?$');
+const regexpBrowserPrefix = /((\:\:\-?|\:\-)([a-z]+\-)?)/;
+const regexpMediaPriority = /^(.*)\^([0-9]+)$/;
+
+const normalizeSelectors = normalizeMapProvider(normalizeSelectorsIteratee);
+const normalizeComboNames = normalizeMapProvider((namesMap, name) => {
+  return flags(splitSpace(name), namesMap);
+});
+function normalizeSelectorsIteratee(selectorsMap, selector) {
+  forEach(splitSelector(selector), (selector) => {
+    flags(variants(selector), selectorsMap);
+  });
+  return selectorsMap;
+}
+function __pi(v) {
+  return routeParseProvider(v);
+}
+function __updateClearIteratee(item) {
+  item.updated = false;
+}
+function __cssReducer(output, v) {
+  push(output, v.content);
+  return output;
+}
+function parseMediaValue(v) {
+  if (!v) return 0;
+  if (isNaN(v = parseInt(v))) {
+    throw new TypeError('parseMediaValue error');
+  }
+  return v;
+}
+function parseMediaPart(mediaPart) {
+  if (!mediaPart) return;
+  const parts = mediaPart.split('-');
+  return parts.length > 1 ? {
+    min: parseMediaValue(parts[0]),
+    max: parseMediaValue(parts[1]),
+  } : {
+    max: parseMediaValue(parts[0]),
+  };
+}
+function handlerWrap(essenceHandler, paramsMatchPath) {
+  const parse = paramsMatchPath instanceof Array
+    ? aggregate(paramsMatchPath.map(__pi), eachApply)
+    : routeParseProvider(paramsMatchPath);
+  return (p) => {
+    parse(p.suffix, p);
+    return essenceHandler(p);
+  };
+}
+function __compilerClear(compiler) {
+  compiler.clear();
+}
+function __compilerRecompile(compiler) {
+  compiler._recompile();
+}
+function __compilerCompile(compiler) {
+  compiler._compile();
+}
+function __normalize(essence) {
+  if (!essence) return essence;
+  // essence.style || (essence.style = {});
+  const {selectors, exts, include} = essence;
+  essence.selectors = selectors ? normalizeSelectors(selectors) : {'': true};
+  exts && (essence.exts = normalizeComboNames(exts));
+  include && (essence.include = normalizeInclude(include));
+  forIn(essence.childs, __normalize);
+  forIn(essence.media, __normalize);
+  return essence;
+}
+function normalizeMapProvider(iteratee) {
+  return (names) => isPlainObject(names) ? names : (
+    isArray(names) ? reduce(names, iteratee, {}) : iteratee({}, names)
+  );
+}
+function normalizeIncludeIteratee(names, name) {
+  return pushArray(names, splitSpace(name));
+}
+function normalizeInclude(names) {
+  return isArray(names)
+    ? reduce(names, normalizeIncludeIteratee, [])
+    : splitSpace(names);
+}
+function __priotitySort(a, b) {
+  return a.priority - b.priority;
+}
+function getEessenceSelectors(selectorsMap) {
+  const specifics = {}, other = [], outputSelectors = []; // eslint-disable-line
+  let matchs, prefix, selector; // eslint-disable-line
+  for (selector in selectorsMap) push( // eslint-disable-line
+    (matchs = regexpBrowserPrefix.exec(selector))
+      ? (specifics[prefix = matchs[3]] || (specifics[prefix] = []))
+      : other, selector);
+  // eslint-disable-next-line
+  for (selector in specifics) push(outputSelectors, specifics[selector]);
+  other.length && push(outputSelectors, other);
+  return outputSelectors;
+}
+function __mergeDepth(src, dst) {
+  return mergeDepth(src, dst, MN_MERGE_DEPTH);
+}
 
 module.exports = (options) => {
-
   function setPresets(presets) {
     eachTry(presets, [mn]);
   }
@@ -319,13 +433,10 @@ module.exports = (options) => {
     }
 
     // get media priority
-    const priorityParts = mediaName.split('^');
-    if (priorityParts.length > 1) {
-      const mediaPriority = parseInt(priorityParts.pop());
-      if (!isNaN(mediaPriority)) {
-        mediaName = priorityParts.join('^');
-        priority = mediaPriority;
-      }
+    const priorityMatch = regexpMediaPriority.exec(mediaName);
+    if (priorityMatch) {
+      mediaName = priorityMatch[1];
+      priority = parseInt(priorityMatch[2]);
     }
 
     if (priority === 0) priority--;
@@ -340,7 +451,7 @@ module.exports = (options) => {
           query += '(min-width: ' + v + 'px)';
         }
         if (v = mp.max) {
-          priority || (priority = -v);
+          priority = priority || -v;
           if (query) query += ' and ';
           query += '(max-width: ' + v + 'px)';
         }
@@ -352,7 +463,7 @@ module.exports = (options) => {
           query += '(min-height: ' + v + 'px)';
         }
         if (v = mp.max) {
-          priority || (priority = -v);
+          priority = priority || -v;
           if (query) query += ' and ';
           query += '(max-height: ' + v + 'px)';
         }
@@ -361,7 +472,7 @@ module.exports = (options) => {
       query = mediaName;
     }
 
-    priority || (priority = MN_DEFAULT_PRIORITY);
+    priority = priority || MN_DEFAULT_PRIORITY;
     priority++;
 
     return {query, selector, priority};
@@ -404,7 +515,7 @@ module.exports = (options) => {
   }
 
   function __assignCore(comboNames, selectors, defaultMediaName, excludes) {
-    defaultMediaName || (defaultMediaName = 'all');
+    defaultMediaName = defaultMediaName || 'all';
     function assignIteratee(optionsItem) {
       const childSelectors = optionsItem.selectors;
       const essencesNames = optionsItem.essences;
@@ -430,12 +541,16 @@ module.exports = (options) => {
     function __iteratee(comboNames, s) {
       __assignCore(comboNames, flags(splitSelector(s)), defaultMediaName);
     }
+    comboNames = comboNames && normalizeComboNames(comboNames);
     isArray(selectors)
-      ? (comboNames = normalizeComboNames(comboNames))
-        && forEach(selectors, (s) => __iteratee(comboNames, s))
-      : (isPlainObject(selectors) ? forIn(selectors, (_comboNames, s) => {
-        __iteratee(normalizeComboNames(_comboNames), s);
-      }) : __iteratee(normalizeComboNames(comboNames), selectors));
+      ? forEach(selectors, (s) => __iteratee(comboNames, s))
+      : (
+        isPlainObject(selectors)
+          ? forIn(selectors, (_comboNames, s) => {
+            __iteratee(normalizeComboNames(_comboNames), s);
+          })
+          : __iteratee(comboNames, selectors)
+      );
   }, mn);
 
   function __initEssence(input) {
@@ -455,7 +570,7 @@ module.exports = (options) => {
      * эту логику руками в каждом отдельном обработчике,
      * параметр params.i добавляется автоматически
      */
-    params.i = (params.ni || (params.ni = '')) ? '!important' : '';
+    params.i = (params.ni = params.ni || '') ? '!important' : '';
     return ($$handlerMap[params.name] || noop)(params);
   }
   function initEssence(essenceName, essence, excludes) {
@@ -532,7 +647,7 @@ module.exports = (options) => {
   ) {
     const excludes = extend({}, _excludes);
     if (excludes[essenceName]) return;
-    mediaName || (mediaName = 'all');
+    mediaName = mediaName || 'all';
     excludes[essenceName] = true;
     essence || (essence = $$essences[essenceName]
       || ($$essences[essenceName] = {}));
@@ -574,8 +689,8 @@ module.exports = (options) => {
   }
 
   function __ctx(src) {
-    src || (src = {});
-    src.map || (src.map = {});
+    src = src || {};
+    src.map = src.map || {};
     return src;
   }
   function __assignItemCompile(actx, mediaName) {
@@ -665,6 +780,7 @@ module.exports = (options) => {
   mn.css = withResult((selector, css) => {
     const map = $$css.map;
     function baseSetCSS(css, s) {
+      s = joinComma(keys(normalizeSelectorsIteratee({}, s)));
       if (css) {
         const instance = map[s] || (map[s] = {css: {}});
         instance.content = joinOnly([s, '{', cssPropertiesStringify(
@@ -690,117 +806,3 @@ module.exports = (options) => {
 
   return mn;
 };
-
-const MN_MERGE_DEPTH = 50;
-const MN_KEYFRAMES_TOKEN = 'keyframes';
-const MN_DEFAULT_PRIORITY = -2000;
-const MN_DEFAULT_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 2000;
-const MN_DEFAULT_OTHER_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 4000;
-const splitSpace = splitProvider(/\s+/);
-const splitSelector = splitProvider(/\s*,+\s*/);
-const normalizeComboNames = normalizeNamesMapProvider(splitSpace);
-const normalizeSelectors = normalizeNamesMapProvider(splitSelector);
-const joinOnly = joinProvider('');
-const joinComma = joinProvider(',');
-const __matchName = routeParseProvider('^([a-z]+):name(.*?):suffix$');
-const __matchImportant = routeParseProvider('^(.*?):prefix(-i):ni$');
-// eslint-disable-next-line
-const __matchValue = routeParseProvider('^(([A-Z][a-z]+):camel|((\\-):negative?[0-9\\.]+):num):value([a-z%]+):unit?(.*?):other?$');
-const normalizeInclude = normalizeNamesProvider(splitSpace);
-const regexpBrowserPrefix = /((\:\:\-?|\:\-)([a-z]+\-)?)/;
-
-function __pi(v) {
-  return routeParseProvider(v);
-}
-function __updateClearIteratee(item) {
-  item.updated = false;
-}
-function __cssReducer(output, v) {
-  push(output, v.content);
-  return output;
-}
-function parseMediaValue(v) {
-  if (!v) return 0;
-  if (isNaN(v = parseInt(v))) {
-    throw new TypeError('parseMediaValue error');
-  }
-  return v;
-}
-function parseMediaPart(mediaPart) {
-  if (!mediaPart) return;
-  const parts = mediaPart.split('-');
-  return parts.length > 1 ? {
-    min: parseMediaValue(parts[0]),
-    max: parseMediaValue(parts[1]),
-  } : {
-    max: parseMediaValue(parts[0]),
-  };
-}
-function handlerWrap(essenceHandler, paramsMatchPath) {
-  const parse = paramsMatchPath instanceof Array
-    ? aggregate(paramsMatchPath.map(__pi), eachApply)
-    : routeParseProvider(paramsMatchPath);
-  return (p) => {
-    parse(p.suffix, p);
-    return essenceHandler(p);
-  };
-}
-function __compilerClear(compiler) {
-  compiler.clear();
-}
-function __compilerRecompile(compiler) {
-  compiler._recompile();
-}
-function __compilerCompile(compiler) {
-  compiler._compile();
-}
-function __normalize(essence) {
-  if (!essence) return essence;
-  // essence.style || (essence.style = {});
-  const {selectors, exts, include} = essence;
-  essence.selectors = selectors ? normalizeSelectors(selectors) : {'': true};
-  exts && (essence.exts = normalizeComboNames(exts));
-  include && (essence.include = normalizeInclude(include));
-  forIn(essence.childs, __normalize);
-  forIn(essence.media, __normalize);
-  return essence;
-}
-function normalizeNamesMapProvider(_split) {
-  function __iteratee(names, name) {
-    flags(_split(name), names);
-    return names;
-  }
-  return (_names) => isPlainObject(_names)
-    ? _names
-    : (isArray(_names)
-      ? reduce(_names, __iteratee, {})
-      : flags(_split(_names))
-    );
-}
-function normalizeNamesProvider(_split) {
-  function __iteratee(names, name) {
-    pushArray(names, _split(name));
-    return names;
-  }
-  return (_names) => isArray(_names)
-    ? reduce(_names, __iteratee, [])
-    : _split(_names);
-}
-function __priotitySort(a, b) {
-  return a.priority - b.priority;
-}
-function getEessenceSelectors(selectorsMap) {
-  const specifics = {}, other = [], outputSelectors = []; // eslint-disable-line
-  let matchs, prefix, selector; // eslint-disable-line
-  for (selector in selectorsMap) push( // eslint-disable-line
-    (matchs = regexpBrowserPrefix.exec(selector))
-      ? (specifics[prefix = matchs[3]] || (specifics[prefix] = []))
-      : other, selector);
-  // eslint-disable-next-line
-  for (selector in specifics) push(outputSelectors, specifics[selector]);
-  other.length && push(outputSelectors, other);
-  return outputSelectors;
-}
-function __mergeDepth(src, dst) {
-  return mergeDepth(src, dst, MN_MERGE_DEPTH);
-}

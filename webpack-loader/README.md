@@ -64,7 +64,9 @@ module.exports = {
         require('mn-presets/prefixes'),
         require('mn-presets/styles'),
         require('mn-presets/states'),
-        require('mn-presets/theme'),
+        // require('mn-presets/main'),
+        // require('mn-presets/normalize'), // normalize.css v8.0.1
+        // require('./mn-my-preset'), // custom preset
       ],
     }),
     new MnPlugin({
@@ -77,7 +79,9 @@ module.exports = {
         require('mn-presets/prefixes'),
         require('mn-presets/styles'),
         require('mn-presets/states'),
-        require('mn-presets/theme')
+        // require('mn-presets/main'),
+        // require('mn-presets/normalize'), // normalize.css v8.0.1
+        // require('./mn-my-preset'), // custom preset
       ],
     }),
     /* ... */
@@ -99,7 +103,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\/mn-presets\/.*\.js$/,
+        test: /\.mn\.js$/,
         use: [
           {
             loader: 'minimalist-notation/webpack-loader/reload',
@@ -118,10 +122,10 @@ module.exports = {
 ```
 ```js
 // /src/app.js
-require('./mn-presets/theme');
+require('./style.mn.js');
 ```
 ```js
-// ./src/mn-presets/theme.js
+// ./src/style.mn.js
 module.exports = (mn) => {
   mn({
     fCustom: 'f100',
@@ -129,5 +133,5 @@ module.exports = (mn) => {
 };
 ```
 Эта возможность добавлена для того, чтобы можно была менять пресеты, не перезапуская для этого всю сборку,
-но будьте внимательны так, как пресеты остаются закэшироваными, если их подключение удаляется из кода.  
+но будьте внимательны так, как пресеты остаются закэшированными, если их подключение удаляется из кода.  
 Это связано с тем, что Webpack не предоставляет удобного API для отслеживания того, какие файлы были отключены от сборки проекта.
