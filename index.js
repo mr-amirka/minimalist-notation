@@ -196,9 +196,9 @@ function __normalize(essence) {
   return essence;
 }
 function normalizeMapProvider(iteratee) {
-  return (names) => isPlainObject(names) ? names : (
-    isArray(names) ? reduce(names, iteratee, {}) : iteratee({}, names)
-  );
+  return (names) => isObject(names)
+    ? reduce(isArray(names) ? names : keys(names), iteratee, {})
+    : iteratee({}, names);
 }
 function normalizeIncludeIteratee(names, name) {
   return pushArray(names, splitSpace(name));
@@ -538,19 +538,16 @@ module.exports = (options) => {
   }
 
   mn.assign = withResult((selectors, comboNames, defaultMediaName) => {
-    function __iteratee(comboNames, s) {
-      __assignCore(comboNames, flags(splitSelector(s)), defaultMediaName);
-    }
-    comboNames = comboNames && normalizeComboNames(comboNames);
-    isArray(selectors)
-      ? forEach(selectors, (s) => __iteratee(comboNames, s))
-      : (
-        isPlainObject(selectors)
-          ? forIn(selectors, (_comboNames, s) => {
-            __iteratee(normalizeComboNames(_comboNames), s);
-          })
-          : __iteratee(comboNames, selectors)
+    function iteratee(comboNames, s) {
+      __assignCore(
+          normalizeComboNames(comboNames),
+          normalizeSelectors(s),
+          defaultMediaName,
       );
+    }
+    isPlainObject(selectors)
+      ? forIn(selectors, iteratee)
+      : iteratee(comboNames, selectors);
   }, mn);
 
   function __initEssence(input) {
