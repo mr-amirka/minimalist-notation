@@ -59,7 +59,7 @@ Try this tests:
 
 
 Try check how this work with using MN Viewer:  
-http://viewer.minimalist-notation.org/  
+https://viewer.minimalist-notation.org/  
 
 
 The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
