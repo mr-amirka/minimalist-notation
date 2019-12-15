@@ -236,7 +236,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.4.47.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.4.50.js" async></script>
 ```
 
 
