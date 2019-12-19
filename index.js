@@ -33,6 +33,11 @@ const isString = require('mn-utils/isString');
 const noop = require('mn-utils/noop');
 const variants = require('mn-utils/variants');
 const keys = require('mn-utils/keys');
+const {
+  SC_ESSENCES,
+  SC_SELECTORS,
+  SC_MEDIA_NAME,
+} = require('./constants');
 
 const utils = merge([
   {
@@ -127,7 +132,7 @@ const __matchImportant = routeParseProvider('^(.*?):prefix(-i):ni$');
 // eslint-disable-next-line
 const __matchValue = routeParseProvider('^(([A-Z][a-z]+):camel|((\\-):negative?[0-9\\.]+):num):value([a-z%]+):unit?(.*?):other?$');
 const regexpBrowserPrefix = /((\:\:\-?|\:\-)([a-z]+\-)?)/;
-const regexpMediaPriority = /^(.*)\^([0-9]+)$/;
+const regexpMediaPriority = /^(.*)\^(-?[0-9]+)$/;
 
 const normalizeSelectors = normalizeMapProvider(normalizeSelectorsIteratee);
 const normalizeComboNames = normalizeMapProvider((namesMap, name) => {
@@ -143,7 +148,7 @@ function __pi(v) {
   return routeParseProvider(v);
 }
 function __updateClearIteratee(item) {
-  item.updated = false;
+  item.updated = 0;
 }
 function __cssReducer(output, v) {
   push(output, v.content);
@@ -188,7 +193,7 @@ function __normalize(essence) {
   if (!essence) return essence;
   // essence.style || (essence.style = {});
   const {selectors, exts, include} = essence;
-  essence.selectors = selectors ? normalizeSelectors(selectors) : {'': true};
+  essence.selectors = selectors ? normalizeSelectors(selectors) : {'': 1};
   exts && (essence.exts = normalizeComboNames(exts));
   include && (essence.include = normalizeInclude(include));
   forIn(essence.childs, __normalize);
@@ -288,7 +293,7 @@ module.exports = (options) => {
       i = 1, l = essencePath.length;
     $$staticsEssences[essenceName]
       || ($$staticsEssences[essenceName] = __normalize({
-        inited: true,
+        inited: 1,
       }));
     for (;i < l; i++) push(path, 'childs', essencePath[i]);
     baseSet($$staticsEssences, path, __mergeDepth([
@@ -303,14 +308,16 @@ module.exports = (options) => {
 
   // eslint-disable-next-line
   const updateAttrByMap = mn.updateAttrByMap = withResult((comboNamesMap, attrName) => {
-    var parseComboName = parseComboNameProvider(attrName), comboName; // eslint-disable-line
-    for (comboName in comboNamesMap) updateSelector(parseComboName(comboName)); // eslint-disable-line
+    let parseComboName = parseComboNameProvider(attrName), comboName; // eslint-disable-line
+    for (comboName in comboNamesMap) forEach( // eslint-disable-line
+        parseComboName(comboName), updateSelectorIteratee,
+    );
   }, mn);
   // eslint-disable-next-line
   const updateAttrByValues = mn.updateAttrByValues = withResult((comboNames, attrName) => {
     const parseComboName = parseComboNameProvider(attrName);
     forEach(comboNames, (comboName) => {
-      updateSelector(parseComboName(comboName));
+      forEach(parseComboName(comboName), updateSelectorIteratee);
     });
   }, mn);
 
@@ -333,7 +340,7 @@ module.exports = (options) => {
       // eslint-disable-next-line
       for (var vls = splitSpace(v || ''), i = 0, l = vls.length; i < l; i++) {
         if ((v = vls[i]) && !cache[v]) {
-          cache[v] = true;
+          cache[v] = 1;
           push(newValues, v);
         }
       }
@@ -354,10 +361,11 @@ module.exports = (options) => {
     instance.checkNode = (node) => {
       node.getAttribute && instance(node.getAttribute(attrName));
     };
-    const recursiveCheckNode = instance.recursiveCheck = (node) => {
+    instance.recursiveCheck = recursiveCheckNode;
+    function recursiveCheckNode(node) {
       node.getAttribute && instance(node.getAttribute(attrName));
       forEach(node.childNodes, recursiveCheckNode);
-    };
+    }
     return instance;
   };
   const getCompiler = mn.getCompiler = (attrName) => $$compilers[attrName]
@@ -386,9 +394,9 @@ module.exports = (options) => {
       name,
       priority: priority || 0,
       content: content || '',
-      updated: true,
+      updated: 1,
     };
-    $$updated = true;
+    $$updated = 1;
     return mn;
   }
   mn.setStyle = (name, content, priority) => setStyle(
@@ -493,10 +501,10 @@ module.exports = (options) => {
       : ((selectors) => joinComma(selectors) + cssText);
 
     // eslint-disable-next-line
-    let essenceName, contextEssence, essence, cssText, output, isContinue = true;
+    let essenceName, contextEssence, essence, cssText, output, isContinue = 1;
     for (essenceName in context) {
       if ((contextEssence = context[essenceName]) && contextEssence.updated) {
-        isContinue = false;
+        isContinue = 0;
         cssText = contextEssence.cssText;
         contextEssence.content = cssText ? joinOnly(map(
             getEessenceSelectors(contextEssence.map),
@@ -516,24 +524,29 @@ module.exports = (options) => {
 
   function __assignCore(comboNames, selectors, defaultMediaName, excludes) {
     defaultMediaName = defaultMediaName || 'all';
-    function assignIteratee(optionsItem) {
-      const childSelectors = optionsItem.selectors;
-      const essencesNames = optionsItem.essences;
-      const mediaName = optionsItem.mediaName || defaultMediaName;
-      const actx = $$assigned[mediaName] || ($$assigned[mediaName] = {});
-      let essenceName; // eslint-disable-line
-      for (essenceName in essencesNames) { // eslint-disable-line
-        extend(actx[essenceName] || (actx[essenceName] = {}), childSelectors);
-        updateEssence(essenceName, childSelectors, mediaName, excludes);
+    let name, selector, l, i, items, essenceName, item, // eslint-disable-line
+      essencesNames, childSelectors, mediaName, actx; // eslint-disable-line
+    for (name in comboNames) { // eslint-disable-line
+      for (selector in selectors) { // eslint-disable-line
+        for (
+          items = __parseComboName(name, selector), l = items.length, i = 0;
+          i < l;
+          i++
+        ) {
+          item = items[i];
+          essencesNames = item[SC_ESSENCES];
+          childSelectors = item[SC_SELECTORS];
+          mediaName = item[SC_MEDIA_NAME] || defaultMediaName;
+          actx = $$assigned[mediaName] || ($$assigned[mediaName] = {});
+          for (essenceName in essencesNames) { // eslint-disable-line
+            extend(
+                actx[essenceName] || (actx[essenceName] = {}),
+                childSelectors,
+            );
+            updateEssence(essenceName, childSelectors, mediaName, excludes);
+          }
+        }
       }
-    };
-    var comboName, selector; // eslint-disable-line
-    for (comboName in comboNames) { // eslint-disable-line
-      // eslint-disable-next-line
-      for (selector in selectors) forEach(
-          __parseComboName(comboName, selector),
-          assignIteratee,
-      );
     }
   }
 
@@ -608,7 +621,7 @@ module.exports = (options) => {
       });
     }
     __childsHandle(essence.childs, '.');
-    __childsHandle(essence.media, '@', true);
+    __childsHandle(essence.media, '@', 1);
   }
   function compileMixedEssence(dst, src, excludes) {
     const include = src.include;
@@ -627,7 +640,7 @@ module.exports = (options) => {
 
     dst.cssText = (style = dst.style)
       && (style = cssPropertiesStringify(style)) ? ('{' + style + '}') : '';
-    dst.inited = true;
+    dst.inited = 1;
     return dst;
   }
   function createContextEssence(essenceName, essence, excludes) {
@@ -645,13 +658,13 @@ module.exports = (options) => {
     const excludes = extend({}, _excludes);
     if (excludes[essenceName]) return;
     mediaName = mediaName || 'all';
-    excludes[essenceName] = true;
+    excludes[essenceName] = 1;
     essence || (essence = $$essences[essenceName]
       || ($$essences[essenceName] = {}));
     const context = $$root[mediaName] || ($$root[mediaName] = {});
     const contextEssence = context[essenceName] || (context[essenceName]
       = createContextEssence(essenceName, essence, excludes));
-    contextEssence.updated = true;
+    contextEssence.updated = 1;
     extend(
         contextEssence.map,
         selectors = joinMaps({}, selectors, contextEssence.selectors),
@@ -672,17 +685,13 @@ module.exports = (options) => {
     exts && __assignCore(exts, selectors, mediaName, excludes);
     return essence;
   }
-  function updateSelectorIteratee(optionsItem) {
-    const {essences, selectors, mediaName} = optionsItem;
+  function updateSelectorIteratee([essences, selectors, mediaName]) {
     let essenceName;
     for (essenceName in essences) updateEssence( // eslint-disable-line
         essenceName,
         selectors,
         mediaName,
     );
-  }
-  function updateSelector(optionsItems) {
-    forEach(optionsItems, updateSelectorIteratee);
   }
 
   function __ctx(src) {
@@ -717,7 +726,7 @@ module.exports = (options) => {
   }, mn);
 
   const keyframesRender = mn.keyframesCompile = withResult(() => {
-    $$keyframes.updated = false;
+    $$keyframes.updated = 0;
     const keyframesPrefix = MN_KEYFRAMES_TOKEN + ' ';
     const prefixes = cssPropertiesStringify.prefixes;
     // eslint-disable-next-line
@@ -731,7 +740,7 @@ module.exports = (options) => {
     }, [])), MN_DEFAULT_CSS_PRIORITY);
   }, mn);
   const cssRender = mn.cssCompile = withResult(() => {
-    $$css.updated = false;
+    $$css.updated = 0;
     // eslint-disable-next-line
     setStyle('css', joinOnly(reduce($$css.map, __cssReducer, [])), MN_DEFAULT_CSS_PRIORITY);
   }, mn);
@@ -747,15 +756,15 @@ module.exports = (options) => {
     }
     forIn($$root, __mode);
     $$updated && styleRender();
-    $$updated = $$force = false;
+    $$updated = $$force = 0;
   }, mn);
   mn.recompile = withResult(() => {
-    $$force = true;
+    $$force = 1;
     __render();
   }, mn);
   const deferCompile = mn.deferCompile = withDefer(__render, mn);
   mn.deferRecompile = () => {
-    $$force = true;
+    $$force = 1;
     return deferCompile();
   };
   mn.setKeyframes = withResult((name, body) => {
@@ -772,7 +781,7 @@ module.exports = (options) => {
     } else {
       delete map[name];
     }
-    $$keyframes.updated = true;
+    $$keyframes.updated = 1;
   }, mn);
   mn.css = withResult((selector, css) => {
     const map = $$css.map;
@@ -792,7 +801,7 @@ module.exports = (options) => {
     isObject(selector)
       ? forIn(selector, baseSetCSS)
       : baseSetCSS(css, selector);
-    $$css.updated = true;
+    $$css.updated = 1;
   }, mn);
 
   mn.setPresets = withResult(setPresets, mn);

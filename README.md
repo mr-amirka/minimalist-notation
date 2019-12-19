@@ -294,7 +294,7 @@ class App extends React.Component {
   }
 }
 
-render(<App/>, document.querySelector('#app'));
+render(<App/>, document.getElementById('app'));
 
 ```
 
