@@ -11,6 +11,7 @@ const forIn = require('mn-utils/forIn');
  * @param {func} createElement
  * @param {array | object} attrs
  * @param {object}  mn
+ * @param {boolean} hasDefer?
  * @example
  * ```js
  *  React.createElement = patchCreateElement(React.createElement, {
@@ -20,8 +21,11 @@ const forIn = require('mn-utils/forIn');
  * @return {func}
  * ```
  */
-module.exports = function patchCreateElement(createElement, attrs, mn) {
-  const {getCompiler, deferCompile} = mn;
+module.exports = function patchCreateElement(
+    createElement, attrs, mn, hasDefer,
+) {
+  const {getCompiler} = mn;
+  const compile = hasDefer ? mn.deferCompile : mn.compile;
   const handlers = {};
   isArray(attrs)
     ? forEach(attrs, (attrName) => {
@@ -35,7 +39,7 @@ module.exports = function patchCreateElement(createElement, attrs, mn) {
     if (props) {
       let attrName, v; // eslint-disable-line
       for (attrName in handlers) (v = props[attrName]) && handlers[attrName](v); // eslint-disable-line
-      deferCompile();
+      compile();
     }
     return createElement.apply(null, arguments); // eslint-disable-line
   };
