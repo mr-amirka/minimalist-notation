@@ -13,19 +13,19 @@
     * [Essence name](#essence-name)  
     * [Essence context](#essence-context)  
     * [Media queries in notation](#media-queries-in-notation)
-* [Grouping](#grouping)  
-* [Escaping](#escaping)  
-* [Media queries generation](#media-queries-generation)  
-* [Essences of styles](#essences-of-styles)  
-* [Dynamic essences](#dynamic-essences)  
-* [Generating the essences of styles](#generating-the-essences-of-styles)  
-* [Auto prefixes](#auto-prefixes)  
-* [States](#states)  
-* [Parent/child selectors](#parent/child-selectors)   
-* [Depth](#depth)  
-* [Complex selectors](#complex-selectors)   
-* [Essences assignment (Example with container)](#essences-assignment)   
-* [Priority multiplier](#priority-multiplier)   
+    * [Grouping](#grouping)  
+    * [Escaping](#escaping)  
+    * [Media queries generation](#media-queries-generation)  
+    * [Essences of styles](#essences-of-styles)  
+    * [Dynamic essences](#dynamic-essences)  
+    * [Generating the essences of styles](#generating-the-essences-of-styles)  
+    * [Auto prefixes](#auto-prefixes)  
+    * [States](#states)  
+    * [Parent/child selectors](#parent/child-selectors)   
+    * [Depth](#depth)  
+    * [Complex selectors](#complex-selectors)   
+    * [Essences assignment (Example with container)](#essences-assignment)   
+    * [Priority multiplier](#priority-multiplier)   
 
 
 
@@ -90,7 +90,7 @@ If you are using the Functional/Atomic CSS methodology, then:
 ```   
 
 
-Thanks to MN:
+Thanks MN:
 * CSS is generated automatically from attribute values in the markup, and we save time by saving ourselves from writing "satanic" CSS-code;
 * We do not have dead CSS code, because CSS is generated only for the markup that is available.
 * we have the opportunity not to contact the server for "heavy" CSS-files, generating CSS in runtime.
@@ -203,7 +203,7 @@ Output:
 ```
 
 
-### Notation
+## Notation
 
 Base format:  
 ```

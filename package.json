@@ -1,6 +1,6 @@
 {
   "name": "minimalist-notation",
-  "version": "1.4.67",
+  "version": "1.4.68",
   "description": "Minimalist Notation",
   "main": "./index.js",
   "bin": {
@@ -73,11 +73,11 @@
     "jest": "^24.9.0"
   },
   "dependencies": {
-    "mn-utils": "0.0.66",
-    "mn-back-utils": "0.0.4",
-    "mn-presets": "0.0.24",
+    "mn-utils": "0.0.68",
+    "mn-presets": "0.0.25",
     "loader-utils": "1.2.3",
     "commander": "^2.18.0",
-    "through2": "^3.0.1"
+    "through2": "^3.0.1",
+    "node-watch": "0.5.8"
   }
 }

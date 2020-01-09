@@ -1,4 +1,3 @@
-const fs = require('fs');
 const Path = require('path');
 const through = require('through2');
 const parserProvider = require('../mnParserProvider');
@@ -6,8 +5,8 @@ const compileProvider = require('../mnCompileProvider');
 const isObject = require('mn-utils/isObject');
 const isString = require('mn-utils/isString');
 const isArray = require('mn-utils/isArray');
-const eachAsync = require('../build-utils/eachAsync');
-const checkDir = require('../build-utils/checkDir');
+const eachAsync = require('mn-utils/eachAsync');
+const writeFile = require('mn-utils/node/writeFile');
 
 function normalize(v) {
   return v ? (isArray(v) ? (v.length ? v : null) : [v]) : null;
@@ -44,11 +43,7 @@ function gulpMN(outputs, options) {
     const content = compile(data);
     data = {};
     eachAsync(outputs, (outputFileName, i, done) => {
-      checkDir(outputFileName, (err) => {
-        err
-          ? done(err)
-          : fs.writeFile(outputFileName, content, 'utf8', done);
-      });
+      writeFile(outputFileName, content, done);
     }).then(cb);
   });
 }

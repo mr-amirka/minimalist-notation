@@ -60,9 +60,9 @@ module.exports = (instance) => {
     return parseComboName(comboName, '.' + escapeCss(comboName));
   }
   function parseAttrProvider(attrName) {
-    const prefix = '[' + attrName + '~=\'';
+    const prefix = '[' + attrName + '~="';
     return (comboName) => parseComboName(
-        comboName, prefix + escapeQuote(comboName) + '\']',
+        comboName, prefix + escapeQuote(comboName) + '"]',
     );
   }
   function parseComboName(comboName, targetName) {

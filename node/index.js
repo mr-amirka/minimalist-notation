@@ -1,5 +1,7 @@
 const fs = require('fs');
-const {scanPath, scanPathWatch} = require('mn-back-utils/scanPath');
+const fsWatch = require('node-watch');
+const scanPath = require('mn-utils/node/scanPath');
+const writeFile = require('mn-utils/node/writeFile');
 const finallyAll = require('mn-utils/finallyAll');
 const forIn = require('mn-utils/forIn');
 const map = require('mn-utils/map');
@@ -13,7 +15,7 @@ const noop = require('mn-utils/noop');
 const isEmpty = require('mn-utils/isEmpty');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
-const checkDir = require('../build-utils/checkDir');
+
 
 const getAttrs = parserProvider.getAttrs;
 
@@ -48,11 +50,17 @@ exports.compileSource = (__options) => {
     });
 };
 
+function scanPathWatch({path, each, callback, exclude}) {
+  scanPath({
+    path, each, exclude,
+    callback: () => {
+      fsWatch(path, {recursive: true}, each);
+      callback && callback();
+    },
+  });
+}
 function __sort(a, b) {
   return b.count - a.count;
-}
-function __onError(err) {
-  err && console.error(err);
 }
 function __parseSource({path, attrs, each, callback, watch, exclude}) {
   finallyAll((inc, dec) => {
@@ -186,33 +194,21 @@ function buildProvider(data, name, compile, options) {
     forIn(data, (srcAttrsMap) => {
       forIn(srcAttrsMap, attrsIteratee);
     });
-    checkDir(name, (err) => {
-      err
-        ? onFinally(err)
-        : fs.writeFile(name, compile(mergedData), onFinally);
-    });
-    metricsFiles && checkDir(metricsFiles, (err) => {
-      err
-        ? onFinally(err)
-        : fs.writeFile(metricsFiles, JSON.stringify(
-            reduce(data, (dst, attrsMap, path) => {
-              isEmpty(attrsMap)
-                || (dst[path] = map(attrsMap, __iterateeAttrsMap));
-              return dst;
-            }, {}),
-            null,
-            '  ',
-        ), __onError);
-    });
-    metrics && checkDir(metrics, (err) => {
-      err
-        ? onFinally(err)
-        : fs.writeFile(
-            metrics,
-            JSON.stringify(map(mergedData, __iterateeAttrsMap), null, '  '),
-            __onError,
-        );
-    });
+    writeFile(name, compile(mergedData), onFinally);
+    metricsFiles && writeFile(metricsFiles, JSON.stringify(
+        reduce(data, (dst, attrsMap, path) => {
+          isEmpty(attrsMap)
+            || (dst[path] = map(attrsMap, __iterateeAttrsMap));
+          return dst;
+        }, {}),
+        null,
+        '  ',
+    ), onFinally);
+    metrics && writeFile(
+        metrics,
+        JSON.stringify(map(mergedData, __iterateeAttrsMap), null, '  '),
+        onFinally,
+    );
   };
 }
 function setDataProvider(data, attrsMap) {

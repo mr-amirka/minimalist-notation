@@ -1,5 +1,7 @@
 const fs = require('fs');
 const loaderUtils = require('loader-utils');
+const writeFile = require('mn-utils/node/writeFile');
+const eachAsync = require('mn-utils/eachAsync');
 const merge = require('mn-utils/merge');
 const forIn = require('mn-utils/forIn');
 const forEach = require('mn-utils/forEach');
@@ -8,8 +10,6 @@ const isFunction = require('mn-utils/isFunction');
 const values = require('mn-utils/values');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
-const eachAsync = require('../build-utils/eachAsync');
-const checkDir = require('../build-utils/checkDir');
 
 const scope = {};
 const dynamicPresetsScope = {};
@@ -106,11 +106,7 @@ function MnPlugin(options) {
           .then(() => {
             const content = compile(attrsMap);
             return eachAsync(outputs, (outputFileName, i, done) => {
-              checkDir(outputFileName, (err) => {
-                err
-                  ? done(err)
-                  : fs.writeFile(outputFileName, content, 'utf8', done);
-              });
+              writeFile(outputFileName, content, done);
             });
           })
           .then(callback);

@@ -13,19 +13,19 @@
     * [Имя эссенции](#Имя-эссенции)  
     * [Контекст эссенции](#Контекст-эссенции)  
     * [Медиа-запросы в нотации](#Медиа-запросы-в-нотации)  
-* [Grouping](#grouping)  
-* [Media-queries generation](#media-queries-generation)  
-* [Escaping](#escaping)  
-* [Essences of styles](#essences-of-styles)  
-* [Dynamic essences](#dynamic-essences)  
-* [Generating the essences of styles](#generating-the-essences-of-styles)  
-* [States](#states)  
-* [Auto prefixes](#auto-prefixes)  
-* [Parent/child selectors](#parent/child-selectors)  
-* [Depth](#depth)  
-* [Complex selectors](#complex-selectors)  
-* [Essences assignment (Example with container)](#essences-assignment)  
-* [Priority multiplier](#priority-multiplier)  
+    * [Grouping](#grouping)  
+    * [Media-queries generation](#media-queries-generation)  
+    * [Escaping](#escaping)  
+    * [Essences of styles](#essences-of-styles)  
+    * [Dynamic essences](#dynamic-essences)  
+    * [Generating the essences of styles](#generating-the-essences-of-styles)  
+    * [States](#states)  
+    * [Auto prefixes](#auto-prefixes)  
+    * [Parent/child selectors](#parent/child-selectors)  
+    * [Depth](#depth)  
+    * [Complex selectors](#complex-selectors)  
+    * [Essences assignment (Example with container)](#essences-assignment)  
+    * [Priority multiplier](#priority-multiplier)  
 
 
 
@@ -207,7 +207,7 @@ Output:
 ```
 
 
-### Notation
+## Notation
 
 Base format:  
 ```

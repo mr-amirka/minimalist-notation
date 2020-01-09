@@ -190,7 +190,6 @@ function __compilerCompile(compiler) {
 }
 function __normalize(essence) {
   if (!essence) return essence;
-  // essence.style || (essence.style = {});
   const {selectors, exts, include} = essence;
   essence.selectors = selectors ? normalizeSelectors(selectors) : {'': 1};
   exts && (essence.exts = normalizeComboNames(exts));
@@ -284,22 +283,31 @@ module.exports = (options) => {
       : mnBaseSet(extendedEssence, essencePath);
   }
 
+  function baseSetEssenseBase(path, extendedEssence, important) {
+    const name = path[0];
+    const instance = $$staticsEssences[name]
+      || ($$staticsEssences[name] = __normalize({
+        inited: 1,
+      }));
+    important && (instance.important = important);
+    baseSet($$staticsEssences, path, __mergeDepth([
+      baseGet($$staticsEssences, path),
+      __normalize(extendedEssence),
+    ], {}));
+  }
+
   function baseSetEssense(_essencePath, extendedEssence) {
     var //eslint-disable-line
       essencePath = _essencePath.split('.'),
       essenceName = essencePath[0],
       path = [essenceName],
       i = 1, l = essencePath.length;
-    $$staticsEssences[essenceName]
-      || ($$staticsEssences[essenceName] = __normalize({
-        inited: 1,
-      }));
     for (;i < l; i++) push(path, 'childs', essencePath[i]);
-    baseSet($$staticsEssences, path, __mergeDepth([
-      baseGet($$staticsEssences, path),
-      __normalize(extendedEssence),
-    ], {}));
-  };
+    baseSetEssenseBase(path, extendedEssence);
+    // for important
+    path[0] = essenceName + '-i';
+    baseSetEssenseBase(path, extendedEssence, 1);
+  }
 
   selectorsCompileProvider(mn);
   const parseComboNameProvider = mn.parseComboNameProvider;
@@ -568,19 +576,16 @@ module.exports = (options) => {
       prefix: input,
       name: input,
       suffix: '',
+      ni: '',
     };
     __matchImportant(input, params);
     __matchName(params.prefix, params);
     __matchValue(params.suffix, params);
 
-    /**
-     * Исходя из предшествующего опыта,
-     * чтобы избавить разработчика от необходимости добалять
-     * эту логику руками в каждом отдельном обработчике,
-     * параметр params.i добавляется автоматически
-     */
-    params.i = (params.ni = params.ni || '') ? '!important' : '';
-    return ($$handlerMap[params.name] || noop)(params);
+    const important = !!params.ni;
+    const essence = ($$handlerMap[params.name] || noop)(params);
+    essence && (essence.important = important);
+    return essence;
   }
   function initEssence(essenceName, essence, excludes) {
     let _essence;
@@ -596,6 +601,7 @@ module.exports = (options) => {
 
     if (!tmpEssence) return essence;
     compileMixedEssence(essence, tmpEssence, excludes);
+    const important = essence.important;
 
     function __childsHandle(childs, separator, withStatic) {
       const __prefix = essenceName + separator;
@@ -609,20 +615,20 @@ module.exports = (options) => {
                   ? childStaticEssence
                   : __mergeDepth([childStaticEssence, _childEssence], {}))
               : _childEssence,
-            excludes,
+            excludes, important,
         );
       } : (_childEssence, _childName) => {
         childs[_childName] = compileMixedEssence(
             $$essences[__prefix + _childName] = {},
             _childEssence,
-            excludes,
+            excludes, important,
         );
       });
     }
     __childsHandle(essence.childs, '.');
     __childsHandle(essence.media, '@', 1);
   }
-  function compileMixedEssence(dst, src, excludes) {
+  function compileMixedEssence(dst, src, excludes, important) {
     const include = src.include;
     let // eslint-disable-line
       i = include && include.length,
@@ -638,7 +644,8 @@ module.exports = (options) => {
     }
 
     dst.cssText = (style = dst.style)
-      && (style = cssPropertiesStringify(style)) ? ('{' + style + '}') : '';
+      && (style = cssPropertiesStringify(style, dst.important || important))
+      ? ('{' + style + '}') : '';
     dst.inited = 1;
     return dst;
   }
