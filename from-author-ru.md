@@ -8,27 +8,6 @@
 * [Минимализм](#Минимализм)   
 
 
-
-* [Getting started](https://github.com/mr-amirka/minimalist-notation/blob/master/README-ru.md)
-* [Подробная документация](https://github.com/mr-amirka/minimalist-notation/blob/master/docs-ru.md)
-* [Предустановленные опции](https://github.com/mr-amirka/mn-presets/blob/master/README.md)
-
-
-Try this tests:
-* https://jsfiddle.net/dzgj2sL3/
-* https://jsfiddle.net/j6d8aozy/46/  
-
-Home page: http://minimalist-notation.org  
-
-
-
-Буду благодарен за Ваши отзывы и замечания. Пишите мне в [telegram](https://t.me/mr_amirka) .  
-С любовью, Ваш mr.Amirka :)
-
-
-Вы заинтересованы в развитии проекта? Внесите свою [лепту](https://yasobe.ru/na/notation)
-
-
 ## Начало борьбы за адаптивность
 
 

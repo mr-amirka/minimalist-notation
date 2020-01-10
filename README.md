@@ -54,8 +54,8 @@ Output:
 
 
 Try this tests:
-* https://jsfiddle.net/qu12sdox/  
-* https://jsfiddle.net/pvLx62nh/  
+* https://jsfiddle.net/Amirka/dkozgauy/  
+* https://jsfiddle.net/Amirka/0475wbq2/  
 
 
 Try check how this work with using MN Viewer:  
@@ -243,7 +243,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.4.50.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.5.0.js" async></script>
 ```
 
 

@@ -4,31 +4,8 @@
 # From the author
 
 
-
 * [How it started](#how-it-started)  
 * [Minimalism](#minimalism)   
-
-
-
-* [Getting started](https://github.com/mr-amirka/minimalist-notation/blob/master/README.md)
-* [More documentation](https://github.com/mr-amirka/minimalist-notation/blob/master/docs.md)
-* [Presets](https://github.com/mr-amirka/mn-presets/blob/master/README.md)
-
-
-
-Try this tests:
-* https://jsfiddle.net/dzgj2sL3/
-* https://jsfiddle.net/j6d8aozy/46/  
-
-Home page: http://minimalist-notation.org
-
-
-
-I would be grateful for your feedback and comments. Write me in a [telegram](https://t.me/mr_amirka).
-With love, your mr.Amirka :)
-
-
-Are you interested in the development of this project? Do your [bit](https://yasobe.ru/na/notation).
 
 
 

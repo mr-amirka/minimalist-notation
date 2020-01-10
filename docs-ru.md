@@ -38,11 +38,11 @@
 
 
 Try this tests:
-* https://jsfiddle.net/j6d8aozy/51/  
-* https://jsfiddle.net/j6d8aozy/46/  
+* https://jsfiddle.net/Amirka/dkozgauy/  
+* https://jsfiddle.net/Amirka/0475wbq2/  
 
 
-Home page: http://minimalist-notation.org  
+Home page: https://minimalist-notation.org  
 
 
 Буду благодарен за Ваши отзывы и замечания. Пишите мне в [telegram](https://t.me/mr_amirka) .  
@@ -74,7 +74,7 @@ PS:
 * не задаете громоздкие атрибуты длинным селекторам в каждом месте, где хотите, например, просто добавить плавность трансформации. В функциональном подходе это делается один раз, как в CSS-коде ниже:
 
 ```css
-[m~='dn250'] {
+.dn250 {
   -khtml-transition-duration: 250ms;
   -ms-transition-duration: 250ms;
   -o-transition-duration: 250ms;

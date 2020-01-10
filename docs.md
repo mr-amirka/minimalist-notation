@@ -38,10 +38,10 @@
 
 
 Try this tests:
-* https://jsfiddle.net/dzgj2sL3/
-* https://jsfiddle.net/j6d8aozy/46/  
+* https://jsfiddle.net/Amirka/dkozgauy/  
+* https://jsfiddle.net/Amirka/0475wbq2/  
 
-Home page: http://minimalist-notation.org  
+Home page: https://minimalist-notation.org  
 
 
 I would be grateful for your feedback and comments. Write me in a [telegram](https://t.me/mr_amirka).  
@@ -79,7 +79,7 @@ If you are using the Functional/Atomic CSS methodology, then:
 * do not specify bulky attributes for long selectors in every place you want, for example, just add smoothness to the transformation. In the functional approach, this is done once, as in the CSS code below:
 
 ```css
-[m~='dn250'] {
+.dn250 {
   -khtml-transition-duration: 250ms;
   -ms-transition-duration: 250ms;
   -o-transition-duration: 250ms;
