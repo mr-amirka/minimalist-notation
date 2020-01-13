@@ -6,7 +6,7 @@ const CLONE_DEPTH = 10;
 function paddingHandle(p) {
   return {
     style: {
-      padding: (p.num || '0') + (p.unit || 'px') + p.i,
+      padding: (p.num || '0') + (p.unit || 'px'),
     },
   };
 }
@@ -81,7 +81,7 @@ describe('MN instance', () => {
     mn.compile();
     /*
     expect(outputMediaItem).toEqual({
-      content: '[m~=\'p15\']{padding:15px}',
+      content: '[m~=\"p15\"]{padding:15px}',
       name: 'media.all',
       priority: -2000,
       updated: 1,
@@ -89,7 +89,7 @@ describe('MN instance', () => {
     */
     expect(mn.emitter.getValue()).toEqual([
       {
-        content: '[m~=\'p15\']{padding:15px}',
+        content: '[m~=\"p15\"]{padding:15px}',
         name: 'media.all',
         priority: -2000,
         updated: 0,
@@ -100,7 +100,7 @@ describe('MN instance', () => {
     check('p20');
     expect(mn.emitter.getValue()).toEqual([
       {
-        content: '[m~=\'p15\']{padding:15px}',
+        content: '[m~=\"p15\"]{padding:15px}',
         name: 'media.all',
         priority: -2000,
         updated: 0,
@@ -109,7 +109,7 @@ describe('MN instance', () => {
     mn.compile();
     expect(mn.emitter.getValue()).toEqual([
       {
-        content: '[m~=\'p15\']{padding:15px}[m~=\'p20\']{padding:20px}',
+        content: '[m~=\"p15\"]{padding:15px}[m~=\"p20\"]{padding:20px}',
         name: 'media.all',
         priority: -2000,
         updated: 0,

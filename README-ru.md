@@ -55,6 +55,10 @@ Try check how this work with using MN Viewer:
 https://viewer.minimalist-notation.org/  
 
 
+See default styles docs (mn-presets/styles):  
+[styles.minimalist-notation.org](https://styles.minimalist-notation.org)
+
+
 The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
 
 

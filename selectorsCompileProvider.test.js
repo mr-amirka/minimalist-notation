@@ -30,7 +30,7 @@ describe('MN instance', () => {
     expect(parseComboNameProvider('m')(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'[m~=\'cF00\']': 1},
+        {'[m~=\"cF00\"]': 1},
         '',
       ],
     ]);
@@ -38,7 +38,7 @@ describe('MN instance', () => {
     expect(parseComboNameProvider('m-n')(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'[m-n~=\'cF00\']': 1},
+        {'[m-n~=\"cF00\"]': 1},
         '',
       ],
     ]);
@@ -97,14 +97,14 @@ describe('MN instance', () => {
     expect(parseComboNameProvider('m')(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'[m~=\'cF00>.anyChildClass\'] .anyChildClass': 1},
+        {'[m~=\"cF00>.anyChildClass\"] .anyChildClass': 1},
         '',
       ],
     ]);
     expect(parseComboNameProvider('m')(testNotation2)).toEqual([
       [
         {'ph10': 1},
-        {'[m~=\'ph10>div\'] div': 1},
+        {'[m~=\"ph10>div\"] div': 1},
         '',
       ],
     ]);
@@ -112,14 +112,14 @@ describe('MN instance', () => {
     expect(parseComboNameProvider('m-n')(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'[m-n~=\'cF00>.anyChildClass\'] .anyChildClass': 1},
+        {'[m-n~=\"cF00>.anyChildClass\"] .anyChildClass': 1},
         '',
       ],
     ]);
     expect(parseComboNameProvider('m-n')(testNotation2)).toEqual([
       [
         {'ph10': 1},
-        {'[m-n~=\'ph10>div\'] div': 1},
+        {'[m-n~=\"ph10>div\"] div': 1},
         '',
       ],
     ]);
