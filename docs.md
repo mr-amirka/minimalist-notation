@@ -37,7 +37,8 @@
 * [From author](https://github.com/mr-amirka/minimalist-notation/blob/master/from-author.md)    
 
 
-Try this tests:
+Try this tests:  
+
 * https://jsfiddle.net/Amirka/dkozgauy/  
 * https://jsfiddle.net/Amirka/0475wbq2/  
 
@@ -69,7 +70,8 @@ PS:
 The technology is focused on the methodology Functional/Atomic CSS.  
 
 
-If you are using the Functional/Atomic CSS methodology, then:
+If you are using the Functional/Atomic CSS methodology, then:  
+
 * over time, you will at a glance understand the meaning of each name in the markup;
 * you can easily standardize the rules of notation and naming;
 * easy to reuse markup in the new project, if it provides the same basic set of functional styles in CSS.
@@ -90,7 +92,8 @@ If you are using the Functional/Atomic CSS methodology, then:
 ```   
 
 
-Thanks MN:
+Thanks MN:  
+
 * CSS is generated automatically from attribute values in the markup, and we save time by saving ourselves from writing "satanic" CSS-code;
 * We do not have dead CSS code, because CSS is generated only for the markup that is available.
 * we have the opportunity not to contact the server for "heavy" CSS-files, generating CSS in runtime.
@@ -136,7 +139,8 @@ mn.css('.theme-bg', {
 });
 ```
 
-Technology "Minimalist Notation" supports:
+Technology "Minimalist Notation" supports:  
+
 * parameterizable name notation
 * parameterizable state;
 * contexts of parent / child selectors;
@@ -211,7 +215,8 @@ Base format:
 ```
 
 
-Record of notation in MN is divided into 2 parts:
+Record of notation in MN is divided into 2 parts:  
+
 * name of the essence;
 * context of the essence (combined selector and media query).
 

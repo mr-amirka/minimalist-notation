@@ -6,24 +6,22 @@ const escapedHalfProvider = require('mn-utils/escapedHalfProvider');
 const variantsBase = require('mn-utils/variants').base;
 const reduce = require('mn-utils/reduce');
 const push = require('mn-utils/push');
-const joinProvider = require('mn-utils/joinProvider');
 const escapeQuote = require('mn-utils/escapeQuote');
 const escapeCss = require('mn-utils/escapeCss');
 const repeat = require('mn-utils/repeat');
 
-const joinEmpty = joinProvider('');
+const selectorNormalize = require('./selectorNormalize');
+
 const splitSelector = escapedSplitProvider(/[<:\.\[\]#+~]/).base;
 const splitParent = escapedSplitProvider(/<|>\-/).base;
 const splitChild = escapedSplitProvider(/>|<\-/).base;
 const splitMedia = escapedSplitProvider('@').base;
 const splitState = escapedSplitProvider(':').base;
-const splitReverse = escapedSplitProvider('!').base;
 const extractSuffix = escapedHalfProvider(/[<>:\.\[\]#+~@\!]/).base;
 const regexpScope = /^(.*?)\[(.*)\]$/;
 const regexpDepth = /^(\d+)(.*)$/;
 const regexpFix = /^(.*)([~+])$/;
-const regexpClassSubstr = /\.\*([A-Za-z0-9-_$]+)/g;
-const regexpIdSubstr = /\#\*([A-Za-z0-9-_$]+)/g;
+
 const regexpMultiplier = /^(.*)\*([0-9]+)$/;
 
 function getPrefix(depth) {
@@ -77,11 +75,7 @@ module.exports = (instance) => {
         reduce(variantsBase(comboName), suffixesReduce, {}),
         (items, essences, suffix) => {
           const mediaNames = [];
-          const parts = splitChild(joinEmpty(splitReverse(
-              suffix
-                  .replace(regexpClassSubstr, '[class*=$1]')
-                  .replace(regexpIdSubstr, '[id*=$1]'),
-          ).reverse()));
+          const parts = splitChild(selectorNormalize(suffix));
           return push(items, [
             essences,
             reduce(parts, (selectors, partName) => {
@@ -107,12 +101,12 @@ module.exports = (instance) => {
   function procMedia(mediaNames, partName) {
     const separators = [];
     // eslint-disable-next-line
-    return joinEmpty(reduce(splitSelector(partName, separators), (output, selector, index) => {
+    return reduce(splitSelector(partName, separators), (output, selector, index) => {
       const mediaParts = splitMedia(selector);
       push(output, mediaParts[0] + (separators[index] || ''));
       mediaParts.length > 1 && push(mediaNames, unslash(mediaParts[1]));
       return output;
-    }, []));
+    }, []).join('');
   }
   function getParents(mediaNames, name, targetName) {
     const parts = splitParent(name);

@@ -1,4 +1,3 @@
-const selectorsCompileProvider = require('./selectorsCompileProvider');
 const Emitter = require('mn-utils/Emitter');
 const extend = require('mn-utils/extend');
 const isPlainObject = require('mn-utils/isPlainObject');
@@ -33,18 +32,20 @@ const isString = require('mn-utils/isString');
 const noop = require('mn-utils/noop');
 const variants = require('mn-utils/variants');
 const keys = require('mn-utils/keys');
+
 const {
   SC_ESSENCES,
   SC_SELECTORS,
   SC_MEDIA_NAME,
 } = require('./constants');
+const selectorsCompileProvider = require('./selectorsCompileProvider');
+const selectorNormalize = require('./selectorNormalize');
 
 const utils = merge([
   {
     Emitter: Emitter,
     color: require('mn-utils/color'),
     colorGetBackground: require('mn-utils/colorGetBackground'),
-    trimProvider: require('mn-utils/trimProvider'),
     half: require('mn-utils/half'),
     unslash: require('mn-utils/unslash'),
     noop,
@@ -126,12 +127,13 @@ const splitSpace = splitProvider(/\s+/);
 const splitSelector = splitProvider(/\s*,+\s*/);
 const joinOnly = joinProvider('');
 const joinComma = joinProvider(',');
-const __matchName = routeParseProvider('^([a-z]+):name(.*?):suffix$');
-const __matchImportant = routeParseProvider('^(.*?):prefix(-i):ni$');
+const __matchName = routeParseProvider('^([a-z]+):name(.*):suffix$');
+const __matchImportant = routeParseProvider('^(.*):prefix(-i):ni$');
 // eslint-disable-next-line
-const __matchValue = routeParseProvider('^(([A-Z][a-z]+):camel|((\\-):negative?[0-9\\.]+):num):value([a-z%]+):unit?(.*?):other?$');
+const __matchValue = routeParseProvider('^(([A-Z][a-z]+):camel|((\\-):negative?[0-9\\.]+):num):value([a-z%]+):unit?(.*):other?$');
 const regexpBrowserPrefix = /((\:\:\-?|\:\-)([a-z]+\-)?)/;
 const regexpMediaPriority = /^(.*)\^(-?[0-9]+)$/;
+const regexpImportant = /-i$/;
 
 const normalizeSelectors = normalizeMapProvider(normalizeSelectorsIteratee);
 const normalizeComboNames = normalizeMapProvider((namesMap, name) => {
@@ -139,12 +141,9 @@ const normalizeComboNames = normalizeMapProvider((namesMap, name) => {
 });
 function normalizeSelectorsIteratee(selectorsMap, selector) {
   forEach(splitSelector(selector), (selector) => {
-    flags(variants(selector), selectorsMap);
+    flags(map(variants(selector), selectorNormalize), selectorsMap);
   });
   return selectorsMap;
-}
-function __pi(v) {
-  return routeParseProvider(v);
 }
 function __updateClearIteratee(item) {
   item.updated = 0;
@@ -171,8 +170,8 @@ function parseMediaPart(mediaPart) {
   };
 }
 function handlerWrap(essenceHandler, paramsMatchPath) {
-  const parse = paramsMatchPath instanceof Array
-    ? aggregate(paramsMatchPath.map(__pi), eachApply)
+  const parse = isArray(paramsMatchPath)
+    ? aggregate(paramsMatchPath.map(routeParseProvider), eachApply)
     : routeParseProvider(paramsMatchPath);
   return (p) => {
     parse(p.suffix, p);
@@ -188,14 +187,36 @@ function __compilerRecompile(compiler) {
 function __compilerCompile(compiler) {
   compiler._compile();
 }
+function iterateeAddImportant(v) {
+  v.important = 1;
+}
+function iterateeCheckImportant(a, v, k) {
+  a[__iterateeCheckImportant(k)] = v;
+  return a;
+}
+function __iterateeCheckImportant(v) {
+  return regexpImportant.test(v) ? v : (v + '-i');
+}
 function __normalize(essence) {
   if (!essence) return essence;
-  const {selectors, exts, include} = essence;
+  const {selectors, exts, include, important} = essence;
+  function childAddNormalize(childs) {
+    important && forIn(childs, iterateeAddImportant);
+    forIn(childs, __normalize);
+  }
   essence.selectors = selectors ? normalizeSelectors(selectors) : {'': 1};
-  exts && (essence.exts = normalizeComboNames(exts));
-  include && (essence.include = normalizeInclude(include));
-  forIn(essence.childs, __normalize);
-  forIn(essence.media, __normalize);
+  exts && (
+    essence.exts = important
+      ? reduce(normalizeComboNames(exts), iterateeCheckImportant, {})
+      : normalizeComboNames(exts)
+  );
+  include && (
+    essence.include = important
+      ? map(normalizeInclude(include), __iterateeCheckImportant)
+      : normalizeInclude(include)
+  );
+  childAddNormalize(essence.childs);
+  childAddNormalize(essence.media);
   return essence;
 }
 function normalizeMapProvider(iteratee) {
@@ -283,13 +304,10 @@ module.exports = (options) => {
       : mnBaseSet(extendedEssence, essencePath);
   }
 
-  function baseSetEssenseBase(path, extendedEssence, important) {
-    const name = path[0];
-    const instance = $$staticsEssences[name]
-      || ($$staticsEssences[name] = __normalize({
-        inited: 1,
-      }));
-    important && (instance.important = important);
+  function baseSetEssenseBase(name, path, extendedEssence) {
+    $$staticsEssences[name] || ($$staticsEssences[name] = __normalize({
+      inited: 1,
+    }));
     baseSet($$staticsEssences, path, __mergeDepth([
       baseGet($$staticsEssences, path),
       __normalize(extendedEssence),
@@ -303,10 +321,12 @@ module.exports = (options) => {
       path = [essenceName],
       i = 1, l = essencePath.length;
     for (;i < l; i++) push(path, 'childs', essencePath[i]);
-    baseSetEssenseBase(path, extendedEssence);
+    baseSetEssenseBase(essenceName, path, extendedEssence);
     // for important
-    path[0] = essenceName + '-i';
-    baseSetEssenseBase(path, extendedEssence, 1);
+    baseSetEssenseBase(
+        path[0] = essenceName + '-i', path,
+        extend(extend({}, extendedEssence), {important: 1}),
+    );
   }
 
   selectorsCompileProvider(mn);
@@ -439,7 +459,7 @@ module.exports = (options) => {
     const selector = media && media.selector || '';
     let query = media && media.query || '';
     let priority = media && media.priority;
-    if (query) {
+    if (query || selector) {
       return {
         query,
         selector,
