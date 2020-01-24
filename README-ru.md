@@ -47,7 +47,7 @@ Output:
 
 
 Try this tests:
-* https://jsfiddle.net/Amirka/dkozgauy/  
+* https://jsfiddle.net/Amirka/ev9fupcq/   
 * https://jsfiddle.net/Amirka/0475wbq2/  
 
 
@@ -56,7 +56,7 @@ https://viewer.minimalist-notation.org/
 
 
 See default styles docs (mn-presets/styles):  
-[styles.minimalist-notation.org](https://styles.minimalist-notation.org)
+https://styles.minimalist-notation.org/
 
 
 The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
@@ -240,7 +240,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.5.0.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.5.4.js" async></script>
 ```
 
 
