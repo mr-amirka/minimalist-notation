@@ -41,7 +41,7 @@ const {
 const selectorsCompileProvider = require('./selectorsCompileProvider');
 const selectorNormalize = require('./selectorNormalize');
 
-const utils = merge([
+const utils = MinimalistNotationProvider.utils = merge([
   {
     Emitter: Emitter,
     color: require('mn-utils/color'),
@@ -127,10 +127,9 @@ const splitSpace = splitProvider(/\s+/);
 const splitSelector = splitProvider(/\s*,+\s*/);
 const joinOnly = joinProvider('');
 const joinComma = joinProvider(',');
-const __matchName = routeParseProvider('^([a-z]+):name(.*):suffix$');
-const __matchImportant = routeParseProvider('^(.*):prefix(-i):ni$');
-// eslint-disable-next-line
-const __matchValue = routeParseProvider('^(([A-Z][a-z]+):camel|((\\-):negative?[0-9\\.]+):num):value([a-z%]+):unit?(.*):other?$');
+const regexpMatchName = /^([a-z]+)(.*)$/;
+const regexpMatchImportant = /^(.*)(-i)$/;
+const regexpMatchValue = /^((([A-Z][a-z]+)|((-)?[0-9.]+))([a-z%]+)?)?(.*)?$/;
 const regexpBrowserPrefix = /((\:\:\-?|\:\-)([a-z]+\-)?)/;
 const regexpMediaPriority = /^(.*)\^(-?[0-9]+)$/;
 const regexpImportant = /-i$/;
@@ -159,33 +158,25 @@ function parseMediaValue(v) {
   }
   return v;
 }
-function parseMediaPart(mediaPart) {
-  if (!mediaPart) return;
-  const parts = mediaPart.split('-');
-  return parts.length > 1 ? {
-    min: parseMediaValue(parts[0]),
-    max: parseMediaValue(parts[1]),
-  } : {
-    max: parseMediaValue(parts[0]),
-  };
+function parseMediaPart(mediaPart, parts, v) {
+  return mediaPart && (
+    v = parseMediaValue(parts[0]),
+    (parts = mediaPart.split('-')).length > 1 ? {
+      min: v,
+      max: parseMediaValue(parts[1]),
+    } : {
+      max: v,
+    }
+  );
 }
 function handlerWrap(essenceHandler, paramsMatchPath) {
   const parse = isArray(paramsMatchPath)
-    ? aggregate(paramsMatchPath.map(routeParseProvider), eachApply)
+    ? aggregate(map(paramsMatchPath, routeParseProvider), eachApply)
     : routeParseProvider(paramsMatchPath);
   return (p) => {
     parse(p.suffix, p);
     return essenceHandler(p);
   };
-}
-function __compilerClear(compiler) {
-  compiler.clear();
-}
-function __compilerRecompile(compiler) {
-  compiler._recompile();
-}
-function __compilerCompile(compiler) {
-  compiler._compile();
 }
 function iterateeAddImportant(v) {
   v.important = 1;
@@ -250,8 +241,43 @@ function getEessenceSelectors(selectorsMap) {
 function __mergeDepth(src, dst) {
   return mergeDepth(src, dst, MN_MERGE_DEPTH);
 }
-
-module.exports = (options) => {
+function __ctx(src) {
+  src = src || {};
+  src.map = src.map || {};
+  return src;
+}
+function __compileProvider(attrName) {
+  let _cache, _values; // eslint-disable-line
+  function recursiveCheckNode(node) {
+    node.getAttribute && instance(node.getAttribute(attrName));
+    forEach(node.childNodes, recursiveCheckNode);
+  }
+  function instance(v) {
+    if (!v) return;
+    // eslint-disable-next-line
+    for (var vs = splitSpace(v || ''), i = 0, l = vs.length, k; i < l; i++) {
+      _cache[k = vs[i]] || (
+        _cache[k] = 1,
+        push(_values, k)
+      );
+    }
+  }
+  (instance.clear = () => {
+    _cache = instance.cache = {};
+    _values = [];
+  })();
+  instance.getNext = (node) => {
+    const values = _values;
+    _values = [];
+    return values;
+  };
+  instance.checkNode = (node) => {
+    node.getAttribute && instance(node.getAttribute(attrName));
+  };
+  instance.recursiveCheck = recursiveCheckNode;
+  return instance;
+}
+function MinimalistNotationProvider(options) {
   function setPresets(presets) {
     eachTry(presets, [mn]);
   }
@@ -263,27 +289,29 @@ module.exports = (options) => {
     const options = mn.options || {};
     $$selectorPrefix = options.selectorPrefix || '';
   }
-  function mn(essencePath, extendedEssence, paramsMatchPath) {
+  function mn(essencePath, extendedEssence, paramsMatchPath, skip) {
     const type = typeof essencePath;
-    if (type === OBJECT) {
-      forIn(essencePath, baseSetMapIteratee);
-      return mn;
-    }
-    if (!essencePath || type !== STRING) {
-      console.warn('MN: essencePath value must be an string', essencePath);
-      return mn;
-    }
-    mnBaseSet(extendedEssence, essencePath, paramsMatchPath);
+    type === OBJECT
+      ? forIn(essencePath, baseSetMapIteratee)
+      : (
+        !essencePath || type !== STRING
+          ? console.warn('MN: essencePath value must be an string', essencePath)
+          : mnBaseSet(extendedEssence, essencePath, paramsMatchPath, skip)
+      );
     return mn;
   };
   mn.set = mn;
 
-  function mnBaseSet(extendedEssence, essencePath, paramsMatchPath) {
+  function mnBaseSet(extendedEssence, essencePath, paramsMatchPath, skip, v) {
     const type = typeof(extendedEssence);
     type === FUNCTION
       ? (
         $$handlerMap[essencePath] = paramsMatchPath
-          ? handlerWrap(extendedEssence, paramsMatchPath)
+          ? (
+            v = handlerWrap(extendedEssence, paramsMatchPath),
+            v.skip = skip || 0,
+            v
+          )
           : extendedEssence
       )
       : (
@@ -362,42 +390,12 @@ module.exports = (options) => {
     styleRender();
   }, mn);
 
-  function __compileProvider(attrName) {
-    function instance(v) {
-      // eslint-disable-next-line
-      for (var vls = splitSpace(v || ''), i = 0, l = vls.length; i < l; i++) {
-        if ((v = vls[i]) && !cache[v]) {
-          cache[v] = 1;
-          push(newValues, v);
-        }
-      }
-    }
-    let newValues;
-    (instance.clear = () => {
-      cache = instance.cache = {};
-      newValues = [];
-    })();
-    instance._compile = () => {
-      const _values = newValues;
-      newValues = [];
-      updateAttrByValues(_values, attrName);
-    };
-    instance._recompile = () => {
-      updateAttrByMap(cache, attrName);
-    };
-    instance.checkNode = (node) => {
-      node.getAttribute && instance(node.getAttribute(attrName));
-    };
-    instance.recursiveCheck = recursiveCheckNode;
-    function recursiveCheckNode(node) {
-      node.getAttribute && instance(node.getAttribute(attrName));
-      forEach(node.childNodes, recursiveCheckNode);
-    }
-    return instance;
-  };
-  const getCompiler = mn.getCompiler = (attrName) => $$compilers[attrName]
-    || ($$compilers[attrName] = __compileProvider(attrName));
+  function getCompiler(attrName) {
+    return $$compilers[attrName]
+      || ($$compilers[attrName] = __compileProvider(attrName));
+  }
 
+  mn.getCompiler = getCompiler;
   mn.recursiveCheckByAttrs = withResult((node, attrs) => {
     eachApply( // eslint-disable-next-line
         map(map(isString(attrs) ? [attrs] : attrs, getCompiler), 'recursiveCheck'),
@@ -439,17 +437,18 @@ module.exports = (options) => {
   let $$essences;
   let $$root;
   let $$statics;
-  let $$assigned;
+  let $$staticsAssigned;
   let $$staticsEssences;
   let $$keyframes;
   let $$css;
   let $$stylesMap = $$data.stylesMap = {};
+  let $$assigned = $$data.assigned = {};
   let $$media = mn.media = {};
   let $$handlerMap = mn.handlerMap = {};
   let $$force;
   let $$selectorPrefix;
 
-  const parseMediaName = mn.parseMediaName = (mediaName) => {
+  function parseMediaName(mediaName) {
     if (!mediaName || mediaName === 'all') {
       return {
         priority: MN_DEFAULT_PRIORITY,
@@ -511,7 +510,8 @@ module.exports = (options) => {
     priority++;
 
     return {query, selector, priority};
-  };
+  }
+  mn.parseMediaName = parseMediaName;
 
   function __mode(context, mediaName) {
     function prefixIteratee(selector) {
@@ -549,7 +549,9 @@ module.exports = (options) => {
     setStyle('media.' + mediaName, output, mediaPriority);
   }
 
-  function __assignCore(comboNames, selectors, defaultMediaName, excludes) {
+  function __assignCore(
+      assigned, comboNames, selectors, defaultMediaName, excludes,
+  ) {
     defaultMediaName = defaultMediaName || 'all';
     let name, selector, l, i, items, essenceName, item, // eslint-disable-line
       essencesNames, childSelectors, mediaName, actx; // eslint-disable-line
@@ -564,7 +566,7 @@ module.exports = (options) => {
           essencesNames = item[SC_ESSENCES];
           childSelectors = item[SC_SELECTORS];
           mediaName = item[SC_MEDIA_NAME] || defaultMediaName;
-          actx = $$assigned[mediaName] || ($$assigned[mediaName] = {});
+          actx = assigned[mediaName] || (assigned[mediaName] = {});
           for (essenceName in essencesNames) { // eslint-disable-line
             extend(
                 actx[essenceName] || (actx[essenceName] = {}),
@@ -580,6 +582,7 @@ module.exports = (options) => {
   mn.assign = withResult((selectors, comboNames, defaultMediaName) => {
     function iteratee(comboNames, s) {
       __assignCore(
+          $$staticsAssigned,
           normalizeComboNames(comboNames),
           normalizeSelectors(s),
           defaultMediaName,
@@ -590,22 +593,31 @@ module.exports = (options) => {
       : iteratee(comboNames, selectors);
   }, mn);
 
-  function __initEssence(input) {
-    const params = {
-      input,
-      prefix: input,
-      name: input,
-      suffix: '',
-      ni: '',
-    };
-    __matchImportant(input, params);
-    __matchName(params.prefix, params);
-    __matchValue(params.suffix, params);
-
-    const important = !!params.ni;
-    const essence = ($$handlerMap[params.name] || noop)(params);
-    essence && (essence.important = important);
-    return essence;
+  function __initEssence(suffix, matchs, ni, name, handle, essence, params) {
+    return (matchs = regexpMatchName.exec(suffix)) && (
+      name = matchs[1],
+      (matchs = regexpMatchImportant.exec(suffix = matchs[2])) && (
+        suffix = matchs[1],
+        ni = matchs[2]
+      ),
+      (handle = $$handlerMap[name]) && (
+        params = {
+          name: name,
+          suffix: suffix,
+          ni: ni || '',
+        },
+        handle.skip || (matchs = regexpMatchValue.exec(suffix)) && (
+          params.value = matchs[2],
+          params.camel = matchs[3],
+          params.num = matchs[4],
+          params.negative = matchs[5],
+          params.unit = matchs[6],
+          params.other = matchs[7]
+        ),
+        (essence = handle(params)) && (essence.important = ni ? 1 : 0),
+        essence
+      )
+    );
   }
   function initEssence(essenceName, essence, excludes) {
     let _essence;
@@ -708,7 +720,7 @@ module.exports = (options) => {
     const {childs, media, exts} = essence;
     childs && __childsHandle(childs, '.');
     media && __childsHandle(media, '@');
-    exts && __assignCore(exts, selectors, mediaName, excludes);
+    exts && __assignCore($$assigned, exts, selectors, mediaName, excludes);
     return essence;
   }
   function updateSelectorIteratee([essences, selectors, mediaName]) {
@@ -720,11 +732,6 @@ module.exports = (options) => {
     );
   }
 
-  function __ctx(src) {
-    src = src || {};
-    src.map = src.map || {};
-    return src;
-  }
   function __assignItemCompile(actx, mediaName) {
     forIn(actx, (selectors, essenceName) => {
       updateEssence(essenceName, selectors, mediaName);
@@ -736,18 +743,21 @@ module.exports = (options) => {
     $$essences = $$data.essences = {};
     $$root = $$data.root = {};
     $$statics = $$data.statics || ($$data.statics = {});
+
     $$staticsEssences = $$statics.essences || ($$statics.essences = {});
     $$keyframes = $$data.keyframes = __ctx($$data.keyframes);
     $$css = $$data.css = __ctx($$data.css);
     $$stylesMap = $$data.stylesMap = {};
+    $$assigned = $$data.assigned = {};
     forIn(
-        $$assigned = $$statics.assigned || ($$statics.assigned = {}),
+        $$staticsAssigned = $$statics.assigned || ($$statics.assigned = {}),
         __assignItemCompile,
     );
   }
   __clear();
-  mn.clear = withResult(() => {
-    forIn($$compilers, __compilerClear);
+  mn.clear = withResult((attrName) => {
+    // eslint-disable-next-line
+    for (attrName in $$compilers) $$compilers[attrName].clear();
     __clear();
   }, mn);
 
@@ -770,15 +780,21 @@ module.exports = (options) => {
     // eslint-disable-next-line
     setStyle('css', joinOnly(reduce($$css.map, __cssReducer, [])), MN_DEFAULT_CSS_PRIORITY);
   }, mn);
-  const __render = mn.compile = withResult(() => {
+  const __render = mn.compile = withResult((attrName) => {
     updateOptions();
     $$keyframes.updated && keyframesRender();
     $$css.updated && cssRender();
     if ($$force) {
       __clear();
-      forIn($$compilers, __compilerRecompile);
+      // eslint-disable-next-line
+      for (attrName in $$compilers) {
+        updateAttrByMap($$compilers[attrName].cache, attrName);
+      }
     } else {
-      forIn($$compilers, __compilerCompile);
+      // eslint-disable-next-line
+      for (attrName in $$compilers) {
+        updateAttrByValues($$compilers[attrName].getNext(), attrName);
+      }
     }
     forIn($$root, __mode);
     $$updated && styleRender();
@@ -793,8 +809,9 @@ module.exports = (options) => {
     $$force = 1;
     return deferCompile();
   };
-  mn.setKeyframes = withResult((name, body) => {
+  mn.setKeyframes = withResult((name, body, ifEmpty) => {
     const map = $$keyframes.map;
+    if (ifEmpty && map[name]) return;
     if (body) {
       const output = ['{'];
       isObject(body)
@@ -837,4 +854,6 @@ module.exports = (options) => {
   isArray(options.presets) && setPresets(options.presets);
 
   return mn;
-};
+}
+
+module.exports = MinimalistNotationProvider;

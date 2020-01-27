@@ -52,12 +52,13 @@ function parser(attrs) {
               escapedDoubleQuoteAsValue
                 ? unslash(escapedDoubleQuoteAsValue)
                 : (
-                  doubleQuote
-                    || oneQuote
+                  doubleQuote || unslash(
+                      oneQuote
                     || apostrophe
                     || doubleQuoteAsValue
                     || oneQuoteAsValue
-                    || apostropheAsValue
+                    || apostropheAsValue,
+                  )
                 ),
           ),
           (name) => {
@@ -74,13 +75,16 @@ function parser(attrs) {
 }
 function getAttrs(attrs) {
   isString(attrs) && (attrs = splitAttrs(attrs));
-  if (!isObject(attrs)) return null;
-  return isArray(attrs) ? reduce(filter(attrs), (output, name) => {
-    const parts = splitKeyValue(name);
-    name = parts[0];
-    output[name] = parts[1] || name;
-    return output;
-  }, {}) : attrs;
+  return isObject(attrs)
+    ? (
+      isArray(attrs) ? reduce(filter(attrs), (output, name) => {
+        const parts = splitKeyValue(name);
+        name = parts[0];
+        output[name] = parts[1] || name;
+        return output;
+      }, {}) : attrs
+    )
+    : null;
 }
 
 module.exports = parser;
