@@ -1,6 +1,6 @@
 /**
  * @overview minimalistNotation reactCreateElementPatch for React
- * @author Amir Absolutely <mr.amirka@ya.ru>
+ * @author Amir Absalyamov <mr.amirka@ya.ru>
  */
 const isArray = require('mn-utils/isArray');
 const forEach = require('mn-utils/forEach');

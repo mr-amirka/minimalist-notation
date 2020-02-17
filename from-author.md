@@ -12,53 +12,72 @@
 ## How it started
 
 
-In some CSS frameworks, in the same Twitter Bootstrap, in some cases we literally indicate in the markup:
+Using many CSS frameworks, for example, such as Twitter Bootstrap, We write html code this way:  
 ```html
-class="text-center"
+<div class="text-center">...</div>
 ```
-, instead of
+, instead of doing the same through inline style:  
 ```html
-style="text-align: center;"
+<div style="text-align: center;">...</div>
 ```
-In practice, this is similar to the old “criminal” inline way of setting styles for elements. The only difference is in the slightly abbreviated form of writing and the priority of styles.
+In practice, this approach is similar to the old “criminal” for some inline way of setting styles for elements. The difference is only in a slightly reduced form of writing and priority of styles.  
+
+In fact, in such examples, using classes instead of inline styles makes little sense.  
+
+The main disadvantage of inline styles is that they are very bulky and make the html code less readable.  
+CSS allows us to assign the necessary styles to a class, and then specify this class in the target elements, and this allows us to reduce the html code and automate the setting of styles a little, which accordingly speeds up Our work.  
+Also in CSS We can set behavior when changing various selectors and media queries.  
+
+There are several problems with CSS:  
+
+  * context break that slows down the editing process;
+  * the presence of excess abstraction as a separate file with styles;
+  * the need to monitor and clean dependencies;
+  * the behavior of classes in the code are not obvious and need to navigate the code each time to understand their purpose;
+  * excessive cognitive load due to the need to come up with new class names;
+  * side effects and rakes from overlapping CSS rules - although various component approaches are now addressing this flaw;
+  * Lots of CSS. The more CSS there is, the more the browser slows down.  
+  This is due to the fact that under the hood of the browser, cascades of styles, roughly speaking, are a ranked list of templates, with each of which each html element is matched during each rendering.  
+  The more saturated the DOM tree and the longer the list of cascading rules, the more obvious freez. Braking is especially pronounced when animation is applied, as rendering animations can increase the frequency of comparisons..
+
+There are cases when developers are not able to use modern technologies or component approaches.  
+Over time, CSS in their projects grows. It accumulates trash from unused styles and the lot of rakes from overlapping CSS rules.
 
 
+Like many other developers, I started my epic of make adaptive UIs with Twitter Bootstrap.  
+Some flaunted the fact that they use this "framework" in their projects, but in practice, I often saw that most developers made wild overlays on top of the standard styles of this library.  
+In all cases, using Twitter Bootstrap 3 as such did not make much sense.  
+In my observations, from the entire dustbin of the rules that exist in this actually ballast library, for the most part only an adaptive grid is used.  
+I myself also used Bootstrap for the first six months of getting to know him.  
+After getting to know the SASS preprocessor, I myself began to generate an adaptive grid for my own needs.  
 
-I see no benefit in clogging the project with files with extra CSS code, given the likelihood that it may potentialy uncontrollably lose relevance as the markup for which it was written may be changed. The project may accumulate CSS code, the relevance of which is not known to us. When trying to clean it up, you can accidentally delete something that is necessary, and as a result, the consequences of this action can be very sad. Although, of course, the component approach, or some methodologies, such as BEM, or properly configured build systems helps to cope with this problem, however here you see another solution.
+The adaptation Bootstrap 3, in fact, applies only to the column grid for different screen resolutions and some predefined and often unclaimed elements.  
 
-
-
-The main disadvantage of inline styles is that they are very bulky and make markup less readable. CSS allows us to place the necessary styles in a class, and then specify this class for the elements we need. But at the development time of the project, the CSS grows, and the garbage dump from the heap of unused styles accumulates in it, or if this was developed "developers with curved hands", which I often watched, then there is lot of rakes from the heap of overlaying each other rules of CSS.
-
-
-Some developers is flaunt the fact that they used Twitter Bootstrap 3 in their projects, but in practice I had to deal with the fact that most of the developers I knew made wild overlaying on top of the standard styles in the classes of this library. In all cases, using Twitter Bootstrap 3, as such, did not make much sense.
-
-
-In my observations, most often from the entire garbage, which is in this ballast library, for the most part, only the adaptive grid is used, since the tasks are often quite specific - I myself did this for the first six months of my acquaintance with Bootstrap 3.
-After becoming acquainted with the SASS preprocessor, I began to independently generate an adaptive grid to fit my needs.  
+In the adaptive grid, we use suffixes in class notation that correspond to a certain width of the browser window, or rather media queries, such as -xs, -sm, -md, -lg.  
+For example: col-sm-6, col-md-4, col-lg-6.
 
 
-Adaptation of Bootstrap 3, in fact, extends only to the column grid for different screen resolutions and some pre-installed and often unclaimed elements.
+Often I wanted to have the ability to adapt other relevant styles of Bootstrap classes: text-left, text-center, etc. by analogy, for example: text-center-xs, text-left-md.  
+
+It is very strange that this was not in the library.  
 
 
-In the adaptive grid, we use suffixes in the class notation corresponding to a specific width of the browser window, or rather media queries, such as: -xs, -sm, -md, -lg. For example: col-sm-6, col-md-4, col-lg-6.
+For obvious reasons, such a notation is not intended for adaptability of font sizes, for example: font-size-sm-14, font-size-lg-20.  
+Although, for my tasks, a similar feature is in demand,
+I understand that generating classes for all font sizes will yield a lot of useless CSS code.
 
 
-In my opinion, the omission of Bootstrap 3 is that prefixes are not provided for the adaptability of other actual styles: text-left, text-center, etc. For example: text-center-xs, text-left-md.
+My CSS approach is a well-established general optimal approach for most CSS frameworks, which We all are coming to experimentally.
+
+I borrowed it partly from famous Twitter Bootstrap.  
+The essence of the approach is to define in each CSS class a minimal set of styles to take into account many common situations, which allows us to:  
+
+  * do not add new classes for similar cases;
+  * avoid excessive overlapping styles;
+  * do not get confused in cumbersome CSS code, vainly reserving “memory cells” in your brain for all these continuously multiplying selectors and cascades of styles.  
 
 
-For obvious reasons, such a notation is not provided for the adaptability of font sizes, for example: font-size-sm-14, font-size-lg-20. Although, for my tasks, this feature is in demand, I understand that the generation of classes for all font sizes will give a lot of useless CSS code.
-
-
-By the way, note that the more CSS-code, the stronger it slows down the browser. This is due to the fact that under the hood of the browser, cascades of styles, roughly speaking, are a ranked list of templates, with each of which is matched each markup element during each rendering. The more saturated the DOM and the longer the list of cascading rules, the more clearly the inhibition. Braking is especially obvious when animation is applied, because rendering animations can increase the frequency of these comparisons.
-
-
-My approach to the layout is a well-proven general optimal approach of most CSS frameworks, to which we arrive by experience. He partially is borrowed by me from famed the Twitter Bootstrap. The essence of the approach is to define in each CSS class a minimal set of styles to take into account many common situations, which allows us to:
-* not add new classes for similar cases;
-* avoid excessive overlapping styles;
-* yourself am not confused in the cumbersome CSS code, vainly reserving in your brain the “memory cells” for all these continuously multiplying selectors and cascades of  styles.
-
-The idea of creating MN technology came at a time when, in the course of my professional activity, I got into the habit of writing CSS like this:
+The idea of creating MN technology arose at a time when in the process of professional activity I got into the habit of writing CSS in approximately this way:  
 ```css
 .p10{
   padding: 10px;
@@ -79,99 +98,256 @@ The idea of creating MN technology came at a time when, in the course of my prof
   }
 }
 ```
-In my code, there was already a certain notation comparable to strictly defined style attributes, their values ​​and media queries.
+There was already a certain notation in my code comparable to strictly defined attributes of styles, their values and media queries.  
 
-At first I was try to automate the generation of classes by LESS preprocessors, then SASS.
+At first, I tried to automate the generation of classes by the SASS preprocessor, roughly speaking, in approximately this way:  
+```scss
+$grids: (
+  // suffix, media, container width
+  ('', all ),
+  ('-sm', (max-width: 992px), 750px),
+  ('-xs', (max-width: 768px), 480px),
+  ('-xm', (max-width: 480px) ),
+  ('-xn', (max-width: 360px) ),
+  ('-mm', (max-width: 320px) ),
+  ('-md', (min-width: 992px), 970px ),
+  ('-lg', (min-width: 1200px), 1170px ),
+  ('-ll', (min-width: 1600px), 1570px )
 
-Then I thought about developing my technology, which could involves the generation of styles based on the notation of class names in the markup itself, which would allow even more automation of the development process.
+  //,('-print', print )
+);
 
-In order to research out all the nuances, I studied the BEM methodology, which I met earlier in 2017, in more detail. BEM offers a unique naming of components and their components in order to avoid collisions of names from different components, a hierarchy of placement of source codes of components, which is essentially similar to that in the component approach methodology.
-This idea is understandable, but my approach also allows me to reduce the writing of unnecessary code, systematize the naming of classes and improve the understanding of their purpose in the markup.
+$prefixes: ( '-o-', '-ms-', '-moz-', '-webkit-' );
+
+@mixin cross($name, $value: ''){
+  @each $prefix in $prefixes {
+    #{$prefix + $name}: $value;
+  }
+  #{$name}: $value;
+}
+
+@mixin sides($name, $valueName, $suffix, $prop, $value) {
+  #{$name}#{$valueName}#{$suffix} {
+    #{$prop} : $value;
+  }
+  #{$name}v#{$valueName}#{$suffix} {
+    #{$prop}-top : $value;
+    #{$prop}-bottom : $value;
+  }
+  #{$name}h#{$valueName}#{$suffix} {
+    #{$prop}-left : $value;
+    #{$prop}-right : $value;
+  }
+  #{$name}t#{$valueName}#{$suffix} {
+    #{$prop}-top : $value;
+  }
+  #{$name}b#{$valueName}#{$suffix} {
+    #{$prop}-bottom : $value;
+  }
+  #{$name}l#{$valueName}#{$suffix} {
+    #{$prop}-left : $value;
+  }
+  #{$name}r#{$valueName}#{$suffix} {
+    #{$prop}-right : $value;
+  }`
+}
+@mixin clearfix(){
+  &:before, &:after {
+    content: " ";
+    clear: both;
+    display: table;
+  }
+  @content
+}
+
+@mixin keyframes($name) {
+  @-o-keyframes #{$name} { @content; }
+  @-moz-keyframes #{$name} { @content; }
+  @-webkit-keyframes #{$name} { @content; }
+  @keyframes #{$name} { @content; }
+}
+
+@include keyframes(spinner-animate){
+  from { @include cross(transform, rotateZ(0deg)); }
+  to { @include cross(transform, rotateZ(360deg)); }
+}
+
+.spnr {
+  @include cross(animation, spinner-animate 3s infinite linear);
+}
+
+%col{min-height: 1px;}
+
+@each $suffix, $media, $container in $grids {
+  $i: 12;
+  @while $i > 0 {
+    .col#{$i}#{$suffix}{ @extend %col; }
+    $i: $i - 1;
+  }
+  @media #{$media} {
+    $i: 12;
+    @while $i > 0 {
+      .col#{$i}#{$suffix}{
+        @extend .lt#{$suffix};
+        width: 100% * $i / 12;
+      }
+      $i: $i - 1;
+    }
+
+    .cfx#{$suffix} {
+      @include clearfix();
+    }
+
+    @each $size in 5, 10, 15, 20, 25, 30 {
+      #{'.mh-' + $size + $suffix} {
+        margin-left: -$size + px;
+        margin-right: -$size + px;
+      }
+    }
+
+    // text-align
+    .tl#{$suffix}{text-align:left;}
+    .tc#{$suffix}{text-align:center;}
+    .tr#{$suffix}{text-align:right;}
+
+    // float
+    .lt#{$suffix}{float:left;}
+    .ct#{$suffix}{float:none;}
+    .rt#{$suffix}{float:right;}
+
+    // display
+    .dNone#{$suffix}{display:none;}
+    .dBlock#{$suffix}{display:block;}
+    .dInlineBlock#{$suffix}{display:inline-block;}
+    .dInline#{$suffix}{display:inline;}
+    // ...
+
+    // font-size
+    @each $size in 12, 14, 16, 18, 20, 24, 30, 32 {
+      #{'.f' + $size + $suffix} { font-size: $size + px; }
+    }
+
+    // padding
+    @each $size in 0, 5, 10, 15, 20, 25, 30 {
+      @include sides('.p', $size, $suffix, padding, $size + px)
+    }
+
+    // margin
+    @each $size in 0, 5, 10, 15, 20, 30 {
+      @include sides('.m', $size, $suffix, margin, $size + px);
+    }
+    // ...
+  }
+  //...
+}
+```
+
+Then I began thought about developing my technology, which mean generating styles based on class notation in the html code itself, which would be allow to further automate the development process and improve the quality of the code.  
+
+
+The main idea: styles are generated automatically based on the attribute values found in the html code itself - nothing more!  
+
+
+Thus, We will not have unused CSS-code, and in most cases We can not have need write CSS-code at all, and if desired in the runtime version We can even are not go to the server for CSS-files - CSS is unpacked, like a rar-archive , from the html or jsx code itself.  
+
+
+The basis is the principle of forming a class name from a style attribute - this is, in fact, an analog of inline styles,
+only more minimalistic, for I tried to shorten the names of classes to abbreviations.  
+
+
+Part of the class name is responsible for the style attribute, part for its value.  
+However, this is not enough for adaptability, so I have done even more, and We can see this from the examples given in this documentation.  
+
+
+In order to work out all the nuances, I tried to study in more detail the approaches known to me at the time of 2017 in the development of interfaces, including the "BEM methodology".   
+
+
+My approach reduces code writing, systematizes class naming, and improves understanding of their purpose in code.  
+
+
+Agree, in any case, We have to write class names in the html code, and if We compare MN with something, then for example:  
+
+  1. The total value of the ``` class ``` attribute in your markup can be even less than the long BEM class names..
+  2. No need to write CSS.
+  3. Class names almost literally speak for themselves what exactly they do.
+  4. The eternal problem of the programmer: "How to name a variable?". In most cases, we save time and mental energy, eliminating the need to think once again about how best to name the class for any element, since we are guided by a predefined template.
+  5. Once defined essences and rules for generating essences in the future form an easily expandable, flexible and final fundamental base, which can act as a generally accepted standard for most developers, which lowers the threshold for entry.
+  6. Due to the flexibility and reactive nature of the technology, based on the basic "style essences" and the rules for their generation, a reusable code is created.
+
+
+The BEM methodology, in terms of its bulkiness and non-adaptability, is somewhat opposite to the methodology that I adhere to, but if necessary it can be applied together.  
+
+In my notation, instead of the concept of "Element" there is the concept of "Essence of style."
+An alternative to the concepts "Block" and "State modifier" is the "Essence Context", which includes:  
+
+  * improved alternative to CSS selectors;
+  * synonyms or patterns of media queries.
+
+Through a well-thought-out syntax, you can succinctly indicate the behavior of the "essences of styles" when changing all kinds of selectors and media queries.  
+
+
+When I created MN, my goal was:    
+
+  1. To automate CSS generation, because my manual way of writing CSS has become mechanical. If I already add new classes for each individual value of the style attribute, calling them the corresponding abbreviations - which is a direct correlation, then why don’t I automatically generate them directly from the markup so that I can no need longer open the CSS file? This is geniusly! This is like a peculiar implementation of the reactivity paradigm in CSS!
+  As We know, html code makes sense without CSS, but CSS alone doesn't make sense without html. In our case, everything you need is in one place. The markup is autonomous and all information about its appearance is in it itself.  
+  This approach has something in common with the Angular directive approach. The difference between pure CSS and MN is about the same as between VanillaJS and Angular, or between jQuery and Angular. In the first case, you manually manipulate DOM elements, manually register element selectors in JS for which you need to initialize any plug-in or hang an event. In the second case, you simply write a directive on the necessary element in the markup that initializes the component or sets the expression to be executed upon the occurrence of an event..  
+
+  2. To avoid collisions with class names. The generation of styles for individual custom attributes in the markup is provided. The notation insolently use service symbols, that it is unlikely that someone will use it voluntarily, since their manual escaping in CSS is quite expensive and “stressful” to read. MN allows We to be minimally limited in the parameterization of notation essences. There is also a convenient opportunity, if necessary, to shield service symbols if they should be in the parameters of the essence.
+
+  3. To develop the most adaptive and concise notation system that takes into account the mutability of styles depending on changes in state, attributes and classes both on the element itself and on its parent elements, and mutability depending on changes in media queries.  
+  With MN technology, you might get the feeling that cascades of styles have moved directly to the html code itself. MN looks like a more concise counterpart and an alternative to inline styles with all the features of regular CSS.  
+
+
+All subsequent features were added during the application of MN in my projects. I added something that allowed me to reduce the routine of writing classes in the html code itself:  
+
+  1. The ability to indicate in a notation of the current element which style its child elements will have is a very convenient feature that has helped me out many times.  
+
+  2. To reducing the writing of several class names with similar substrings thanks the notation of grouping of substrings developed by me and the algorithm for parsing them.  
+
+  3. To prioritize styles in notation.
+
+
+Some features were added purely experimentally due to the fact that something similar is in other preprocessors, and something seemed possible and easily achievable:  
+
+
+  1. Inheritance from essences of styles (extension). This is a cool feature. Sometimes it is needed, but I do not recommend its use unnecessarily, due to the fact that:  
+
+    * first, multiple inheritance makes code harder to understand;  
+    * secondly, when the essence ``` A ``` inherits the properties of the essence ``` B ```, the selectors associated with the essence ``` A ```, are also associated with the essence ``` B ```. This in most cases leads to the fact that the generated final CSS code due to the duplication of selectors in volume can significantly exceed the CSS code obtained using mixins.  
+
+  2. The essences mixins. The essences mixins can be used as an alternative to inheritance of essences, depending on how optimal it is for the current project from your point of view. Mixins differ from inheritance in that they directly copy the attributes of donor essences at the step of compiling the essences, which is more optimal.  
+
+  3. The association of selectors with essences of styles is a rarely used but very convenient feature.  
+
+  4. The programmatically manipulation global CSS styles in runtime. Manipulation of global CSS styles in runtime is mainly used as a way of dynamic customization and alternative style setting when we want to not see CSS files in our project at all.  
 
 
 
-Agree, in any case, you have to write class names in the markup, and if MN is compared with something then, for example:
-1. The total value of the attribute ``` class ``` or ``` m ``` in your markup may even be less than the class names in BEM.
-2. No need to write CSS.
-3. The names of classes almost literally speak for themselves what exactly they do.
-4. The eternal problem of the programmer: "How to named a variable?". In most cases, you save time and mental energy, eliminating the need to once again think about how best to name a class for any element, as you are guided by a predefined template.
-5. In perspective, essences and rules of generation of essences form an easily expandable, flexible and finite fundamental base, which can act as a generally accepted standard for most developers, reducing the threshold of entry.
-6. Due to the flexibility and reactive nature of the technology, based on b
+I later found out that the methodology I follow is referred to as Functional / Atomic CSS.  
 
 
 
-The BEM methodology in its aspects of cumbersomeness and non-adaptability is somewhat opposite to the methodology that I adhere to, but it is quite possible to apply it together. For example, in order to give your markup a little semantics, which will help you looking at the markup to understand that such and such a fragment of the markup is related specifically to such a component. Often, this is not difficult to understand, but nonetheless.
-Combining the use of BEM is also advisable when you write CSS for creating themes, customizing color schemes, font sizes and other attributes that do not require changing the code of the markup itself.
+## Минимализм!
 
+In my case, minimalism implies the minimum complexity of solving problems, in particular, the following:  
 
-In my notation, instead of the notion "Element", there is the notion "Essence of Style", around which everything revolves. An alternative to the concepts of "Block" and "State Modifier" is the "Context of Essence", which, in fact, is an improved alternative to CSS selectors. Through these selectors, you can concisely indicate all those situations in which styles of essences become active.
-
-
-
-When I started to develope MN, my goal was:
-
-1. Automate the generation of CSS, for my manual way of writing CSS has become mechanical. If I already add new classes for each individual value of the style attribute, calling them the appropriate abbreviations - where there is a direct relationship, then why don't I make their automatic generation directly from the markup in order not to open anymore the CSS file? This is geniusly! It looks like a kind of reactivity paradigm implementation in CSS!
-As you know, markup makes sense without CSS, but by itself CSS does not make sense without markup. In our case, the everything needed in the one place. The markup is autonomous and all information about its appearance is in it.
-This approach has something in common with the Angular directive approach. The difference between pure CSS and MN is about the same as between VanillaJS and Angular, or between jQuery and Angular. In the first case, you manipulate DOM elements manually, manually registrate elements selectors in JS, for which you need to initialize a plugin or hang up an event. In the second case, you simply write on the desired element in the markup a directive that initializes the component or sets the expression to be executed upon the occurrence of an event.
-
-2. To avoid collisions with class names. It is possible to generate styles for a separate custom attribute in markup. In notation, the use of service characters are exploited in a cheeky way, which, it is unlikely, someone will use voluntarily, since their manual shielding in CSS is quite expensive and stressful to read. The service symbols are supported by a rigid notation framework in MN, which allows you to restrict yourself minimally in the parameterization of notation essences. There is also a convenient opportunity, if necessary, to escape characters that are serviced if they should be in the parameters of the essence.
-
-3. Develop the most adaptive and concise notation system that takes into account the mutability of styles depending on changes in state, attributes and classes both on the element itself and on its parent elements, and depending on changes in media queries.
-With MN technology, you may feel that the cascades of styles have moved directly into the markup itself. MN looks like a more concise analogue and alternative to inline styles with mutability depending on the media query, state, attributes and classes both on the element itself and on its parent elements.
-
-
-All subsequent features were added already in the process of applying MN in my projects. I added something that made it possible to reduce routine actions with writing class names in the markup itself:
-
-1. The ability to specify in the notation of the name of the class of the current element how style its child elements - this is a very handy feature that has help me many times.
-
-2. Reduction of the record of several class names with similar substrings, thanks developed by me the notation of grouping of substrings;
-
-Some features were added purely experimentally due to the fact that there is something similar in other preprocessors, and something seemed possible and easily achievable:
-
-
-1. Inheritance from the essences of styles (extension). This is a cool feature. Sometimes it is needed, but rarely needed due to other features of MN. I do not recommend its use without necessity, due to the fact that:
-* First, multiple inheritance makes the code harder to understand;
-* secondly, when the essence ``` A ``` inherits the properties of the essence ``` B ```, selectors associated with the essence ``` A ``` are also associated with the essence ``` B ```. This in most cases leads to the fact that the generated final CSS-code due to duplication of selectors by volume can significantly exceed the CSS-code obtained using impurities.
-
-2. Impurities of essences. Essencess impurities can be used as an alternative to the inheritance of essences, depending on how optimal it is for the current project by your point of view. Impurities differ from inheritance in that they directly copy the attributes of donor essences during the precompilation step of the essence, which is more optimal.
-
-3. The association of selectors with style essences is a rarely used but very convenient option.
-
-4. Availabale manipulation of global CSS styles in runtime. From this list, the manipulation of global CSS styles in runtime is most often used mainly as a way of alternatively specifying styles when we want not to see the CSS files in our project at all.
+  * minimum code characters;
+  * minimal memory allocation in Our brain for storing classes and their corresponding styles;
+  * exclusion of unnecessary abstractions.
 
 
 
-
-
-Later I found out that the methodology I follow is like the Functional / Atomic CSS methodology.
-So far, I ha not studied the existing technologies at the moment, which are also focused on this methodology, but I naively believe that my solution covers all their possibilities!))  
+We remember only the basic notation rules and interpretation rules for parameterized names that we set ourselves, as well as options at Our discretion: synonyms of pseudo-classes, contexts of parent / child selectors.  
 
 
 
-
-## Minimalism!
-In my case, minimalism implies the minimum complexity of problem solving, in particular, the following:
-* the minimum number of characters code;
-* minimal memory allocation in your brain for memorizing classes and which styles correspond to them;
-* elimination of unnecessary abstractions.  
+We can add our own handler that generates essences of styles.
+Examples are in the repository https://github.com/mr-amirka/mn-presets.   
 
 
-The main idea: the generation of styles is based on the class names found in the markup - nothing superfluous! Thus, we will not have unused CSS-code, and in most cases we can is not write CSS-code at all, and even not got CSS-files from the server because CSS is unpacked, like a rar-archive from the markup itself.  
+For the runtime version of the library, I tried to make the parsing and CSS generation as optimal as possible:  
 
-
-
-You remember only the basic notation rule and interpretation rules for parameterized names that you set yourself, as well as options at your discretion: states, contexts of parent / child selectors and synonyms.  
-
-
-In base the principle of forming a class name from an attribute of a style - this, in essence, is the same abbreviated analogue of inline styles, but I tried to shorten the names of the classes to abbreviations so that they are as short as possible, but nonetheless to avoid collisions.
-Part of the class name is responsible for the attribute of style, part - for its value - this is not enough for adaptability, so I did more, and you can see this from the examples above.  
-
-You can add your handler that generates essences of styles. Examples are located in the repository directory ``` /mn-presets ```.
-
-
-
-I tried to make parsing and the CSS generating as optimal as possible:
-* if the registered class name is already registered once, then the repeated call of the check method for this name will be ignored.
-* If a new class name has been registered, the rendering procedure does not occur immediately, but is postponed to the end of the iteration of the event loop and runs once after all the previous calls to the check method.
-* values in inside are grouped by media-queries contexts and essences  styles, each of which contains separately precompiled text of CSS attributes and text of CSS selectors that remain unchanged if registration of a new name does not apply to this essence. Those. When registering new class names, there is a minimum of string concatenation operations.
-* CSS handler generators are triggered once for each unique essence.
+  * if the class name is already registered once, then the repeated call of the check method for this name will be ignored.  
+  * if a new class name has been registered, the rendering procedure does not occur immediately, but is delayed at the end of the iteration of the event loop and fulfills once after all previous calls to the check method.  
+  * in the internal data structures of the preprocessor, selectors are grouped by media query contexts and style essences, for each of which a separate precompiled text of CSS attributes and text of CSS selectors are stored. When registering new class names, there is a minimum of string concatenation operations.  
+  * CSS handlers generate once for each unique essence.  

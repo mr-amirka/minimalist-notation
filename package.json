@@ -1,6 +1,6 @@
 {
   "name": "minimalist-notation",
-  "version": "1.5.6",
+  "version": "1.5.8",
   "description": "Minimalist Notation",
   "main": "./index.js",
   "bin": {
@@ -50,7 +50,7 @@
     "selectors"
   ],
   "author": {
-    "name": "Amir Absolutely",
+    "name": "Amir Absalyamov",
     "email": "mr.amirka@ya.ru",
     "url": "https://github.com/mr-amirka"
   },

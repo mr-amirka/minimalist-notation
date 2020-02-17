@@ -1,6 +1,6 @@
 /**
  * @overview minimalist-notation/parserProvider
- * @author Amir Absolutely <mr.amirka@ya.ru>
+ * @author Amir Absalyamov <mr.amirka@ya.ru>
  */
 
 import { attrsMap } from './index';
