@@ -62,6 +62,8 @@ https://styles.minimalist-notation.org/
 The starter build with Webpack: https://github.com/mr-amirka/mn-get-started  
 
 
+-------------------------
+
 
 ### CLI
 ```sh
@@ -74,6 +76,8 @@ mn --compile ./src --output ./dist/styles.css
 
 [More about CLI](https://github.com/mr-amirka/minimalist-notation/blob/master/cli/README.md)
 
+
+-------------------------
 
 ### Usage with Webpack
 
@@ -160,6 +164,7 @@ module.exports = {
 };
 ```
 
+-------------------------
 
 ### Usage with Gulp3
 
@@ -194,6 +199,8 @@ gulp.task('build', function() {
 [More about Gulp3](https://github.com/mr-amirka/minimalist-notation/blob/master/gulp3/README.md)
 
 
+-------------------------
+
 ## Runtime
 
 Example:
@@ -227,6 +234,7 @@ onDocumentReady(() => {
 });
 ```
 
+-------------------------
 
 ### Standalone
 
@@ -243,6 +251,7 @@ Example:
 <script src="https://minimalist-notation.org/dest/standalone-mn.1.5.6.js" async></script>
 ```
 
+-------------------------
 
 ### Integrating "Minimalist Notation" into  React
 
@@ -295,6 +304,7 @@ render(<App/>, document.getElementById('app'));
 
 ```
 
+-------------------------
 
 Буду благодарен за Ваши отзывы и замечания. Пишите мне в [telegram](https://t.me/mr_amirka).    
 С любовью, Ваш mr.Amirka :)  
