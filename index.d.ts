@@ -3,7 +3,7 @@
  * @author Amir Absalyamov <mr.amirka@ya.ru>
  */
 
-import {MinimalistNotation} from './global';
+import {IMinimalistNotation} from "./global";
 
-declare const minimalistNotationProvider: () => MinimalistNotation;
+declare const minimalistNotationProvider: () => IMinimalistNotation;
 export = minimalistNotationProvider;

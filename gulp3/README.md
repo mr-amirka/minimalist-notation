@@ -19,6 +19,7 @@ gulp.task('build', function() {
     .pipe(gulpMN('./dest/app.css', {
       // selectorPrefix: '',
       // attrs: {'class': 'class'},
+      // altColor: 'off' // disable alternate color generation
       presets: [
         require('mn-presets/medias'),
         require('mn-presets/prefixes'),
@@ -39,6 +40,7 @@ gulp.task('build', function() {
 interface gulpMNOptions {
   selectorPrefix?: string,
   output?: string | null,
+  altColor?: string | null,
   attrs?: string | string[] | {[fromName:string]: string},
   presets?: MnPreset[]
 }
@@ -51,5 +53,6 @@ interface gulpMNOptions {
 | --------------- | -------------------------------------------------- |
 | selectorPrefix  | ''                                                 |
 | output          | './mn.styles.css'                                  |
+| altColor        | 'on'                                               |
 | attrs           | {'class': 'class', 'className': 'class', 'm': 'm'} |
 | presets         | [  require('mn-presets/medias'), require('mn-presets/prefixes'), require('mn-presets/styles'), require('mn-presets/states'), require('mn-presets/main') ] |

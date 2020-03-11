@@ -16,7 +16,6 @@ const isEmpty = require('mn-utils/isEmpty');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
 
-
 const getAttrs = parserProvider.getAttrs;
 
 const defaultSettings = exports.defaultSettings = {
@@ -91,7 +90,7 @@ function parseSource(path, commonOptions, entries) {
   const attrs = commonOptions.attrs || [];
   const presets = commonOptions.presets || [];
   const selectorPrefix = commonOptions.selectorPrefix || '';
-  const {include, exclude, watch} = commonOptions;
+  const {include, exclude, watch, altColor} = commonOptions;
   const allAttrsMap = getAttrs(attrs);
   const handlersMap = {};
   const excludesMap = {};
@@ -110,6 +109,7 @@ function parseSource(path, commonOptions, entries) {
       build: buildProvider(data, entryOptions.output || name, compileProvider({
         presets: entryOptions.presets || presets,
         selectorPrefix: entryOptions.selectorPrefix || selectorPrefix,
+        altColor: entryOptions.altColor || altColor,
       }), {
         ...commonOptions,
         ...entryOptions,

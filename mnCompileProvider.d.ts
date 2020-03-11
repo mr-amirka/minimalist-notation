@@ -1,4 +1,4 @@
-import { MnPreset, attrsMap } from './index';
+import {IAttrsMap, IMNPreset} from "./global";
 
-declare const compileProvider: (presets: MnPreset[]) => (attrsMap: attrsMap) => string;
+declare const compileProvider: (presets: IMNPreset[]) => (attrsMap: IAttrsMap) => string;
 export = compileProvider;

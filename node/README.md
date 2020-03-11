@@ -7,6 +7,7 @@ const {compileSource} = require('minimalist-notation/node');
 compileSource({
   watch: true,
   path: './src',
+  // altColor: 'off' // disable alternate color generation
   entry: {
     './dist/styles': './src',
     './dist/other': './other',

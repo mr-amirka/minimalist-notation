@@ -4,6 +4,7 @@ const isPlainObject = require('mn-utils/isPlainObject');
 const isObject = require('mn-utils/isObject');
 const isArray = require('mn-utils/isArray');
 const isNumber = require('mn-utils/isNumber');
+const isEmpty = require('mn-utils/isEmpty');
 const set = require('mn-utils/set');
 const get = require('mn-utils/get');
 const aggregate = require('mn-utils/aggregate');
@@ -22,7 +23,8 @@ const cssPropertiesParse = require('mn-utils/cssPropertiesParse');
 const push = require('mn-utils/push');
 const pushArray = require('mn-utils/pushArray');
 const splitProvider = require('mn-utils/splitProvider');
-const joinProvider = require('mn-utils/joinProvider');
+const joinOnly = require('mn-utils/joinOnly');
+const joinComma = require('mn-utils/joinComma');
 const withDefer = require('mn-utils/withDefer');
 const withResult = require('mn-utils/withResult');
 const map = require('mn-utils/map');
@@ -32,6 +34,8 @@ const isString = require('mn-utils/isString');
 const noop = require('mn-utils/noop');
 const variants = require('mn-utils/variants');
 const keys = require('mn-utils/keys');
+const color = require('mn-utils/color');
+const colorGetBackground = require('mn-utils/colorGetBackground');
 
 const {
   SC_ESSENCES,
@@ -44,8 +48,8 @@ const selectorNormalize = require('./selectorNormalize');
 const utils = MinimalistNotationProvider.utils = merge([
   {
     Emitter: Emitter,
-    color: require('mn-utils/color'),
-    colorGetBackground: require('mn-utils/colorGetBackground'),
+    color,
+    colorGetBackground,
     half: require('mn-utils/half'),
     unslash: require('mn-utils/unslash'),
     noop,
@@ -63,7 +67,7 @@ const utils = MinimalistNotationProvider.utils = merge([
     isPromise: require('mn-utils/isPromise'),
     isIndex: require('mn-utils/isIndex'),
     isLength: require('mn-utils/isLength'),
-    isEmpty: require('mn-utils/isEmpty'),
+    isEmpty,
     once: require('mn-utils/once'),
     delay: require('mn-utils/delay'),
     removeOf: require('mn-utils/removeOf'),
@@ -89,7 +93,9 @@ const utils = MinimalistNotationProvider.utils = merge([
     push,
     pushArray,
     splitProvider,
-    joinProvider,
+    joinProvider: require('mn-utils/joinProvider'),
+    joinOnly,
+    joinComma,
     withDefer,
     withResult,
     map,
@@ -118,6 +124,14 @@ const // eslint-disable-line
   STRING = 'string',
   baseSet = set.base,
   baseGet = get.base;
+
+const MN_CONTEXT_ESSENCE_MAP = 0;
+const MN_CONTEXT_ESSENCE_SELECTORS = 1;
+const MN_CONTEXT_ESSENCE_PRIORITY = 2;
+const MN_CONTEXT_ESSENCE_CSS_TEXT = 3;
+const MN_CONTEXT_ESSENCE_UPDATED = 4;
+const MN_CONTEXT_ESSENCE_CONTENT = 5;
+
 const MN_MERGE_DEPTH = 50;
 const MN_KEYFRAMES_TOKEN = 'keyframes';
 const MN_DEFAULT_PRIORITY = -2000;
@@ -125,8 +139,6 @@ const MN_DEFAULT_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 2000;
 const MN_DEFAULT_OTHER_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 4000;
 const splitSpace = splitProvider(/\s+/);
 const splitSelector = splitProvider(/\s*,+\s*/);
-const joinOnly = joinProvider('');
-const joinComma = joinProvider(',');
 const regexpMatchName = /^([a-z]+)(.*)$/;
 const regexpMatchImportant = /^(.*)(-i)$/;
 const regexpMatchValue = /^((([A-Z][A-Za-z]*)|((-)?[0-9.]+))([a-z%]+)?)?(.*)?$/;
@@ -160,13 +172,11 @@ function parseMediaValue(v) {
 }
 function parseMediaPart(mediaPart, parts, v) {
   return mediaPart && (
+    parts = mediaPart.split('-'),
     v = parseMediaValue(parts[0]),
-    (parts = mediaPart.split('-')).length > 1 ? {
-      min: v,
-      max: parseMediaValue(parts[1]),
-    } : {
-      max: v,
-    }
+    parts.length > 1
+      ? [v, parseMediaValue(parts[1])]
+      : [0, v]
   );
 }
 function handlerWrap(essenceHandler, paramsMatchPath) {
@@ -223,8 +233,11 @@ function normalizeInclude(names) {
     ? reduce(names, normalizeIncludeIteratee, [])
     : splitSpace(names);
 }
-function __priotitySort(a, b) {
+function priotitySort(a, b) {
   return a.priority - b.priority;
+}
+function priotitySortContext(a, b) {
+  return a[MN_CONTEXT_ESSENCE_PRIORITY] - b[MN_CONTEXT_ESSENCE_PRIORITY];
 }
 function getEessenceSelectors(selectorsMap) {
   const specifics = {}, other = [], outputSelectors = []; // eslint-disable-line
@@ -240,11 +253,6 @@ function getEessenceSelectors(selectorsMap) {
 }
 function __mergeDepth(src, dst) {
   return mergeDepth(src, dst, MN_MERGE_DEPTH);
-}
-function __ctx(src) {
-  src = src || {};
-  src.map = src.map || {};
-  return src;
 }
 function __compileProvider(attrName) {
   let _cache, _values; // eslint-disable-line
@@ -279,15 +287,16 @@ function __compileProvider(attrName) {
 }
 function MinimalistNotationProvider(options) {
   function setPresets(presets) {
-    eachTry(presets, [mn]);
+    isArray(presets) && eachTry(presets, [mn]);
   }
   function styleRender() {
-    emit(__values($$stylesMap).sort(__priotitySort));
+    emit(__values($$stylesMap).sort(priotitySort));
     forIn($$stylesMap, __updateClearIteratee);
   }
   function updateOptions() {
     const options = mn.options || {};
     $$selectorPrefix = options.selectorPrefix || '';
+    $$altColor = options.altColor !== 'off';
   }
   function mn(essencePath, extendedEssence, paramsMatchPath, skip) {
     const type = typeof essencePath;
@@ -428,6 +437,7 @@ function MinimalistNotationProvider(options) {
       name, content, priority || MN_DEFAULT_OTHER_CSS_PRIORITY,
   );
 
+  options = mn.options = options || {};
   const $$data = mn.data = {};
   const $$compilers = $$data.compilers = {};
   const cssPropertiesStringify = mn.propertiesStringify
@@ -443,48 +453,46 @@ function MinimalistNotationProvider(options) {
   let $$css;
   let $$stylesMap = $$data.stylesMap = {};
   let $$assigned = $$data.assigned = {};
-  let $$media = mn.media = {};
+  let $$media = mn.media = options.media || {};
   let $$handlerMap = mn.handlerMap = {};
   let $$force;
   let $$selectorPrefix;
+  let $$altColor;
 
   function parseMediaName(mediaName) {
     if (!mediaName || mediaName === 'all') {
-      return {
-        priority: MN_DEFAULT_PRIORITY,
-      };
+      return [MN_DEFAULT_PRIORITY];
     }
     const media = $$media[mediaName];
     const selector = media && media.selector || '';
-    let query = media && media.query || '';
-    let priority = media && media.priority;
+    let // eslint-disable-line
+      priorityMatch, v, mp,
+      query = media && media.query || '',
+      priority = media && media.priority;
     if (query || selector) {
-      return {
+      return [
+        priority || 0,
         query,
         selector,
-        priority: priority || 0,
-      };
+      ];
     }
 
     // get media priority
-    const priorityMatch = regexpMediaPriority.exec(mediaName);
-    if (priorityMatch) {
+    if (priorityMatch = regexpMediaPriority.exec(mediaName)) {
       mediaName = priorityMatch[1];
       priority = parseInt(priorityMatch[2]);
     }
-
     if (priority === 0) priority--;
 
     try {
       if (mediaName === 'x') throw new TypeError('empty parts');
       const mediaParts = mediaName.split('x');
-      let v, mp; //eslint-disable-line
 
       if (mp = parseMediaPart(mediaParts[0])) {
-        if (v = mp.min) {
+        if (v = mp[0]) {
           query += '(min-width: ' + v + 'px)';
         }
-        if (v = mp.max) {
+        if (v = mp[1]) {
           priority = priority || -v;
           if (query) query += ' and ';
           query += '(max-width: ' + v + 'px)';
@@ -492,11 +500,11 @@ function MinimalistNotationProvider(options) {
       }
 
       if (mp = parseMediaPart(mediaParts[1])) {
-        if (v = mp.min) {
+        if (v = mp[0]) {
           if (query) query += ' and ';
           query += '(min-height: ' + v + 'px)';
         }
-        if (v = mp.max) {
+        if (v = mp[1]) {
           priority = priority || -v;
           if (query) query += ' and ';
           query += '(max-height: ' + v + 'px)';
@@ -509,7 +517,7 @@ function MinimalistNotationProvider(options) {
     priority = priority || MN_DEFAULT_PRIORITY;
     priority++;
 
-    return {query, selector, priority};
+    return [priority, query, selector];
   }
   mn.parseMediaName = parseMediaName;
 
@@ -518,9 +526,7 @@ function MinimalistNotationProvider(options) {
       return selectorPrefix + selector;
     }
     const media = parseMediaName(mediaName);
-    const mediaQuery = media.query;
-    const mediaSelector = media.selector;
-    const mediaPriority = media.priority;
+    const [mediaPriority, mediaQuery, mediaSelector] = media;
     const selectorPrefix = ($$selectorPrefix || '')
       + (mediaSelector ? (mediaSelector + ' ') : '');
     const selectorsIteratee = selectorPrefix
@@ -529,24 +535,28 @@ function MinimalistNotationProvider(options) {
 
     // eslint-disable-next-line
     let essenceName, contextEssence, essence, cssText, output, isContinue = 1;
-    for (essenceName in context) {
-      if ((contextEssence = context[essenceName]) && contextEssence.updated) {
-        isContinue = 0;
-        cssText = contextEssence.cssText;
-        contextEssence.content = cssText ? joinOnly(map(
-            getEessenceSelectors(contextEssence.map),
-            selectorsIteratee,
-        )) : '';
-        delete contextEssence.updated;
-      }
+    for (essenceName in context) { // eslint-disable-line
+      (contextEssence = context[essenceName])
+        && contextEssence[MN_CONTEXT_ESSENCE_UPDATED]
+        && (
+          isContinue = 0,
+          cssText = contextEssence[MN_CONTEXT_ESSENCE_CSS_TEXT],
+          contextEssence[MN_CONTEXT_ESSENCE_CONTENT] = cssText ? joinOnly(map(
+              getEessenceSelectors(contextEssence[MN_CONTEXT_ESSENCE_MAP]),
+              selectorsIteratee,
+          )) : '',
+          contextEssence[MN_CONTEXT_ESSENCE_UPDATED] = 0
+        );
     }
-    if (isContinue) return;
-
-    output = joinOnly(map(__values(context).sort(__priotitySort), 'content'));
-    if (mediaQuery && output) {
-      output = joinOnly(['@media ', mediaQuery, '{', output, '}']);
-    }
-    setStyle('media.' + mediaName, output, mediaPriority);
+    isContinue || (
+      output = joinOnly(map(
+          __values(context).sort(priotitySortContext),
+          MN_CONTEXT_ESSENCE_CONTENT,
+      )),
+      mediaQuery && output
+        && (output = joinOnly(['@media ', mediaQuery, '{', output, '}'])),
+      setStyle('media.' + mediaName, output, mediaPriority)
+    );
   }
 
   function __assignCore(
@@ -683,12 +693,14 @@ function MinimalistNotationProvider(options) {
   }
   function createContextEssence(essenceName, essence, excludes) {
     essence.inited || initEssence(essenceName, essence, excludes);
-    return {
-      priority: essence.priority || 0,
-      selectors: essence.selectors,
-      cssText: essence.cssText,
-      map: {},
-    };
+    return [
+      {},
+      essence.selectors,
+      essence.priority || 0,
+      essence.cssText,
+      0,
+      0,
+    ];
   }
   function updateEssence(
       essenceName, selectors, mediaName, _excludes, essence,
@@ -697,15 +709,19 @@ function MinimalistNotationProvider(options) {
     if (excludes[essenceName]) return;
     mediaName = mediaName || 'all';
     excludes[essenceName] = 1;
-    essence || (essence = $$essences[essenceName]
-      || ($$essences[essenceName] = {}));
+    essence || (essence = $$essences[essenceName] || {});
     const context = $$root[mediaName] || ($$root[mediaName] = {});
     const contextEssence = context[essenceName] || (context[essenceName]
       = createContextEssence(essenceName, essence, excludes));
-    contextEssence.updated = 1;
+
+    isEmpty(essence) || ($$essences[essenceName] = essence);
+
+    contextEssence[MN_CONTEXT_ESSENCE_UPDATED] = 1;
     extend(
-        contextEssence.map,
-        selectors = joinMaps({}, selectors, contextEssence.selectors),
+        contextEssence[MN_CONTEXT_ESSENCE_MAP],
+        selectors = joinMaps(
+            {}, selectors, contextEssence[MN_CONTEXT_ESSENCE_SELECTORS],
+        ),
     );
     function __childsHandle(childs, separator) {
       let childName;
@@ -745,8 +761,8 @@ function MinimalistNotationProvider(options) {
     $$statics = $$data.statics || ($$data.statics = {});
 
     $$staticsEssences = $$statics.essences || ($$statics.essences = {});
-    $$keyframes = $$data.keyframes = __ctx($$data.keyframes);
-    $$css = $$data.css = __ctx($$data.css);
+    $$keyframes = $$data.keyframes = $$data.keyframes || [{}, 0];
+    $$css = $$data.css = $$data.css || [{}, 0];
     $$stylesMap = $$data.stylesMap = {};
     $$assigned = $$data.assigned = {};
     forIn(
@@ -762,11 +778,11 @@ function MinimalistNotationProvider(options) {
   }, mn);
 
   const keyframesRender = mn.keyframesCompile = withResult(() => {
-    $$keyframes.updated = 0;
+    $$keyframes[1] = 0;
     const keyframesPrefix = MN_KEYFRAMES_TOKEN + ' ';
     const prefixes = cssPropertiesStringify.prefixes;
     // eslint-disable-next-line
-    setStyle(MN_KEYFRAMES_TOKEN, joinOnly(reduce($$keyframes.map, (output, v, k) => {
+    setStyle(MN_KEYFRAMES_TOKEN, joinOnly(reduce($$keyframes[0], (output, v, k) => {
       let prefix;
       for (prefix in prefixes) push( // eslint-disable-line
           output, '@' + prefix + keyframesPrefix + k + v,
@@ -776,14 +792,14 @@ function MinimalistNotationProvider(options) {
     }, [])), MN_DEFAULT_CSS_PRIORITY);
   }, mn);
   const cssRender = mn.cssCompile = withResult(() => {
-    $$css.updated = 0;
+    $$css[1] = 0;
     // eslint-disable-next-line
-    setStyle('css', joinOnly(reduce($$css.map, __cssReducer, [])), MN_DEFAULT_CSS_PRIORITY);
+    setStyle('css', joinOnly(reduce($$css[0], __cssReducer, [])), MN_DEFAULT_CSS_PRIORITY);
   }, mn);
   const __render = mn.compile = withResult((attrName) => {
     updateOptions();
-    $$keyframes.updated && keyframesRender();
-    $$css.updated && cssRender();
+    $$keyframes[1] && keyframesRender();
+    $$css[1] && cssRender();
     if ($$force) {
       __clear();
       // eslint-disable-next-line
@@ -809,11 +825,11 @@ function MinimalistNotationProvider(options) {
     $$force = 1;
     return deferCompile();
   };
-  mn.setKeyframes = withResult((name, body, ifEmpty) => {
-    const map = $$keyframes.map;
+  mn.setKeyframes = withResult((name, body, ifEmpty, map, output) => {
+    map = $$keyframes[0];
     if (ifEmpty && map[name]) return;
     if (body) {
-      const output = ['{'];
+      output = ['{'];
       isObject(body)
         ? forIn(body, (css, k) => push(output, k + '{'
           + (isObject(css) ? cssPropertiesStringify(css) : css) + '}'),
@@ -824,10 +840,10 @@ function MinimalistNotationProvider(options) {
     } else {
       delete map[name];
     }
-    $$keyframes.updated = 1;
+    $$keyframes[1] = 1;
   }, mn);
   mn.css = withResult((selector, css) => {
-    const map = $$css.map;
+    const map = $$css[0];
     function baseSetCSS(css, s) {
       s = joinComma(keys(normalizeSelectorsIteratee({}, s)));
       if (css) {
@@ -844,14 +860,16 @@ function MinimalistNotationProvider(options) {
     isObject(selector)
       ? forIn(selector, baseSetCSS)
       : baseSetCSS(css, selector);
-    $$css.updated = 1;
+    $$css[1] = 1;
   }, mn);
 
   mn.setPresets = withResult(setPresets, mn);
-  mn.utils = utils;
+  mn.utils = extend(extend({}, utils), {
+    color: (v) => color(v, $$altColor),
+    colorGetBackground: (v) => colorGetBackground(v, $$altColor),
+  });
 
-  options = mn.options = options || {};
-  isArray(options.presets) && setPresets(options.presets);
+  setPresets(options.presets);
 
   return mn;
 }

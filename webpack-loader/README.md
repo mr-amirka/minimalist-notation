@@ -59,6 +59,7 @@ module.exports = {
       attrs: [ 'm' ], // имена атрибутов, которые будут парситься в шаблоне ('./src/index.html')
       output: './dist/app.css',
       template: './src/index.html',
+      // altColor: 'off', // отключить генерацию альтернативного цвета
       presets: [
         require('mn-presets/medias'),
         require('mn-presets/prefixes'),
@@ -74,6 +75,7 @@ module.exports = {
       attrs: [ 'class' ], // имена атрибутов, которые будут парситься в шаблоне ('./src/indexWithClass.html')
       output: './dist/classic.css',
       template: './src/indexWithClass.html',
+      // altColor: 'off', // отключить генерацию альтернативного цвета
       presets: [
         require('mn-presets/medias'),
         require('mn-presets/prefixes'),
@@ -90,48 +92,3 @@ module.exports = {
 };
 
 ```
-
-# Features
-
-For version 0.4:
-- добавлена горячая перезагрузка изменяемых MN пресетов, например:
-```js
-// ./webpack.config.js
-module.exports = {
-  watch: true,
-  //...
-  module: {
-    rules: [
-      {
-        test: /\.mn\.js$/,
-        use: [
-          {
-            loader: 'minimalist-notation/webpack-loader/reload',
-            options: {
-              id: 'app',
-            },
-          },
-        ],
-      },
-      //...
-    ]
-  },
-  //...
-};
-
-```
-```js
-// /src/app.js
-require('./style.mn.js');
-```
-```js
-// ./src/style.mn.js
-module.exports = (mn) => {
-  mn({
-    fCustom: 'f100',
-  });
-};
-```
-Эта возможность добавлена для того, чтобы можно была менять пресеты, не перезапуская для этого всю сборку,
-но будьте внимательны так, как пресеты остаются закэшированными, если их подключение удаляется из кода.  
-Это связано с тем, что Webpack не предоставляет удобного API для отслеживания того, какие файлы были отключены от сборки проекта.

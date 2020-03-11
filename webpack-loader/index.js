@@ -15,13 +15,14 @@ const scope = {};
 const dynamicPresetsScope = {};
 
 const __exports = module.exports = function(source) {
+  const self = this;
   const settings = merge([
     __exports.defaultLoaderSettings,
-    loaderUtils.getOptions(this),
+    loaderUtils.getOptions(self),
   ]);
   const id = settings.id || '';
   parserProvider(settings.attrs)(
-      (scope[id] || (scope[id] = {}))[this.resourcePath] = {},
+      (scope[id] || (scope[id] = {}))[self.resourcePath] = {},
       source || '',
   );
   return source;

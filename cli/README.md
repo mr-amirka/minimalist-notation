@@ -52,6 +52,7 @@ module.exports = {
   path: './'
   output: './styles.css',
   */
+  // altColor: 'off' // disable alternate color generation
   attrs: [ 'class' ],
   include: [
     /^.*\.(html?|(js|ts)x?|vue)$/
@@ -76,6 +77,7 @@ module.exports = {
 ```ts
 interface compileSourceOptions {
   path: string,
+  altColor?: string | null,
   selectorPrefix?: string,
   entry?: string | {
     [outputName: string]: string | compileSourceOptions
@@ -91,16 +93,17 @@ interface compileSourceOptions {
 
 ## Default options
 
-| option  | value                             |
-| ------- | --------------------------------- |
-| config  | './mn-config.js'                  |
-| prefix  | ''                                |
-| path    | './'                              |
-| entry   | './'                              |
-| output  | './mn.styles.css'                 |
-| metrics | './mn-metrics.json' if true       |
-| attrs   | [ 'm' ]                           |
-| presets | [  require('mn-presets/medias'), require('mn-presets/prefixes'), require('mn-presets/styles'), require('mn-presets/states'), require('mn-presets/main') ] |
+| option   | value                             |
+| -------- | --------------------------------- |
+| config   | './mn-config.js'                  |
+| prefix   | ''                                |
+| altColor | 'on'                              |
+| path     | './'                              |
+| entry    | './'                              |
+| output   | './mn.styles.css'                 |
+| metrics  | './mn-metrics.json' if true       |
+| attrs    | [ 'm' ]                           |
+| presets  | [ require('mn-presets/medias'), require('mn-presets/prefixes'), require('mn-presets/styles'), require('mn-presets/states'), require('mn-presets/main') ] |
 
 * include: ``` /^.*\.(html?|(js|ts)x?|vue)$/ ```
 * exclude: ``` /\/node_modules\/|(\.tmp\.)/  ```

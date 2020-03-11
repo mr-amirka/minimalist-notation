@@ -9,7 +9,6 @@ const push = require('mn-utils/push');
 const escapeQuote = require('mn-utils/escapeQuote');
 const escapeCss = require('mn-utils/escapeCss');
 const repeat = require('mn-utils/repeat');
-
 const selectorNormalize = require('./selectorNormalize');
 
 const splitSelector = escapedSplitProvider(/[<:\.\[\]#+~]/).base;
@@ -21,7 +20,6 @@ const extractSuffix = escapedHalfProvider(/[<>:\.\[\]#+~@\!]/).base;
 const regexpScope = /^(.*?)\[(.*)\]$/;
 const regexpDepth = /^(\d+)(.*)$/;
 const regexpFix = /^(.*)([~+])$/;
-
 const regexpMultiplier = /^(.*)\*([0-9]+)$/;
 
 function getPrefix(depth) {
@@ -63,13 +61,12 @@ module.exports = (instance) => {
         comboName, prefix + escapeQuote(comboName) + '"]',
     );
   }
-  function parseComboName(comboName, targetName) {
+  function parseComboName(comboName, targetName, multiplierMatch, multiplier) {
     $$states = instance.states || {};
-    const multiplierMatch = regexpMultiplier.exec(comboName);
-    if (multiplierMatch) {
+    if (multiplierMatch = regexpMultiplier.exec(comboName)) {
       comboName = multiplierMatch[1];
-      const multiplier = parseInt(multiplierMatch[2]);
-      if (multiplier > 1) targetName = repeat(targetName, multiplier);
+      (multiplier = parseInt(multiplierMatch[2])) > 1
+        && (targetName = repeat(targetName, multiplier));
     }
     return reduce(
         reduce(variantsBase(comboName), suffixesReduce, {}),

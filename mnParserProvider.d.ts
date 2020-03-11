@@ -3,8 +3,8 @@
  * @author Amir Absalyamov <mr.amirka@ya.ru>
  */
 
-import { attrsMap } from './index';
+import {IAttrsMap} from "./global";
 
 declare function parserProvider(attrs: string | string[] | {[from: string]: string})
-  : ((output: attrsMap, content: string) => number) | null;
+  : ((output: IAttrsMap, content: string) => number) | null;
 export = parserProvider;

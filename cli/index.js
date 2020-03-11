@@ -15,6 +15,7 @@ program
     .option('-w, --watch [watch]', 'set watch')
     .option('-conf, --config [config]', 'set config path (./mn-config.js)')
     .option('-a, --attrs [attrs]', 'set attrs (m|class)')
+    .option('-ac, --altColor [altColor]', 'set altColor')
     .option('-p, --prefix [prefix]', 'set selectors prefix (\'\')')
     .option('-o, --output [output]', 'set output path (./mn.styles.css)');
 
@@ -40,6 +41,7 @@ const settings = {
   ...defaultSettings,
   watch: watch || false,
   selectorPrefix: prefix || '',
+  altColor: program.altColor || 'on',
 };
 
 const configPath

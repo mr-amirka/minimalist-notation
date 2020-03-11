@@ -3,184 +3,172 @@
  * @author Amir Absalyamov <mr.amirka@ya.ru>
  */
 
-import {IFlagsMap} from 'mn-utils/global';
-import {Emitter} from 'mn-utils/Emitter/emitter';
-import {
-  cssPropertiesStringify,
-  CssProps
-} from 'mn-utils/cssPropertiesStringifyProvider';
+import {Emitter} from "mn-utils/Emitter/emitter";
+import {ICssPropertiesStringify, ICssProps, IFlagsMap} from "mn-utils/global";
+import {selectorsCompile} from "./selectorsCompileProvider";
 
-import { selectorsCompile } from './selectorsCompileProvider';
-
-
-export interface mnCompiler {
+export interface IMNCompiler {
   (attrValue: string): void;
   checkNode: (node: Element) => void;
   recursiveCheck: (node: Element | Document) => void;
   clear: () => void;
 }
 
-export interface essencesNamesMap {
-  [essenceName: string]: boolean | number;
+export interface IEssencesNamesMap {
+  [essenceName: string]: any;
 }
-export interface attrsMap {
-  [attrName: string]: essencesNamesMap;
-}
-export interface MnPreset {
-  (mn: MinimalistNotation): any;
+export interface IAttrsMap {
+  [attrName: string]: IEssencesNamesMap;
 }
 
-export interface MinimalistNotationOptions {
-  selectorPrefix?: string
+export type IMNPreset = (mn: IMinimalistNotation) => any;
+
+export interface IMinimalistNotationOptions {
+  selectorPrefix?: string;
+  presets?: IMNPreset[];
+  altColor?: string;
 }
 
-export interface MinimalistNotation extends selectorsCompile {
-  (essencePrefix: string, essenceOptions: EssenceOptions | string | string[]): MinimalistNotation;
-  (essencePrefix: string, handler: EssenceHandler, matches?: string | string[]): MinimalistNotation;
-  (essences: EssenceMapOptions): MinimalistNotation;
-  propertiesStringify: cssPropertiesStringify;
-  data: MinimalistNotationData;
-  media: {[mediaName: string]: media};
-  handlerMap: handlerMap;
-  contextMode: string;
-  disabled: boolean;
-  getCompiler: (attrName: string) => mnCompiler;
-  recompileFrom: (attrsMap: attrsMap, options?: MinimalistNotationOptions) => MinimalistNotation;
-  updateAttrByMap: (essencesMap: essencesNamesMap, attrName: string) => MinimalistNotation;
-  updateAttrByValues: (essencesNames: string[], attrName: string) => MinimalistNotation
-  //ngCheck: (ngClass: string) => MinimalistNotation;
-  parseMediaName: (mediaName: string) => media;
-  clear: () => MinimalistNotation;
-  compile: () => MinimalistNotation; //перекомиплировать стили для новых классов
-  recompile: () => MinimalistNotation; //полностью перекомиплировать все стили
-  keyframesCompile: () => MinimalistNotation; //перекомиплировать стили для новых keyframes
-  cssCompile: () => MinimalistNotation; //перекомиплировать стили для нового css, добавленного через метод mn.css
-  deferCompile: () => MinimalistNotation;
-  deferRecompile: () => MinimalistNotation;
-  assign: (essencesNames: string[], selectors: string[]) => MinimalistNotation;
-  css: (selector: string | {[n: string]: CssProps}, css?: CssProps) => MinimalistNotation;
-  setKeyframes: (name: string, body: keyframes | string) => MinimalistNotation;
-  set: MinimalistNotation;
-  setStyle: (name: string, content: string, priority?: number) => MinimalistNotation;
-  setPresets: (presets: MnPreset[]) => MinimalistNotation;
-  emitter: Emitter<style[]>
+export interface IMinimalistNotation extends selectorsCompile {
+  (essencePrefix: string, essenceOptions: IEssenceOptions | string | string[]): IMinimalistNotation;
+  (
+    essencePrefix: string,
+    handler: IEssenceHandler,
+    matches?: string | string[],
+    defaultMatchOff?: number | boolean,
+  ): IMinimalistNotation;
+  (essences: IEssenceMapOptions): IMinimalistNotation;
+  propertiesStringify: ICssPropertiesStringify;
+  data: IMinimalistNotationData;
+  media: {[mediaName: string]: IMedia};
+  handlerMap: IHandlerMap;
+  getCompiler: (attrName: string) => IMNCompiler;
+  recompileFrom: (attrsMap: IAttrsMap) => IMinimalistNotation;
+  updateAttrByMap: (essencesMap: IEssencesNamesMap, attrName: string) => IMinimalistNotation;
+  updateAttrByValues: (essencesNames: string[], attrName: string) => IMinimalistNotation;
+  parseMediaName: (mediaName: string) => [number, string | undefined, string | undefined];
+  clear: () => IMinimalistNotation;
+  compile: () => IMinimalistNotation; // перекомиплировать стили для новых классов
+  recompile: () => IMinimalistNotation; // полностью перекомиплировать все стили
+  keyframesCompile: () => IMinimalistNotation; // перекомиплировать стили для новых keyframes
+  cssCompile: () => IMinimalistNotation; // перекомиплировать стили для нового css, добавленного через метод mn.css
+  deferCompile: () => IMinimalistNotation;
+  deferRecompile: () => IMinimalistNotation;
+  assign: (
+    selectors: string | string[] | {[selector: string]: string | string[]},
+    comboNames: string | string[],
+    defaultMediaName?: string,
+  ) => IMinimalistNotation;
+  css: (selector: string | {[selector: string]: ICssProps}, css?: ICssProps | null) => IMinimalistNotation;
+  setKeyframes: (name: string, body: IKeyframes | string, ifEmpty?: boolean | number) => IMinimalistNotation;
+  set: IMinimalistNotation;
+  setStyle: (name: string, content: string, priority?: number) => IMinimalistNotation;
+  setPresets: (presets: IMNPreset[]) => IMinimalistNotation;
+  emitter: Emitter<IStyle[]>;
   utils: any;
 }
-export interface handlerMap {
-  [name: string]: EssenceHandler;
+export interface IHandlerMap {
+  [name: string]: IEssenceHandler;
 }
-export interface MinimalistNotationData {
-  keyframes: keyframesData;
-  classNamesMap: Set<string>;
-  root: root;
-  essences: essencesMap;
-  statics: statics;
-  attr: Set<string>;
-  css: cssData;
-  stylesMap: {[mediaName: string]: style};
+export interface IMinimalistNotationData {
+  compilers: {[attrName: string]: IMNCompiler};
+  stylesMap: {[mediaName: string]: IStyle};
+  assigned: IAssigned;
+  root: IRoot;
+  statics: IStatics;
+  essences: IEssencesMap;
+  keyframes: [
+    {[animateName: string]: string},
+    number
+  ];
+  css: [
+    {[selector: string]: ICssDataItem},
+    number
+  ];
 }
-export interface statics {
-  assigned: assigned;
-  essences: {[essenceName: string]: IFlagsMap};
+export interface IStatics {
+  assigned: IAssigned;
+  essences: {[essenceName: string]: IEssenceOptions};
 }
-export interface EssenceMapOptions {
-  [essencePrefix: string]: EssenceOptions | EssenceHandler;
+export interface IEssenceMapOptions {
+  [essencePrefix: string]: IEssenceOptions | IEssenceHandler;
 }
-export interface MediaContext {
-  map: essencesMap;
-  updated: boolean;
-}
-export interface EssenceContext {
+export interface IEssenceContext {
   priority?: number;
   content?: string;
   map?: IFlagsMap;
   updated?: boolean;
-  rules?: string [];
 }
-//функция-генератор эссенции
-export interface EssenceHandler {
-  (params: EssenceParams): EssenceOptions
-}
-export interface EssenceParams {
+
+// функция-генератор эссенции
+export type IEssenceHandler = (params: IEssenceParams) => IEssenceOptions;
+export interface IEssenceParams {
   name: string;
-  input: string;
   suffix: string;
   negative: string;
   value: string;
   camel: string;
   num: string;
+  unit: string;
   other: string;
-  i: string;
   ni: string;
-  [name: string]: string;
+  [param: string]: string;
 }
 
-//Опции эссенции
-export interface EssenceOptions {
+// Опции эссенции
+export interface IEssenceOptions {
   inited?: boolean;
   priority?: number;
-  style?: CssProps;
+  style?: ICssProps;
   exts?: string[] | IFlagsMap;
   include?: string[];
   selectors?: string[];
-  childs?: essencesMap,
+  childs?: IEssencesMap;
   media?: {
-    [mediaName: string]: EssenceOptions
+    [mediaName: string]: IEssenceOptions;
   };
-
-  rules?: rule[];
-  updated?: boolean;
-  content?: string;
+  updated?: number | boolean;
+  important?: number | boolean;
+  cssText?: string;
 }
 
-export interface essencesMap {
-  [essenceName: string]: EssenceOptions;
+export interface IEssencesMap {
+  [essenceName: string]: IEssenceOptions;
 }
 
-export interface root {
-  [mediaName: string]: MediaContext
+export interface IRoot {
+  [mediaName: string]: [
+    IEssencesMap,
+    {[selector: string]: number | boolean},
+    number,
+    string,
+    number | boolean,
+    string
+  ];
 }
 
-export interface keyframesData {
-  map: {
-    [name: string]: string;
-  };
-  updated: boolean;
-}
-export interface keyframes {
-  [name: string]: CssProps | string;
+export interface IKeyframes {
+  [name: string]: ICssProps | string;
 }
 
-export interface cssData {
-  map: {
-    [name: string]: cssDataItem;
-  };
-  updated: boolean;
-}
-
-interface cssDataItem {
+interface ICssDataItem {
   content: string;
-  css: CssProps;
+  css: ICssProps;
 }
 
-export interface media {
+export interface IMedia {
   priority?: number;
   query?: string;
+  selector?: string;
 }
 
-export interface assigned {
-  [mediaName: string]: {[essenceName: string]: IFlagsMap}
+export interface IAssigned {
+  [mediaName: string]: {[essenceName: string]: {[selector: string]: number}};
 }
 
-export interface rule {
-  selectors: string[];
-  css: string;
-  priority: number;
-}
-
-export interface style {
-  priority?: number;
+export interface IStyle {
   name?: string;
+  priority?: number;
   content?: string;
-  updated?: boolean;
+  updated?: boolean | number;
 }
