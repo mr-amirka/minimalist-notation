@@ -34,9 +34,10 @@ function parser(attrs) {
         m: \"abs s ovxHidden ovScroll\"
       }, null) ...")
   */
-  const attrNames = '(' + getKeys(attrs).join('|') + ')';
-  const regexp = new RegExp('(\\s+|\\{\\s*)' + attrNames
-    + '((=\\{?\\s*("([^"]+)"|\'([^\']+)\'|`([^`]+)`))|(:\\s*(\\\\"([^"]+)\\\\"|"([^"]+)"|\'([^\']+)\'|`([^`]+)`)))', 'gm'); // eslint-disable-line
+
+  const regexp = new RegExp('(\\{\\s*|\\.\\s*|\\s+)('
+    + getKeys(attrs).join('|')
+    + ')\\s*((=\\{?\\s*("([^"]+)"|\'([^\']+)\'|`([^`]+)`))|(:\\s*(\\\\"([^"]+)\\\\"|"([^"]+)"|\'([^\']+)\'|`([^`]+)`)))', 'gm'); // eslint-disable-line
   return (dst, text) => {
     let count = 0;
     text.replace(regexp, (
