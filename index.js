@@ -761,7 +761,7 @@ function MinimalistNotationProvider(options) {
     $$statics = $$data.statics || ($$data.statics = {});
 
     $$staticsEssences = $$statics.essences || ($$statics.essences = {});
-    $$keyframes = $$data.keyframes = $$data.keyframes || [{}, 0];
+    $$keyframes = $$data.keyframes || ($$data.keyframes = [{}, 0]);
     $$css = $$data.css = $$data.css || [{}, 0];
     $$stylesMap = $$data.stylesMap = {};
     $$assigned = $$data.assigned = {};
@@ -798,8 +798,6 @@ function MinimalistNotationProvider(options) {
   }, mn);
   const __render = mn.compile = withResult((attrName) => {
     updateOptions();
-    $$keyframes[1] && keyframesRender();
-    $$css[1] && cssRender();
     if ($$force) {
       __clear();
       // eslint-disable-next-line
@@ -812,6 +810,8 @@ function MinimalistNotationProvider(options) {
         updateAttrByValues($$compilers[attrName].getNext(), attrName);
       }
     }
+    $$keyframes[1] && keyframesRender();
+    $$css[1] && cssRender();
     forIn($$root, __mode);
     $$updated && styleRender();
     $$updated = $$force = 0;
