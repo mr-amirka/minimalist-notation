@@ -35,11 +35,11 @@ __exports.defaultPluginSettings = {
     'm': 'm',
   },
   presets: [
-    require('mn-presets/medias'),
-    require('mn-presets/prefixes'),
-    require('mn-presets/styles'),
-    require('mn-presets/states'),
-    require('mn-presets/main'),
+    require('../presets/medias'),
+    require('../presets/prefixes'),
+    require('../presets/styles'),
+    require('../presets/states'),
+    require('../presets/main'),
   ],
 };
 __exports.defaultLoaderSettings = {

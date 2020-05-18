@@ -388,7 +388,6 @@ function MinimalistNotationProvider(options) {
   mn.recompileFrom = withResult((attrsMap) => {
     __clear();
     updateOptions();
-    keyframesRender();
     setStyle(
         'css',
         joinOnly(reduce($$css.map, __cssReducer, [])),
@@ -396,6 +395,7 @@ function MinimalistNotationProvider(options) {
     );
     forIn(attrsMap, updateAttrByMap);
     forIn($$root, __mode);
+    keyframesRender();
     styleRender();
   }, mn);
 
