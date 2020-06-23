@@ -41,7 +41,7 @@ Output:
 
 
 * [Подробная документация](https://github.com/mr-amirka/minimalist-notation/blob/master/docs-ru.md)  
-* [Предустановленные опции](https://github.com/mr-amirka/mn-presets/blob/master/README.md)  
+* [Предустановленные опции](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/README.md)  
 * [От автора](https://github.com/mr-amirka/minimalist-notation/blob/master/from-author-ru.md)  
 
 
@@ -55,7 +55,7 @@ Try check how this work with using MN Viewer:
 https://viewer.minimalist-notation.org/  
 
 
-See default styles docs (mn-presets/styles):  
+See default styles docs (minimalist-notation/presets/styles):  
 https://styles.minimalist-notation.org/
 
 
@@ -149,12 +149,12 @@ module.exports = {
         // './src/other.html',
       ],
       presets: [
-        require('mn-presets/medias'),
-        require('mn-presets/prefixes'),
-        require('mn-presets/styles'),
-        require('mn-presets/states'),
-        // require('mn-presets/main'),
-        // require('mn-presets/normalize'), // normalize.css v8.0.1
+        require('minimalist-notation/presets/medias'),
+        require('minimalist-notation/presets/prefixes'),
+        require('minimalist-notation/presets/styles'),
+        require('minimalist-notation/presets/states'),
+        // require('minimalist-notation/presets/main'),
+        // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
         // require('./mn-my-preset'), // custom preset
       ]
     }),
@@ -183,12 +183,12 @@ gulp.task('build', function() {
       // selectorPrefix: '',
       // attrs: {'class': 'class'},
       presets: [
-        require('mn-presets/medias'),
-        require('mn-presets/prefixes'),
-        require('mn-presets/styles'),
-        require('mn-presets/states'),
-        // require('mn-presets/main'),
-        // require('mn-presets/normalize'), // normalize.css v8.0.1
+        require('minimalist-notation/presets/medias'),
+        require('minimalist-notation/presets/prefixes'),
+        require('minimalist-notation/presets/styles'),
+        require('minimalist-notation/presets/states'),
+        // require('minimalist-notation/presets/main'),
+        // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
         // require('./mn-my-preset'), // custom preset
       ],
     }))
@@ -209,12 +209,12 @@ const mnProvider = require('minimalist-notation');
 const mn = mnProvider({
   // selectorPrefix: '',
   presets: [
-    require('mn-presets/medias'),
-    require('mn-presets/runtimePrefixes'),
-    require('mn-presets/styles'),
-    require('mn-presets/states'),
-    // require('mn-presets/main'),
-    // require('mn-presets/normalize'), // normalize.css v8.0.1
+    require('minimalist-notation/presets/medias'),
+    require('minimalist-notation/presets/runtimePrefixes'),
+    require('minimalist-notation/presets/styles'),
+    require('minimalist-notation/presets/states'),
+    // require('minimalist-notation/presets/main'),
+    // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
     // require('./mn-my-preset'), // custom preset
   ],
 });
@@ -266,12 +266,12 @@ const mnProvider = require('minimalist-notation');
 const mn = mnProvider({
   // selectorPrefix: '.mn-scope ',
   presets: [
-    require('mn-presets/medias'),
-    require('mn-presets/runtimePrefixes'),
-    require('mn-presets/styles'),
-    require('mn-presets/states'),
-    // require('mn-presets/main'),
-    // require('mn-presets/normalize'), // normalize.css v8.0.1
+    require('minimalist-notation/presets/medias'),
+    require('minimalist-notation/presets/runtimePrefixes'),
+    require('minimalist-notation/presets/styles'),
+    require('minimalist-notation/presets/states'),
+    // require('minimalist-notation/presets/main'),
+    // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
     // require('./mn-my-preset'), // custom preset
     ...(window.mnPresets || []),
   ],

@@ -16,8 +16,8 @@ module.exports = (mn) => {
   });
   mn.assign({
     '*, *:before, *:after': 'bxzBB',
-    html: 'ovxH tsa',
-    body: 'm0 ovxH',
+    html: 'tsa',
+    body: 'm',
     a: 'crP@mouse',
     img: 'wmax dB mhA b0',
     iframe: 'dB b0',

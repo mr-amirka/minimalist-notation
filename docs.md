@@ -33,7 +33,7 @@
 
 
 * [Getting started](https://github.com/mr-amirka/minimalist-notation/blob/master/README.md)  
-* [Presets](https://github.com/mr-amirka/mn-presets/blob/master/README.md)  
+* [Presets](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/README.md)  
 * [From author](https://github.com/mr-amirka/minimalist-notation/blob/master/from-author.md)    
 
 

@@ -33,7 +33,7 @@
 
 
 * [Getting started](https://github.com/mr-amirka/minimalist-notation/blob/master/README-ru.md)  
-* [Предустановленные опции](https://github.com/mr-amirka/mn-presets/blob/master/README.md)  
+* [Предустановленные опции](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/README.md)  
 * [От автора](https://github.com/mr-amirka/minimalist-notation/blob/master/from-author-ru.md)  
 
 
