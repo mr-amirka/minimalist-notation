@@ -32,13 +32,13 @@ mn --config ./mn-config.js
 // mn-config.js
 module.exports = {
   entry: {
-    styles: { // styles.css
+    styles: { // for output file: styles.css
       path: './',
       attrs: [
         'class'
       ],
       include: [
-        /^.*\.(html?|(js|ts)x?|vue)$/
+        /^.*\.(php|html?|(js|ts)x?|vue)$/
       ],
       exclude: [
         /\/node_modules\/|(.*\.tmp)/
@@ -55,18 +55,18 @@ module.exports = {
   // altColor: 'off' // disable alternate color generation
   attrs: [ 'class' ],
   include: [
-    /^.*\.(html?|(js|ts)x?|vue)$/
+    /^.*\.(php|html?|(js|ts)x?|vue)$/
   ],
   exclude: [
     /\/node_modules\/|(.*\.tmp)/
   ],
   presets: [
-    require('mn-presets/medias'),
-    require('mn-presets/prefixes'),
-    require('mn-presets/styles'),
-    require('mn-presets/states'),
-    // require('mn-presets/main'),
-    // require('mn-presets/normalize'), // normalize.css v8.0.1
+    require('minimalist-notation/presets/medias'),
+    require('minimalist-notation/presets/prefixes'),
+    require('minimalist-notation/presets/styles'),
+    require('minimalist-notation/presets/states'),
+    // require('minimalist-notation/presets/main'),
+    // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
     // require('./mn-my-preset'), // custom preset
   ]
 };
@@ -103,7 +103,7 @@ interface compileSourceOptions {
 | output   | './mn.styles.css'                 |
 | metrics  | './mn-metrics.json' if true       |
 | attrs    | [ 'm' ]                           |
-| presets  | [ require('mn-presets/medias'), require('mn-presets/prefixes'), require('mn-presets/styles'), require('mn-presets/states'), require('mn-presets/main') ] |
+| presets  | [ require('minimalist-notation/presets/medias'), require('minimalist-notation/presets/prefixes'), require('minimalist-notation/presets/styles'), require('minimalist-notation/presets/states'), require('minimalist-notation/presets/main') ] |
 
-* include: ``` /^.*\.(html?|(js|ts)x?|vue)$/ ```
+* include: ``` /^.*\.(php|html?|(js|ts)x?|vue)$/ ```
 * exclude: ``` /\/node_modules\/|(\.tmp\.)/  ```

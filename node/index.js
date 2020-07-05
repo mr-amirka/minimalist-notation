@@ -21,11 +21,12 @@ const getAttrs = parserProvider.getAttrs;
 const defaultSettings = exports.defaultSettings = {
   path: './',
   output: './mn.styles.css',
-  include: /^.*\.(html?|(js|ts)x?|vue)$/,
+  include: /^.*\.(php|html?|(js|ts)x?|vue)$/,
   exclude: /\/node_modules\/|\.tmp\./,
   attrs: {
     'className': 'class',
     'class': 'class',
+    'm-n': 'm-n',
     'm': 'm',
   },
   watch: false,

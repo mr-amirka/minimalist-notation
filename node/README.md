@@ -17,12 +17,12 @@ compileSource({
   },
   exclude: [ /^.*\/node_modules\/.*$/ ],
   presets: [
-    require('mn-presets/medias'),
-    require('mn-presets/prefixes'),
-    require('mn-presets/styles'),
-    require('mn-presets/states'),
-    // require('mn-presets/main'),
-    // require('mn-presets/normalize'), // normalize.css v8.0.1
+    require('minimalist-notation/presets/medias'),
+    require('minimalist-notation/presets/prefixes'),
+    require('minimalist-notation/presets/styles'),
+    require('minimalist-notation/presets/states'),
+    // require('minimalist-notation/presets/main'),
+    // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
     // require('./mn-my-preset'), // custom preset
   ],
 });

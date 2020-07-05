@@ -47,8 +47,8 @@ Output:
 
 
 Try this tests:
-* https://jsfiddle.net/Amirka/ev9fupcq/   
-* https://jsfiddle.net/Amirka/0475wbq2/  
+* https://jsfiddle.net/Amirka/k4qzpfL9/   
+* https://jsfiddle.net/Amirka/36ey02f8/   
 
 
 Try check how this work with using MN Viewer:  

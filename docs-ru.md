@@ -191,22 +191,22 @@ Output:
 Input:
 
 ```html
-<div m="f12 p10 mb10 f14:h cF00<.parent c0F0@mediaName sq40 bg0F0">...</div>
+<div m-n="f12 p10 mb10 f14:h cF00<.parent c0F0@mediaName sq40 bg0F0">...</div>
 ```
 
 Output:
 
 ```css
 @media mediaName{
-  [m~='c0F0@mediaName']{color:rgb(0,255,0)}
+  [m-n~='c0F0@mediaName']{color:rgb(0,255,0)}
 }
-[m~='f12']{font-size:12px}
-[m~='f14:h']:hover{font-size:14px}
-.parent [m~='cF00<.parent']{color:rgb(255,0,0)}
-[m~='bg0F0']{background:rgb(0,255,0)}
-[m~='sq40']{width:40px;height:40px}
-[m~='p10']{padding:10px}
-[m~='mb10']{margin-bottom:10px}
+[m-n~='f12']{font-size:12px}
+[m-n~='f14:h']:hover{font-size:14px}
+.parent [m-n~='cF00<.parent']{color:rgb(255,0,0)}
+[m-n~='bg0F0']{background:rgb(0,255,0)}
+[m-n~='sq40']{width:40px;height:40px}
+[m-n~='p10']{padding:10px}
+[m-n~='mb10']{margin-bottom:10px}
 
 ```
 
@@ -296,7 +296,7 @@ Example 3:
 
 Таким образом сделано для удобства использования нотации, например в случаях, когда мы задаем общий медиа-запрос для нескольких атрибутов дочернего элемента, но для некоторых атрибутов этот медиа-запрос должен отличаться:
 ```html
-<div m="(sq200|f20|f14@m)>.child1@d">
+<div m-n="(sq200|f20|f14@m)>.child1@d">
   <div class="child1">
     текст
   </div>
@@ -325,11 +325,11 @@ Example:
 
 Вместо этого
 ```html
-<div m="bc00F>input:h bc00F>input:a bg0>input:h bg0>input:a"></div>
+<div m-n="bc00F>input:h bc00F>input:a bg0>input:h bg0>input:a"></div>
 ```
 Вы можете сделать так:
 ```html
-<div m="(bc00F|bg0)>input:(h|a)"></div>
+<div m-n="(bc00F|bg0)>input:(h|a)"></div>
 ```
 
 Т.е., эти записи эквивалентны:  
@@ -349,23 +349,23 @@ Example 3:
 
 В процессе применения MN могут возникать ситуации, когда Вам нужно экранировать служебные символы, например в таком случае:
 ```html
-<div m="pt33.3%"></div>
+<div m-n="pt33.3%"></div>
 ```
 Мы получим не то, чего ожидаем, так как точка является служебным символом
 ``` pt33.3%  ```  ->  
 ```css
-[m~='pt33.3%'].3%{padding-top:33px}
+[m-n~='pt33.3%'].3%{padding-top:33px}
 ```
 
 
 Если мы хотим, чтобы точка попала в параметры эссенции, то мы должны экранировать её так:
 ```html
-<div m="pt33\.3%"></div>
+<div m-n="pt33\.3%"></div>
 ```
 Таким образом, получим желаемое:
 ``` pt33\.3% ``` ->  
 ```css
-[m~='pt33\\.3%']{padding-top:33.3%}
+[m-n~='pt33\\.3%']{padding-top:33.3%}
 ```
 
 
@@ -376,18 +376,18 @@ Example 3:
 По умолчанию имя медиа-запроса генерируется в CSS как есть, например:  
 INPUT:  
 ```html
-<div m="f20@m f10@print">текст</div>
+<div m-n="f20@m f10@print">текст</div>
 ```  
 
 OUTPUT:  
 ```css
 @media m {
-  [m~='f20@m'] {
+  [m-n~='f20@m'] {
     font-size: 20px;
   }
 }
 @media print {
-  [m~='f10@print'] {
+  [m-n~='f10@print'] {
     font-size: 10px;
   }
 }
@@ -409,19 +409,19 @@ mn.media.m2 = {
 ```  
 
 ```html
-<div m="f18@m f16@m2">текст</div>
+<div m-n="f18@m f16@m2">текст</div>
 ```  
 
 OUTPUT:  
 
 ```css
 @media (max-width: 991px) {
-  [m~='f18@m'] {
+  [m-n~='f18@m'] {
     font-size: 18px;
   }
 }
 @media (max-width: 767px) {
-  [m~='f16@m2'] {
+  [m-n~='f16@m2'] {
     font-size: 16px;
   }
 }
@@ -437,13 +437,13 @@ OUTPUT:
 Тогда будут сгенерированы соответствующие медиа-запросы, например:  
 INPUT:  
 ```html
-<div m="f20@768-992x300-600^2">текст</div>
+<div m-n="f20@768-992x300-600^2">текст</div>
 ```  
 
 OUTPUT:  
 ```css
 @media (min-width: 768px) and (max-width: 992px) and (min-height: 300px) and (max-height: 600px) {
-  [m~='f20@768-992x300-600^2'] {
+  [m-n~='f20@768-992x300-600^2'] {
     font-size: 20px;
   }
 }
@@ -452,33 +452,33 @@ OUTPUT:
 Параметры шаблона сокращенной записи медиа-запроса в нотации не являются обязательными и некоторые из них можно опустить, например:  
 INPUT:  
 ```html
-<div m="f20@768 f30@992- f40@x600 f50@1000-1200 f3@x10-60">текст</div>
+<div m-n="f20@768 f30@992- f40@x600 f50@1000-1200 f3@x10-60">текст</div>
 ```  
 
 OUTPUT:  
 ```css
 @media (min-width: 1000px) and (max-width: 1200px) {
-  [m~='f50@1000-1200'] {
+  [m-n~='f50@1000-1200'] {
     font-size: 50px;
   }
 }
 @media (max-width: 768px) {
-  [m~='f20@768'] {
+  [m-n~='f20@768'] {
     font-size: 20px;
   }
 }
 @media (min-height: 10px) and (max-height: 60px) {
-  [m~='f3@x10-60'] {
+  [m-n~='f3@x10-60'] {
     font-size: 3px;
   }
 }
 @media (min-width: 992px) {
-  [m~='f30@992-'] {
+  [m-n~='f30@992-'] {
     font-size: 30px;
   }
 }
 @media (max-height: 600px) {
-  [m~='f40@x600'] {
+  [m-n~='f40@x600'] {
     font-size: 40px;
   }
 }
@@ -597,21 +597,21 @@ mn('tbl.cell',  {
 Example 1.  
 Вы просто пишите в разметку:
 ```html
-<div m="tbl">
+<div m-n="tbl">
   <div>текст</div>
 </div>
 
 ```  
 CSS для этой разметки генерируется автоматически:
 ```css
-[m~='tbl']>*{display:table-cell;vertical-align:middle}
-[m~='tbl']{display:table}
+[m-n~='tbl']>*{display:table-cell;vertical-align:middle}
+[m-n~='tbl']{display:table}
 ```
 
 Example 2.
 Как это работает с контекстами эссенций:
 ```html
-<div m="tbl>.example2__item">
+<div m-n="tbl>.example2__item">
   <div class="example2__item">
     <div>текст</div>
   </div>
@@ -622,31 +622,31 @@ Example 2.
 ```
 Сгенерированный CSS:
 ```css
-[m~='tbl>.example2__item'] .example2__item>*{display:table-cell;vertical-align:middle}
-[m~='tbl>.example2__item'] .example2__item{display:table}
+[m-n~='tbl>.example2__item'] .example2__item>*{display:table-cell;vertical-align:middle}
+[m-n~='tbl>.example2__item'] .example2__item{display:table}
 ```
 
 
 Example 3.  
 Практический пример:
 ```html
-<div m="mb10 lh">
-  <a class="example__button" m="tbl w200 h50 tc cF bg0">
+<div m-n="mb10 lh">
+  <a class="example__button" m-n="tbl w200 h50 tc cF bg0">
     <div>центрированный текст</div>
   </a>
 </div>
 ```
 Сгенерированный CSS:
 ```css
-[m~='lh']{line-height:1}
-[m~='bg0']{background:rgba(0,0,0,1)}
-[m~='cF']{color:rgba(255,255,255,1)}
-[m~='tc']{text-align:center}
-[m~='tbl']>*{display:table-cell;vertical-align:middle}
-[m~='tbl']{display:table}
-[m~='h50']{height:50px}
-[m~='w200']{width:200px}
-[m~='mb10']{margin-bottom:10px}
+[m-n~='lh']{line-height:1}
+[m-n~='bg0']{background:rgba(0,0,0,1)}
+[m-n~='cF']{color:rgba(255,255,255,1)}
+[m-n~='tc']{text-align:center}
+[m-n~='tbl']>*{display:table-cell;vertical-align:middle}
+[m-n~='tbl']{display:table}
+[m-n~='h50']{height:50px}
+[m-n~='w200']{width:200px}
+[m-n~='mb10']{margin-bottom:10px}
 ```
 
 
@@ -675,7 +675,7 @@ Example 1:
 
 INPUT:  
 ```html
-<div m="p20 mb20 dt5 br2">...</div>
+<div m-n="p20 mb20 dt5 br2">...</div>
 ```
 ```js
 mn('p', p => {
@@ -710,10 +710,10 @@ mn('br', p => {
 
 OUTPUT:  
 ```css
-[m~='p10']{padding:10px}
-[m~='mb20']{margin-bottom:20px}
-[m~='dt5']{top:5px}
-[m~='br2']{border-right-width:2px}
+[m-n~='p10']{padding:10px}
+[m-n~='mb20']{margin-bottom:20px}
+[m-n~='dt5']{top:5px}
+[m-n~='br2']{border-right-width:2px}
 ```
 
 
@@ -735,10 +735,10 @@ mn('x', p => {
 
 
 ```html
-<div m="x10y5">...</div>
+<div m-n="x10y5">...</div>
 ```
 ```css
-[m~='x10y5']{
+[m-n~='x10y5']{
   -khtml-transform:translate(10px,5px);
   -ms-transform:translate(10px,5px);
   -o-transform:translate(10px,5px);
@@ -750,10 +750,10 @@ mn('x', p => {
 
 
 ```html
-<div m="x12">...</div>
+<div m-n="x12">...</div>
 ```
 ```css
-[m~='x12']{
+[m-n~='x12']{
   -khtml-transform:translate(12px,0px);
   -ms-transform:translate(12px,0px);
   -o-transform:translate(12px,0px);
@@ -765,10 +765,10 @@ mn('x', p => {
 
 
 ```html
-<div m="x0y20%">...</div>
+<div m-n="x0y20%">...</div>
 ```
 ```css
-[m~='x0y20%']{
+[m-n~='x0y20%']{
   -khtml-transform:translate(0px,20%);
   -ms-transform:translate(0px,20%);
   -o-transform:translate(0px,20%);
@@ -780,10 +780,10 @@ mn('x', p => {
 
 
 ```html
-<div m="x0y20">...</div>
+<div m-n="x0y20">...</div>
 ```
 ```css
-[m~='x0y20']{
+[m-n~='x0y20']{
   -khtml-transform:translate(0px,20px);
   -ms-transform:translate(0px,20px);
   -o-transform:translate(0px,20px);
@@ -795,10 +795,10 @@ mn('x', p => {
 
 
 ```html
-<div m="x7%y20%">...</div>
+<div m-n="x7%y20%">...</div>
 ```
 ```css
-[m~='x7%y20%']{
+[m-n~='x7%y20%']{
   -khtml-transform:translate(7%,20%);
   -ms-transform:translate(7%,20%);
   -o-transform:translate(7%,20%);
@@ -810,10 +810,10 @@ mn('x', p => {
 
 
 ```html
-<div m="x0y20s90">...</div>
+<div m-n="x0y20s90">...</div>
 ```
 ```css
-[m~='x0y20s90']{
+[m-n~='x0y20s90']{
   -webkit-transform:translate(0px,20px) scale(0.9);
   -moz-transform:translate(0px,20px) scale(0.9);
   -o-transform:translate(0px,20px) scale(0.9);
@@ -870,7 +870,7 @@ Input:
 ```html
 <i
   class="ion-chevron-right"
-  m="x10:h cF00:a f16:(h|a)"
+  m-n="x10:h cF00:a f16:(h|a)"
 ></i>
 ```
 
@@ -883,7 +883,7 @@ mn.utils.extend(mn.states, {
 
 Output:
 ```css
-[m~='x10:h']:hover{
+[m-n~='x10:h']:hover{
   -khtml-transform:translate(10px,0px);
   -ms-transform:translate(10px,0px);
   -o-transform:translate(10px,0px);
@@ -891,13 +891,13 @@ Output:
   -webkit-transform:translate(10px,0px);
   transform:translate(10px,0px)
 }
-[m~='cF00:a']:active,
-[m~='cF00:a'].active{
+[m-n~='cF00:a']:active,
+[m-n~='cF00:a'].active{
   color:rgba(255,0,0,1)
 }
-[m~='f16:(h|a)']:hover,
-[m~='f16:(h|a)']:active,
-[m~='f16:(h|a)'].active{
+[m-n~='f16:(h|a)']:hover,
+[m-n~='f16:(h|a)']:active,
+[m-n~='f16:(h|a)'].active{
   font-size: 16px;
 }
 ```
@@ -905,10 +905,10 @@ Output:
 Если Вы укажете какое-либо иное незадекларированное состояние, то оно выводится как есть:
 ```css
 f16:hz ->
-[m~='f16:hz']:hz{font-size: 16px;}
+[m-n~='f16:hz']:hz{font-size: 16px;}
 
 f16:hover ->
-[m~='f16:hover']:hover{font-size: 16px;}
+[m-n~='f16:hover']:hover{font-size: 16px;}
 ```
 
 
@@ -920,7 +920,7 @@ mn.states.n = [ ':nth-child' ];
 
 ```css
 f16:n[3n+2] ->
-[m~='f16:n[3n+2]']:nth-child(3n+2){font-size: 16px;}
+[m-n~='f16:n[3n+2]']:nth-child(3n+2){font-size: 16px;}
 ```
 
 PS: В связи с тем, что круглые скобки являются служебными символами MN, необходимыми для группировки подстрок, то вместо них применяются квадратные скобки.  
@@ -929,16 +929,16 @@ PS: В связи с тем, что круглые скобки являются
 Вы можете без проблем в нотации записать псевдокласс отрицания:
 ```css
 f16:not[.active] ->
-[m~='f16:not[.active]']:not(.active){font-size: 16px;}
+[m-n~='f16:not[.active]']:not(.active){font-size: 16px;}
 
 f16:not[[type=number]] ->
-[m~='f16:not[[type=number]]']:not([type=number]){font-size: 16px;}
+[m-n~='f16:not[[type=number]]']:not([type=number]){font-size: 16px;}
 ```
 
 Вы можете указать в нотации несколько состояний:
 ```css
 f16:(hover|active) ->
-[m~='f16:(hover|active)']:hover, [m~='f16:(hover|active)']:active{font-size: 16px;}
+[m-n~='f16:(hover|active)']:hover, [m-n~='f16:(hover|active)']:active{font-size: 16px;}
 ```
 
 
@@ -956,15 +956,15 @@ mn.states.i = [
 
 
 ```html
-<input m="cA:i" placeholder="имя"/>
+<input m-n="cA:i" placeholder="имя"/>
 ```  
 
 Output:
 ```css
-[m~='cA:i']::-webkit-input-placeholder{color:rgb(170,170,170)}
-[m~='cA:i']::-moz-placeholder{color:rgb(170,170,170)}
-[m~='cA:i']:-ms-input-placeholder{color:rgb(170,170,170)}
-[m~='cA:i']::placeholder{color:rgb(170,170,170)}
+[m-n~='cA:i']::-webkit-input-placeholder{color:rgb(170,170,170)}
+[m-n~='cA:i']::-moz-placeholder{color:rgb(170,170,170)}
+[m-n~='cA:i']:-ms-input-placeholder{color:rgb(170,170,170)}
+[m-n~='cA:i']::placeholder{color:rgb(170,170,170)}
 ```
 
 
@@ -978,7 +978,7 @@ PS: селекторы с нестандартными псевдокласса�
 Например, для записи ``` bgF00<.active ``` генерируется следующий селектор:  
 
 ```css
-.active [m~='bgF00<.active'] { /* ... */ }
+.active [m-n~='bgF00<.active'] { /* ... */ }
 ```
 
 Так мы можем указать для текущего элемента при наличии какого родительского элемента будет отображаться стиль эссенции ``` bgF00 ```.
@@ -990,7 +990,7 @@ PS: селекторы с нестандартными псевдокласса�
 
 Например, для записи ``` bgF00>.active ``` генерируется следующий селектор:  
 ```css
-[m~='bgF00>.active'] .active { /* ... */ }
+[m-n~='bgF00>.active'] .active { /* ... */ }
 ```
 
 
@@ -1001,29 +1001,29 @@ PS: селекторы с нестандартными псевдокласса�
 
 ```css
 /* bgF00<1.active -> */
-.active>[m~='bgF00<1.active'] { /* ... */ }
+.active>[m-n~='bgF00<1.active'] { /* ... */ }
 
 /* bgF00<2.active -> */
-.active>*>[m~='bgF00<2.active'] { /* ... */ }
+.active>*>[m-n~='bgF00<2.active'] { /* ... */ }
 
 /* bgF00<3.active -> */
-.active>*>*>[m~='bgF00<3.active'] { /* ... */ }
+.active>*>*>[m-n~='bgF00<3.active'] { /* ... */ }
 ```
 
 
 Если нужно чтобы стили эссенции были активны при наличии какого-либо селектора(в частности класс ``` active ```) на текущем элементе:
 ```css
 /* bgF00<0.active -> */
-.active[m~='bgF00<0.active'] { /* ... */ }
+.active[m-n~='bgF00<0.active'] { /* ... */ }
 ```
 
 Если есть отрицательный знак, то мы получим распространение стиля эссенции на дочернии элементы:
 ```css
 /* bgF00<-1.active -> */
-[m~='bgF00<-1.active']>.active { /* ... */ }
+[m-n~='bgF00<-1.active']>.active { /* ... */ }
 
 /* bgF00<-2.active -> */
-[m~='bgF00<-2.active']>*>.active { /* ... */ }
+[m-n~='bgF00<-2.active']>*>.active { /* ... */ }
 ```
 
 
@@ -1032,7 +1032,7 @@ PS: селекторы с нестандартными псевдокласса�
 
 ```css
 /* bgF00.active -> */
-[m~='bgF00.active'].active { /* ... */ }
+[m-n~='bgF00.active'].active { /* ... */ }
 ```
 
 
@@ -1042,22 +1042,22 @@ PS: селекторы с нестандартными псевдокласса�
 Всё вышеперечисленное аналогично можем применять и для других селекторов с атрибутами:  
 ```css
 /* bgF00>[type=text] -> */
-[m~='bgF00>[type=text]'] [type=text] { /* ... */ }
+[m-n~='bgF00>[type=text]'] [type=text] { /* ... */ }
 
 /* bgF00[type=text] -> */
-[m~='bgF00[type=text]'][type=text] { /* ... */ }
+[m-n~='bgF00[type=text]'][type=text] { /* ... */ }
 ```
 
 Пример более сложного селектора:
 ```css
 /* bgF00.theme1.active -> */
-[m~='bgF00.theme1.active'].theme1.active { /* ... */ }
+[m-n~='bgF00.theme1.active'].theme1.active { /* ... */ }
 ```
 
 Разделители подразумевают, что Вы можете совместно указать сколько угодно родительских и дочерних элементов и состояний в контексте эссенции:  
 ```css
 /* bgF00.active<.md>.anyChild -> */
-.md [m~='bgF00.active<.md>.anyChild'].active .anyChild { /* ... */ }
+.md [m-n~='bgF00.active<.md>.anyChild'].active .anyChild { /* ... */ }
 ```
 
 
@@ -1068,22 +1068,22 @@ Input:
 <a href="#">
   <i
     class="ion-chevron-right"
-    m="x10<a:h cF00:a"
+    m-n="x10<a:h cF00:a"
   ></i>
 </a>
-<div m="c0F0:a<.parent1">...</div>
-<div m="bg02<.parent1<.parent2">...</div>
-<div m="c065:a<0.parent1">...</div>
-<div m="bgD852<3.parent1<.parent2:h">...</div>
+<div m-n="c0F0:a<.parent1">...</div>
+<div m-n="bg02<.parent1<.parent2">...</div>
+<div m-n="c065:a<0.parent1">...</div>
+<div m-n="bgD852<3.parent1<.parent2:h">...</div>
 ```
 
 Output:
 ```css
-[m~='cF00:a'].active,
-[m~='cF00:a']:active{
+[m-n~='cF00:a'].active,
+[m-n~='cF00:a']:active{
   color:rgba(255,0,0,1)
 }
-a:hover [m~='x10<a:h']{
+a:hover [m-n~='x10<a:h']{
   -khtml-transform:translate(10px,0px);
   -ms-transform:translate(10px,0px);
   -o-transform:translate(10px,0px);
@@ -1091,18 +1091,18 @@ a:hover [m~='x10<a:h']{
   -webkit-transform:translate(10px,0px);
   transform:translate(10px,0px)
 }
-.parent1 [m~='c0F0:a<.parent1']:active,
-.parent1 [m~='c0F0:a<.parent1'].active{
+.parent1 [m-n~='c0F0:a<.parent1']:active,
+.parent1 [m-n~='c0F0:a<.parent1'].active{
   color:rgba(0,255,0,1)
 }
-.parent1[m~='c065:a<0.parent1']:active,
-.parent1[m~='c065:a<0.parent1'].active{
+.parent1[m-n~='c065:a<0.parent1']:active,
+.parent1[m-n~='c065:a<0.parent1'].active{
   color:rgba(0,102,85,1)
 }
-.parent2 .parent1 [m~='bg02<.parent1<.parent2']{
+.parent2 .parent1 [m-n~='bg02<.parent1<.parent2']{
   background-color:rgba(0,0,0,0.13333333333333333)
 }
-.parent2:hover .parent1>*>*>[m~='bgD852<3.parent1<.parent2:h']{
+.parent2:hover .parent1>*>*>[m-n~='bgD852<3.parent1<.parent2:h']{
   background-color:rgba(221,136,85,0.13333333333333333)
 }
 ```
@@ -1112,25 +1112,25 @@ Example 2:
 
 Input:
 ```html
-<div m="(sq50|bg0)<2.anyClass"></div>
-<div m="(w50|h5|bg00F8)>5.innerItem"></div>
+<div m-n="(sq50|bg0)<2.anyClass"></div>
+<div m-n="(w50|h5|bg00F8)>5.innerItem"></div>
 ```
 Output:
 ```css
-.anyClass>*>[m~='(sq50|bg0)<2.anyClass']{
+.anyClass>*>[m-n~='(sq50|bg0)<2.anyClass']{
   background:rgba(0,0,0,1)
 }
-.anyClass>*>[m~='(sq50|bg0)<2.anyClass']{
+.anyClass>*>[m-n~='(sq50|bg0)<2.anyClass']{
   width:50px;
   height:50px
 }
-[m~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
+[m-n~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
   background:rgba(0,0,255,0.5333333333333333)
 }
-[m~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
+[m-n~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
   height:5px
 }
-[m~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
+[m-n~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
   width:50px
 }
 ```
@@ -1300,7 +1300,7 @@ Format:
 Example 1:  
 
 ```html
-<div m="h40*3"></div>
+<div m-n="h40*3"></div>
 ```
 Output:  
 ```css
@@ -1313,7 +1313,7 @@ Output:
 Example 2:  
 
 ```html
-<div m="h40.isActive*2"></div>
+<div m-n="h40.isActive*2"></div>
 ```
 Output:  
 ```css
@@ -1327,7 +1327,7 @@ Output:
 Example 3:  
 
 ```html
-<div m="h40>.child1>.child2*3"></div>
+<div m-n="h40>.child1>.child2*3"></div>
 ```
 Output:  
 ```css

@@ -32,6 +32,7 @@ __exports.defaultPluginSettings = {
   output: './dist/app.css',
   attrs: {
     'class': 'class',
+    'm-n': 'm-n',
     'm': 'm',
   },
   presets: [
@@ -46,6 +47,7 @@ __exports.defaultLoaderSettings = {
   attrs: {
     'className': 'class',
     'class': 'class',
+    'm-n': 'm-n',
     'm': 'm',
   },
 };

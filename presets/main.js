@@ -2,8 +2,8 @@
  * @overview Minimalist-Notation preset "main"
  * @author Amir Absalyamov <mr.amirka@ya.ru>
  * @dependencies
- * mn-presets/styles
- * mn-presets/medias
+ * minimalist-notation/presets/styles
+ * minimalist-notation/presets/medias
  */
 
 

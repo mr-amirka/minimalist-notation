@@ -18,15 +18,15 @@
 #### Auto prefixes
 
 See source:  
-[mn-presets/prefixes.js](https://github.com/mr-amirka/mn-presets/blob/master/prefixes.js)  
-[mn-presets/runtime-prefixes.js](https://github.com/mr-amirka/mn-presets/blob/master/runtime-prefixes.js)  
+[minimalist-notation/presets/prefixes.js](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/prefixes.js)  
+[minimalist-notation/presets/runtime-prefixes.js](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/runtime-prefixes.js)  
 
 
 
 #### Media queries
 
 See source:  
-[mn-presets/medias.js](https://github.com/mr-amirka/mn-presets/blob/master/medias.js)
+[minimalist-notation/presets/medias.js](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/medias.js)
 
 
 ```js
@@ -122,7 +122,7 @@ module.exports = (mn) => {
 #### States
 
 See source:  
-[mn-presets/states.js](https://github.com/mr-amirka/mn-presets/blob/master/states.js)
+[minimalist-notation/presets/states.js](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/states.js)
 
 
 | State name | Selectors                                        |
@@ -198,7 +198,7 @@ See source:
 #### Other default settings
 
 See source:  
-[mn-presets/main.js](https://github.com/mr-amirka/mn-presets/blob/master/main.js)
+[minimalist-notation/presets/main.js](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/main.js)
 
 
 ```js
@@ -333,7 +333,7 @@ const defaultSides = reduce({
 #### Essences of styles
 
 See source:  
-[mn-presets/styles.js](https://github.com/mr-amirka/mn-presets/blob/master/styles.js)
+[minimalist-notation/presets/styles.js](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/styles.js)
 
 
 See docs:  
@@ -346,4 +346,4 @@ See docs:
 This is a fork of the [normalize.css v8.0.1](https://github.com/necolas/normalize.css)
 
 See source:  
-[mn-presets/normalize.js](https://github.com/mr-amirka/mn-presets/blob/master/normalize.js)
+[minimalist-notation/presets/normalize.js](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/normalize.js)
