@@ -312,8 +312,10 @@ Some features were added purely experimentally due to the fact that something si
 
   1. Inheritance from essences of styles (extension). This is a cool feature. Sometimes it is needed, but I do not recommend its use unnecessarily, due to the fact that:  
 
-    * first, multiple inheritance makes code harder to understand;  
-    * secondly, when the essence ``` A ``` inherits the properties of the essence ``` B ```, the selectors associated with the essence ``` A ```, are also associated with the essence ``` B ```. This in most cases leads to the fact that the generated final CSS code due to the duplication of selectors in volume can significantly exceed the CSS code obtained using mixins.  
+  * first, multiple inheritance makes code harder to understand;  
+  * secondly, when the essence ``` A ``` inherits the properties of the essence ``` B ```,
+    the selectors associated with the essence ``` A ```, are also associated with the essence ``` B ```.
+    This in most cases leads to the fact that the generated final CSS code due to the duplication of selectors in volume can significantly exceed the CSS code obtained using mixins.  
 
   2. The essences mixins. The essences mixins can be used as an alternative to inheritance of essences, depending on how optimal it is for the current project from your point of view. Mixins differ from inheritance in that they directly copy the attributes of donor essences at the step of compiling the essences, which is more optimal.  
 
