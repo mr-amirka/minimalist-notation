@@ -329,7 +329,7 @@ I later found out that the methodology I follow is referred to as Functional / A
 
 
 
-## Минимализм!
+## Minimalism!
 
 In my case, minimalism implies the minimum complexity of solving problems, in particular, the following:  
 

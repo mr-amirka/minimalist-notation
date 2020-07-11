@@ -9,6 +9,8 @@ const push = require('mn-utils/push');
 const escapeQuote = require('mn-utils/escapeQuote');
 const escapeCss = require('mn-utils/escapeCss');
 const repeat = require('mn-utils/repeat');
+const scopeJoin = require('mn-utils/scopeJoin');
+const scopeSplit = require('mn-utils/scopeSplit');
 const selectorNormalize = require('./selectorNormalize');
 
 const splitSelector = escapedSplitProvider(/[<:\.\[\]#+~]/).base;
@@ -17,11 +19,22 @@ const splitChild = escapedSplitProvider(/>|<\-/).base;
 const splitMedia = escapedSplitProvider('@').base;
 const splitState = escapedSplitProvider(':').base;
 const extractSuffix = escapedHalfProvider(/[<>:\.\[\]#+~@\!]/).base;
-const regexpScope = /^(.*?)\[(.*)\]$/;
 const regexpDepth = /^(\d+)(.*)$/;
-const regexpFix = /^(.*)([~+])$/;
 const regexpMultiplier = /^(.*)\*([0-9]+)$/;
 
+const SCOPE_START = '[';
+const SCOPE_END = ']';
+
+function getScope(value) {
+  const input = scopeSplit(value, SCOPE_START , SCOPE_END); // eslint-disable-line
+  const first = input.shift();
+  const scope = first[1];
+  return [
+    first[0],
+    (scope ? ('(' + scopeJoin(scope, SCOPE_START, SCOPE_END) + ')') : '')
+      + scopeJoin(input, SCOPE_START, SCOPE_END),
+  ];
+}
 function getPrefix(depth) {
   return depth < 1 ? '' : ('>' + repeat('*>', depth - 1));
 }
@@ -122,23 +135,18 @@ module.exports = (instance) => {
   }
   function getStatesMap(state) {
     const dst = {};
-    let matchs, suffix = '', v = '', ns, si; // eslint-disable-line
-    if (matchs = regexpFix.exec(state)) {
-      state = matchs[1];
-      suffix = matchs[2];
-    }
-    if (matchs = regexpScope.exec(state)) {
-      state = matchs[1];
-      v = '(' + (matchs[2] || '') + ')';
-    }
-    v += suffix;
+    const scope = getScope(state);
+    const suffix = scope[1];
+    state = scope[0];
+    let ns, si; // eslint-disable-line
     if ((ns = $$states[state]) && (si = ns.length)) {
-      for (;si--;) dst[ns[si] + v] = 1;
+      for (;si--;) dst[ns[si] + suffix] = 1;
     } else {
-      dst[':' + state + v] = 1;
+      dst[':' + state + suffix] = 1;
     }
     return dst;
   }
+
   function joinStates(alts, states) {
     const length = states.length;
     let i = 0;
