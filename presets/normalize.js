@@ -30,7 +30,7 @@ module.exports = (mn) => {
     /**
      * Render the `main` element consistently in IE.
      */
-    main: 'dBlock',
+    main: 'dB',
 
     /**
      * Correct the font size and margin on `h1` elements within `section` and
@@ -45,7 +45,7 @@ module.exports = (mn) => {
      * 1. Add the correct box sizing in Firefox.
      * 2. Show the overflow in Edge and IE.
      */
-    hr: 'bxzContentBox h0 ovVisible',
+    hr: 'bxzCB h0 ovV',
 
     /**
      * 1. Correct the inheritance and scaling of font size in all browsers.
@@ -66,7 +66,7 @@ module.exports = (mn) => {
      * 2. Add the correct text decoration in Chrome, Edge, IE, Opera,
      * and Safari.
      */
-    'abbr[title]': 'bb0 tdUnderline',
+    'abbr[title]': 'bb0 tdU',
 
     /**
      * Add the correct font weight in Chrome, Edge, and Safari.
@@ -89,7 +89,7 @@ module.exports = (mn) => {
      * Prevent `sub` and `sup` elements from affecting the line height in
      * all browsers.
      */
-    'sub, sup': 'f75% lh0 rlv vaBaseline',
+    'sub, sup': 'f75% lh0 rlv vaBL',
 
     sub: 'sb-0\\.25em',
 
@@ -101,7 +101,7 @@ module.exports = (mn) => {
     /**
      * Remove the border on images inside links in IE 10.
      */
-    img: 'bsNone',
+    img: 'bsN',
 
     /* Forms
   ========================================================================== */
@@ -116,13 +116,13 @@ module.exports = (mn) => {
      * Show the overflow in IE.
      * 1. Show the overflow in Edge.
      */
-    'button, input': 'ovVisible',
+    'button, input': 'ovV',
 
     /**
      * Remove the inheritance of text transform in Edge, Firefox, and IE.
      * 1. Remove the inheritance of text transform in Firefox.
      */
-    'button, select': 'ttNone',
+    'button, select': 'ttN',
 
     /**
      * Correct the inability to style clickable types in iOS and Safari.
@@ -132,7 +132,7 @@ module.exports = (mn) => {
     /**
      * Remove the inner border and padding in Firefox.
      */
-    '(button|[type=(button|reset|submit)])::-moz-focus-inner': 'bsNone p',
+    '(button|[type=(button|reset|submit)])::-moz-focus-inner': 'bsN p',
 
     /**
      * Restore the focus styles unset by the previous rule.
@@ -151,29 +151,29 @@ module.exports = (mn) => {
      * 3. Remove the padding so developers are not caught out when they zero out
      *    `fieldset` elements in all browsers.
      */
-    legend: 'bxzBorderBox cInherit dTable wmax p wsNormal',
+    legend: 'bxzBB cInherit dTB wmax p wsN',
 
     /**
      * Add the correct vertical alignment in Chrome, Firefox, and Opera.
      */
 
-    progress: 'vaBaseline',
+    progress: 'vaBL',
 
     /**
      * Remove the default vertical scrollbar in IE 10+.
      */
-    textarea: 'ovAuto',
+    textarea: 'ovA',
 
     /**
      * 1. Add the correct box sizing in IE 10.
      * 2. Remove the padding in IE 10.
      */
-    '[type=(checkbox|radio)]': 'bxzBorderBox p',
+    '[type=(checkbox|radio)]': 'bxzBB p',
 
     /**
      * Correct the cursor style of increment and decrement buttons in Chrome.
      */
-    '[type=number]::-webkit-(inner|outer)-spin-button': 'hAuto',
+    '[type=number]::-webkit-(inner|outer)-spin-button': 'hA',
 
     /**
      * 1. Correct the odd appearance in Chrome and Safari.
@@ -199,12 +199,12 @@ module.exports = (mn) => {
     /*
      * Add the correct display in Edge, IE 10+, and Firefox.
      */
-    details: 'dBlock',
+    details: 'dB',
 
     /*
      * Add the correct display in all browsers.
      */
-    summary: 'dListItem',
+    summary: 'dLI',
 
     /* Misc
   ========================================================================== */
@@ -212,12 +212,12 @@ module.exports = (mn) => {
     /**
      * Add the correct display in IE 10+.
      */
-    template: 'dNone',
+    template: 'dN',
 
     /**
      * Add the correct display in IE 10.
      */
 
-    '[hidden]': 'dNone',
+    '[hidden]': 'dN',
   });
 };
