@@ -1195,6 +1195,7 @@ module.exports = (mn) => {
     });
   });
 
+  /*
   forIn({
     '': 'width',
     l: 'marginLeft',
@@ -1217,6 +1218,7 @@ module.exports = (mn) => {
       };
     }, WIDTH_PATTERN, 1);
   });
+  */
 
   mn('ratio', (p, add, v) => {
     return p.other ? 0 : (
