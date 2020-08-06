@@ -27,10 +27,10 @@ const SCOPE_END = ']';
 
 function getScope(value) {
   const input = scopeSplit(value, SCOPE_START , SCOPE_END); // eslint-disable-line
-  const first = input.shift();
+  const first = input.shift() || [];
   const scope = first[1];
   return [
-    first[0],
+    first[0] || '',
     (scope ? ('(' + scopeJoin(scope, SCOPE_START, SCOPE_END) + ')') : '')
       + scopeJoin(input, SCOPE_START, SCOPE_END),
   ];
