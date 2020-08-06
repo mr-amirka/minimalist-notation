@@ -22,9 +22,9 @@ const BASE_COLOR_PATTERN
   = '([A-Z][a-z][A-Za-z]+):camel|([A-Fa-f0-9]+(\\.[0-9]+)?):color';
 const COLOR_PATTERN = '^(' + BASE_COLOR_PATTERN + '):value';
 // eslint-disable-next-line
-const WIDTH_PATTERN = '^(([A-Z][A-Za-z]*):camel|([0-9]+(\\.[0-9]+)?):num(/([0-9]+(\\.[0-9]+)?):total?)?):value?([a-z%]+):unit?([-+][0-9]+):add?$';
+const WIDTH_PATTERN = '^(([A-Z][A-Za-z]*):camel|([0-9]*\\.[0-9]+|[0-9]+):num(/([0-9]*\\.[0-9]+|[0-9]+):total?)?):value?([a-z%]+):unit?([-+]([0-9]*\\.[0-9]+|[0-9]+)):add?$';
 // eslint-disable-next-line
-const MARGIN_PATTERN = '^(([A-Z][A-Za-z]*):camel|([-+]):sign?([0-9]+(\\.[0-9]+)?):num(/([0-9]+(\\.[0-9]+)?):total?)?):value?([a-z%]+):unit?([-+][0-9]+):add?$';
+const MARGIN_PATTERN = '^(([A-Z][A-Za-z]*):camel|([-+]):sign?([0-9]*\\.[0-9]+|[0-9]+):num(/([0-9]*\\.[0-9]+|[0-9]+):total?)?):value?([a-z%]+):unit?([-+]([0-9]*\\.[0-9]+|[0-9]+)):add?$';
 const SHADOW_PATTERNS = [
   '(r|R)(\\-?[0-9]+):r',
   '(x|X)(\\-?[0-9]+):x',
@@ -83,6 +83,7 @@ const tdSynonyms = {
   U: 'Underline',
   O: 'Overline',
   L: 'LineThrough',
+  I: 'Inherit',
 };
 const breakAfterSynonyms = {
   A: 'Auto',
@@ -174,6 +175,7 @@ function normalizeCalc(v, add) {
 module.exports = (mn) => {
   const {utils, setKeyframes} = mn;
   const {
+    isDefined,
     map,
     filter,
     forIn,
@@ -231,9 +233,11 @@ module.exports = (mn) => {
       let propSide;
       for (propSide in sides) propsMap[handle(propSide)] = 1; // eslint-disable-line
       return (v) => {
-        let style = {}, pName; // eslint-disable-line
-        for (pName in propsMap) style[pName] = v; // eslint-disable-line
-        return style;
+        if (isDefined(v)) {
+          let style = {}, pName; // eslint-disable-line
+          for (pName in propsMap) style[pName] = v; // eslint-disable-line
+          return style;
+        }
       };
     }
     function handleProvider(sidesSet) {
@@ -252,7 +256,7 @@ module.exports = (mn) => {
                           num = (p.sign || '') + ((total = p.total)
                             ? toFixed(100 * parseFloat(num)
                               / parseFloat(total)) + '%'
-                            : num + (p.unit || 'px')),
+                            : toFixed(num) + (p.unit || 'px')),
                           (add = p.add)
                             ? normalizeCalc(num, add)
                             : num
@@ -280,7 +284,7 @@ module.exports = (mn) => {
     mn('s' + suffix, handleProvider(
       suffix
         ? sidesSetter((side) => replace(side, regexpTrimKebabLeft, ''))
-        : (v) => ({
+        : (v) => (isDefined(v) && {
           top: v,
           bottom: v,
           left: v,
@@ -572,21 +576,26 @@ module.exports = (mn) => {
   });
 
   forIn({
-    f: ['fontSize', 14, 1],
+    f: ['fontSize', 14, 1, {
+      I: 'Inherit',
+    }],
     r: ['borderRadius', 10000],
     sw: ['strokeWidth'],
     olw: ['outlineWidth', 0, 1],
   }, (options, pfx) => {
     const [propName, defaultValue] = options;
     const priority = options[2] || 0;
-    mn(pfx, (p, style, camel) => {
-      return !p.negative && (
-        style = {},
-        style[propName] = (camel = p.camel)
-          ? toKebabCase(camel)
-          : (p.num || defaultValue) + (p.unit || 'px'),
-        styleWrap(style, priority)
-      );
+    const synonyms = options[3] || {};
+    mn(pfx, (p, style, camel, synonym) => {
+      return (synonym = synonyms[p.suffix])
+        ? normalizeDefault(p, synonym)
+        : !p.negative && (
+          style = {},
+          style[propName] = (camel = p.camel)
+            ? toKebabCase(camel)
+            : (p.num || defaultValue) + (p.unit || 'px'),
+          styleWrap(style, priority)
+        );
     });
   });
 

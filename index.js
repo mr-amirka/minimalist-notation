@@ -67,6 +67,7 @@ const utils = MinimalistNotationProvider.utils = merge([
     isPromise: require('mn-utils/isPromise'),
     isIndex: require('mn-utils/isIndex'),
     isLength: require('mn-utils/isLength'),
+    isDefined: require('mn-utils/isDefined'),
     isEmpty,
     once: require('mn-utils/once'),
     delay: require('mn-utils/delay'),
@@ -114,6 +115,9 @@ const utils = MinimalistNotationProvider.utils = merge([
     camelToKebabCase: require('mn-utils/camelToKebabCase'),
     kebabToCamelCase: require('mn-utils/kebabToCamelCase'),
     defer: require('mn-utils/defer'),
+    scopeJoin: require('mn-utils/scopeJoin'),
+    scopeSplit: require('mn-utils/scopeSplit'),
+    slice: require('mn-utils/slice'),
   },
   require('mn-utils/anyval'),
 ]);
@@ -155,9 +159,6 @@ function normalizeSelectorsIteratee(selectorsMap, selector) {
     flags(map(variants(selector), selectorNormalize), selectorsMap);
   });
   return selectorsMap;
-}
-function __updateClearIteratee(item) {
-  item.updated = 0;
 }
 function __cssReducer(output, v) {
   push(output, v.content);
@@ -291,7 +292,6 @@ function MinimalistNotationProvider(options) {
   }
   function styleRender() {
     emit(__values($$stylesMap).sort(priotitySort));
-    forIn($$stylesMap, __updateClearIteratee);
   }
   function updateOptions() {
     const options = mn.options || {};
@@ -428,7 +428,7 @@ function MinimalistNotationProvider(options) {
       name,
       priority: priority || 0,
       content: content || '',
-      updated: 1,
+      revision: ++$$revision,
     };
     $$updated = 1;
     return mn;
@@ -458,6 +458,7 @@ function MinimalistNotationProvider(options) {
   let $$force;
   let $$selectorPrefix;
   let $$altColor;
+  let $$revision = 0;
 
   function parseMediaName(mediaName) {
     if (!mediaName || mediaName === 'all') {

@@ -20,7 +20,7 @@ module.exports = (mn) => {
     body: 'm',
     a: 'crP@mouse',
     img: 'wmax dB mhA b0',
-    iframe: 'dB b0',
+    iframe: 'dB b0 bcTransparent',
     // eslint-disable-next-line
     'aside, article, main, section, header, footer, nav, video, canvas, input, textarea':
       'dB',

@@ -1,6 +1,3 @@
-[Русский](https://github.com/mr-amirka/minimalist-notation/blob/master/README-ru.md)
-
-
 # Minimalist Notation
 
 This is the best CSS framework and CSS-preprocessing technology that you will not be able to part with.  
@@ -133,6 +130,7 @@ module.exports = {
               id: 'app',
               attrs: { // for jsx parsing
                 className: 'class',
+                // 'm-n': 'm-n',
                 // m: 'm',
               },
             }
@@ -145,6 +143,7 @@ module.exports = {
       id: 'app',
       attrs: { // for templates (html) parsing
         'class': 'class',
+        // 'm-n': 'm-n',
         // m: 'm',
       },
       output: [
@@ -223,10 +222,11 @@ const mn = mnProvider({
     // require('minimalist-notation/presets/main'),
     // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
     // require('./mn-my-preset'), // custom preset
+    ...(window.mnPresets || []),
   ],
 });
 const onDocumentReady = require('mn-utils/browser/ready');
-const stylesRenderProvider = require('mn-utils/browser/stylesRenderProvider');
+const stylesRenderProvider = require('mn-utils/stylesRenderProvider');
 const styleTagIdPrefix = 'mn.';
 const stylesRender = stylesRenderProvider(document, styleTagIdPrefix);
 
@@ -234,7 +234,8 @@ mn.emitter.on(stylesRender);
 
 onDocumentReady(() => {
   mn.getCompiler('class').recursiveCheck(document);
-  mn.getCompiler('m').recursiveCheck(document);
+  // mn.getCompiler('m-n').recursiveCheck(document);
+  // mn.getCompiler('m').recursiveCheck(document);
   mn.compile();
 
   console.log('Minimalist Notation:', mn.data);
@@ -255,7 +256,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.5.17.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.5.20.js" async></script>
 ```
 
 -------------------------
@@ -283,7 +284,7 @@ const mn = mnProvider({
     ...(window.mnPresets || []),
   ],
 });
-const stylesRenderProvider = require('mn-utils/browser/stylesRenderProvider');
+const stylesRenderProvider = require('mn-utils/stylesRenderProvider');
 const styleTagIdPrefix = 'mn.';
 const stylesRender = stylesRenderProvider(document, styleTagIdPrefix);
 
@@ -294,17 +295,15 @@ React.createElement = reactCreateElementPatch(React.createElement, {
 }, mn);
 
 
-class App extends React.Component {
-  render() {
-    return (
-      <div className="tbl c0F0 bg0 w h100vh tc f40">
-        <div>
-          <div>Hello React!</div>
-          <div className="sq10 bgF"></div>
-        </div>
+function App() {
+  return (
+    <div className="tbl c0F0 bg0 w h100vh tc f40">
+      <div>
+        <div>Hello React!</div>
+        <div className="sq10 bgF"></div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 render(<App/>, document.getElementById('app'));
