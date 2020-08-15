@@ -36,7 +36,6 @@ const variants = require('mn-utils/variants');
 const keys = require('mn-utils/keys');
 const color = require('mn-utils/color');
 const colorGetBackground = require('mn-utils/colorGetBackground');
-
 const {
   SC_ESSENCES,
   SC_SELECTORS,

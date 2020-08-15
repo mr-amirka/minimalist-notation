@@ -611,9 +611,14 @@ module.exports = (mn) => {
 
 
   mn({
-    'cfx.pale': {
-      selectors: [':before', ':after'],
-      style: {content: '" "', clear: 'both', display: 'table'},
+    cfx: {
+      style: {position: 'static'},
+      childs: {
+        pale: {
+          selectors: [':before', ':after'],
+          style: {content: '" "', clear: 'both', display: 'table'},
+        },
+      },
     },
 
     tbl: synonymProvider('tableLayout', {
