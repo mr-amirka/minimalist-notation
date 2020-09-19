@@ -21,18 +21,21 @@ const splitState = escapedSplitProvider(':').base;
 const extractSuffix = escapedHalfProvider(/[<>:\.\[\]#+~@\!]/).base;
 const regexpDepth = /^(\d+)(.*)$/;
 const regexpMultiplier = /^(.*)\*([0-9]+)$/;
+const regexpScopeSuffix = /^(.*?)([+~])$/;
 
 const SCOPE_START = '[';
 const SCOPE_END = ']';
 
 function getScope(value) {
-  const input = scopeSplit(value, SCOPE_START , SCOPE_END); // eslint-disable-line
+  const matches = regexpScopeSuffix.exec(value);
+  const input = scopeSplit(matches ? matches[1] : value, SCOPE_START, SCOPE_END); // eslint-disable-line
   const first = input.shift() || [];
   const scope = first[1];
   return [
     first[0] || '',
     (scope ? ('(' + scopeJoin(scope, SCOPE_START, SCOPE_END) + ')') : '')
-      + scopeJoin(input, SCOPE_START, SCOPE_END),
+      + scopeJoin(input, SCOPE_START, SCOPE_END)
+      + (matches ? matches[2] : ''),
   ];
 }
 function getPrefix(depth) {
@@ -150,13 +153,11 @@ module.exports = (instance) => {
   function joinStates(alts, states) {
     const length = states.length;
     let i = 0;
-    if (length) {
-      for (; i < length; i++) {
-        alts = joinMaps({}, alts, getStatesMap(unslash(states[i])));
-      }
-    }
+    // eslint-disable-next-line
+    for (; i < length; i++) alts = joinMaps({}, alts, getStatesMap(unslash(states[i])));
     return alts;
   }
+
   function getEssence(name) {
     const states = splitState(name);
     return [

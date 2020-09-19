@@ -21,6 +21,7 @@ const regexpFilterSep = /_+/;
 const BASE_COLOR_PATTERN
   = '([A-Z][a-z][A-Za-z]+):camel|([A-Fa-f0-9]+(\\.[0-9]+)?):color';
 const COLOR_PATTERN = '^(' + BASE_COLOR_PATTERN + '):value';
+
 // eslint-disable-next-line
 const WIDTH_PATTERN = '^(([A-Z][A-Za-z]*):camel|([0-9]*\\.[0-9]+|[0-9]+):num(/([0-9]*\\.[0-9]+|[0-9]+):total?)?):value?([a-z%]+):unit?([-+]([0-9]*\\.[0-9]+|[0-9]+)):add?$';
 // eslint-disable-next-line
@@ -169,7 +170,7 @@ function __wr(v) {
   return v[0] == '-' ? '"' + v.substr(1) + '"' : v;
 }
 function normalizeCalc(v, add) {
-  return 'calc(' + v + ' ' + add.replace(regexpSign, '$1 ') + 'px)';
+  return 'calc(' + v + ' ' + replace(add, regexpSign, '$1 ') + 'px)';
 }
 
 module.exports = (mn) => {
