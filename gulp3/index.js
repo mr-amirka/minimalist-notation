@@ -60,7 +60,7 @@ const defaultSettings = gulpMN.defaultSettings = {
     require('../presets/prefixes'),
     require('../presets/styles'),
     require('../presets/states'),
-    require('../presets/main'),
+    // require('../presets/main'),
   ],
 };
 

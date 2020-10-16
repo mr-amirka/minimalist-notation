@@ -641,7 +641,7 @@ function MinimalistNotationProvider(options) {
       )
       : __normalize(__initEssence(essenceName));
 
-    if (!tmpEssence) return essence;
+    if (!tmpEssence) return;
     compileMixedEssence(essence, tmpEssence, excludes);
     const important = essence.important;
 

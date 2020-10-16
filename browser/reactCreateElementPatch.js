@@ -41,6 +41,6 @@ module.exports = function patchCreateElement(
       for (attrName in handlers) (v = props[attrName]) && handlers[attrName](v); // eslint-disable-line
       compile();
     }
-    return createElement.apply(null, arguments); // eslint-disable-line
+    return createElement.apply(this, arguments); // eslint-disable-line
   };
 };

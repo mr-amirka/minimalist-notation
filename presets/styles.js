@@ -1105,18 +1105,14 @@ module.exports = (mn) => {
             , __wr).join(','),
       }, 1);
     },
-    cnt: (p, s) => {
-      return styleWrap({
-        content: (s = p.suffix)
-          ? (
-            s == '_'
-              ? normalizeDefault(p, '\' \'')
-              : spaceNormalize(
-                s[0] == '_' ? (snakeLeftTrim(s) || '" "') : toKebabCase(s),
-              )
-          )
-          : 'none',
-      });
+    cnt: (p, s, v) => {
+      return (s = p.suffix) == '_'
+        ? normalizeDefault(p, '\'_\'')
+        : styleWrap({
+          content: s ? spaceNormalize(
+            s[0] == '_' ? (snakeLeftTrim(s) || '" "') : toKebabCase(s),
+          ) : 'none',
+        });
     },
     ft: (p, v) => {
       return (v = filter(map(

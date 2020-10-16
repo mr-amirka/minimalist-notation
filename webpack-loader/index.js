@@ -40,7 +40,7 @@ __exports.defaultPluginSettings = {
     require('../presets/prefixes'),
     require('../presets/styles'),
     require('../presets/states'),
-    require('../presets/main'),
+    // require('../presets/main'),
   ],
 };
 __exports.defaultLoaderSettings = {
