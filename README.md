@@ -317,7 +317,8 @@ I would be grateful for your feedback and comments. Write me in a [telegram](htt
 With respect, mr.Amirka 🙂
 
 
-Are you interested in the development of this project?
+Are you interested in the development of this project?  
+
 Contribute  
 Bitcoin address: 14j4euH5PNmKnyfYdDxeimTkd1hjdnx5W1  
 Ethereum address: 0xeae6bf266f2c361e3a02d74374722cec7f2d8836  
