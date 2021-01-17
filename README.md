@@ -314,7 +314,10 @@ render(<App/>, document.getElementById('app'));
 
 
 I would be grateful for your feedback and comments. Write me in a [telegram](https://t.me/mr_amirka).  
-With love, your mr.Amirka :)
+With respect, mr.Amirka 🙂
 
 
-Are you interested in the development of this project? Do your [bit](https://yasobe.ru/na/notation).  
+Are you interested in the development of this project?
+Contribute  
+Bitcoin address: 14j4euH5PNmKnyfYdDxeimTkd1hjdnx5W1  
+Ethereum address: 0xeae6bf266f2c361e3a02d74374722cec7f2d8836  

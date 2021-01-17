@@ -26,18 +26,18 @@ module.exports = (mn) => {
 
   forEach([
     // mobile
-    ['m', '(max-width: 992px)'],
-    ['m2', '(max-width: 768px)'],
-    ['m3', '(max-width: 640px)'],
-    ['m4', '(max-width: 480px)'],
-    ['m5', '(max-width: 360px)'],
-    ['m6', '(max-width: 320px)'],
+    ['m', '(max-width: 991.98px)'],
+    ['m2', '(max-width: 767.98px)'],
+    ['m3', '(max-width: 639.98px)'],
+    ['m4', '(max-width: 479.98px)'],
+    ['m5', '(max-width: 359.98px)'],
+    ['m6', '(max-width: 319.98px)'],
 
-    ['m2-', '(min-width: 768px) and (max-width: 992px)'],
-    ['m3-', '(min-width: 640px) and (max-width: 992px)'],
-    ['m4-', '(min-width: 480px) and (max-width: 992px)'],
-    ['m5-', '(min-width: 360px) and (max-width: 992px)'],
-    ['m6-', '(min-width: 320px) and (max-width: 992px)'],
+    ['m2-', '(min-width: 768px) and (max-width: 991.98px)'],
+    ['m3-', '(min-width: 640px) and (max-width: 991.98px)'],
+    ['m4-', '(min-width: 480px) and (max-width: 991.98px)'],
+    ['m5-', '(min-width: 360px) and (max-width: 991.98px)'],
+    ['m6-', '(min-width: 320px) and (max-width: 991.98px)'],
 
     // desktop
     ['d', '(min-width: 992px)'],
@@ -45,9 +45,9 @@ module.exports = (mn) => {
     ['d3', '(min-width: 1600px)'],
     ['d4', '(min-width: 1920px)'],
 
-    ['-d4', '(min-width: 992px) and (max-width: 1920px)'],
-    ['-d3', '(min-width: 992px) and (max-width: 1600px)'],
-    ['-d2', '(min-width: 992px) and (max-width: 1200px)'],
+    ['-d4', '(min-width: 992px) and (max-width: 1919.98px)'],
+    ['-d3', '(min-width: 992px) and (max-width: 1599.98px)'],
+    ['-d2', '(min-width: 992px) and (max-width: 1199.98px)'],
 
     // if has mouse, touch pad, advanced stylus digitizers
     ['mouse', '(pointer: fine) and (hover: hover)'],
