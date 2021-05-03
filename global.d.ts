@@ -4,7 +4,7 @@
  */
 
 import {Emitter} from "mn-utils/Emitter/emitter";
-import {ICssPropertiesStringify, ICssProps, IFlagsMap} from "mn-utils/global";
+import {ICssPropertiesStringify, ICssProps, IFlagsMap, fn} from "mn-utils/global";
 import {selectorsCompile} from "./selectorsCompileProvider";
 
 export interface IMNCompiler {
@@ -36,6 +36,7 @@ export interface IMinimalistNotation extends selectorsCompile {
     handler: IEssenceHandler,
     matches?: string | string[],
     defaultMatchOff?: number | boolean,
+    onError?: fn,
   ): IMinimalistNotation;
   (essences: IEssenceMapOptions): IMinimalistNotation;
   propertiesStringify: ICssPropertiesStringify;
@@ -46,7 +47,12 @@ export interface IMinimalistNotation extends selectorsCompile {
   recompileFrom: (attrsMap: IAttrsMap) => IMinimalistNotation;
   updateAttrByMap: (essencesMap: IEssencesNamesMap, attrName: string) => IMinimalistNotation;
   updateAttrByValues: (essencesNames: string[], attrName: string) => IMinimalistNotation;
-  parseMediaName: (mediaName: string) => [number, string | undefined, string | undefined];
+  parseMediaExpression: (mediaExpression: string) => [
+    string, // name
+    number | undefined, // property
+    string | undefined, // query
+    string | undefined // selector
+  ][];
   clear: () => IMinimalistNotation;
   compile: () => IMinimalistNotation; // перекомиплировать стили для новых классов
   recompile: () => IMinimalistNotation; // полностью перекомиплировать все стили
@@ -65,6 +71,7 @@ export interface IMinimalistNotation extends selectorsCompile {
   setStyle: (name: string, content: string, priority?: number) => IMinimalistNotation;
   setPresets: (presets: IMNPreset[]) => IMinimalistNotation;
   emitter: Emitter<IStyle[]>;
+  error$: Emitter<Error>;
   utils: any;
 }
 export interface IHandlerMap {

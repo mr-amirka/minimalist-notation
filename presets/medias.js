@@ -22,7 +22,7 @@ module.exports = (mn) => {
     [ 'lg-ll', '(min-width: 1200px) and (max-width: 1559px)' ],
     [ 'll', '(min-width: 1600px)' ],
   ], (v, i) => media[v[0]] = {query: v[1], priority: i});
-*/
+  */
 
   forEach([
     // mobile
@@ -58,7 +58,8 @@ module.exports = (mn) => {
 
   // user agents
   forEach([
-    'linux', 'mozilla', 'firefox', 'opera', 'trident', 'edge',
+    'linux', 'mozilla', 'firefox', 'opera', 'trident', 'edge', 'touch',
+    'multitouch', 'orientation',
     'chrome', 'ubuntu', 'chromium', 'safari', 'msie', 'webkit', 'applewebkit',
     'mobile', 'ie', 'webtv', 'konqueror', 'blackberry', 'android', 'iron',
     'iphone', 'ipod', 'ipad', 'mac', 'darwin', 'windows', 'freebsd',

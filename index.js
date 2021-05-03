@@ -5,6 +5,7 @@ const isObject = require('mn-utils/isObject');
 const isArray = require('mn-utils/isArray');
 const isNumber = require('mn-utils/isNumber');
 const isEmpty = require('mn-utils/isEmpty');
+const isDefined = require('mn-utils/isDefined');
 const set = require('mn-utils/set');
 const get = require('mn-utils/get');
 const aggregate = require('mn-utils/aggregate');
@@ -35,6 +36,7 @@ const noop = require('mn-utils/noop');
 const variants = require('mn-utils/variants');
 const keys = require('mn-utils/keys');
 const color = require('mn-utils/color');
+const joinProvider = require('mn-utils/joinProvider');
 const colorGetBackground = require('mn-utils/colorGetBackground');
 const {
   SC_ESSENCES,
@@ -66,7 +68,7 @@ const utils = MinimalistNotationProvider.utils = merge([
     isPromise: require('mn-utils/isPromise'),
     isIndex: require('mn-utils/isIndex'),
     isLength: require('mn-utils/isLength'),
-    isDefined: require('mn-utils/isDefined'),
+    isDefined,
     isEmpty,
     once: require('mn-utils/once'),
     delay: require('mn-utils/delay'),
@@ -93,7 +95,7 @@ const utils = MinimalistNotationProvider.utils = merge([
     push,
     pushArray,
     splitProvider,
-    joinProvider: require('mn-utils/joinProvider'),
+    joinProvider,
     joinOnly,
     joinComma,
     withDefer,
@@ -142,12 +144,14 @@ const MN_DEFAULT_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 2000;
 const MN_DEFAULT_OTHER_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 4000;
 const splitSpace = splitProvider(/\s+/);
 const splitSelector = splitProvider(/\s*,+\s*/);
+const splitAmp = splitProvider(/\s*&+\s*/);
 const regexpMatchName = /^([a-z]+)(.*)$/;
 const regexpMatchImportant = /^(.*)(-i)$/;
 const regexpMatchValue = /^((([A-Z][A-Za-z]*)|((-)?[0-9.]+))([a-z%]+)?)?(.*)?$/;
 const regexpBrowserPrefix = /((\:\:\-?|\:\-)([a-z]+\-)?)/;
 const regexpMediaPriority = /^(.*)\^(-?[0-9]+)$/;
 const regexpImportant = /-i$/;
+const joinAnd = joinProvider(' and ');
 
 const normalizeSelectors = normalizeMapProvider(normalizeSelectorsIteratee);
 const normalizeComboNames = normalizeMapProvider((namesMap, name) => {
@@ -285,6 +289,7 @@ function __compileProvider(attrName) {
   instance.recursiveCheck = recursiveCheckNode;
   return instance;
 }
+
 function MinimalistNotationProvider(options) {
   function setPresets(presets) {
     isArray(presets) && eachTry(presets, [mn]);
@@ -294,6 +299,7 @@ function MinimalistNotationProvider(options) {
   }
   function updateOptions() {
     const options = mn.options || {};
+    $$onError = options.onError || noop;
     $$selectorPrefix = options.selectorPrefix || '';
     $$altColor = options.altColor !== 'off';
   }
@@ -393,7 +399,7 @@ function MinimalistNotationProvider(options) {
         MN_DEFAULT_CSS_PRIORITY,
     );
     forIn(attrsMap, updateAttrByMap);
-    forIn($$root, __mode);
+    forIn($$root, generate);
     keyframesRender();
     styleRender();
   }, mn);
@@ -442,6 +448,8 @@ function MinimalistNotationProvider(options) {
   const cssPropertiesStringify = mn.propertiesStringify
     = cssPropertiesStringifyProvider();
   const emit = (mn.emitter = new Emitter([])).emit;
+  const emitError = (mn.error$ = new Emitter()).emit;
+  let $$onError = noop;
   let $$updated;
   let $$essences;
   let $$root;
@@ -459,112 +467,149 @@ function MinimalistNotationProvider(options) {
   let $$altColor;
   let $$revision = 0;
 
-  function parseMediaName(mediaName) {
-    if (!mediaName || mediaName === 'all') {
-      return [MN_DEFAULT_PRIORITY];
-    }
-    const media = $$media[mediaName];
-    const selector = media && media.selector || '';
+  function parseMediaExpression(mediaExpression) {
+    if (!mediaExpression) return [[]];
+
     let // eslint-disable-line
-      priorityMatch, v, mp,
-      query = media && media.query || '',
-      priority = media && media.priority;
-    if (query || selector) {
-      return [
-        priority || 0,
-        query,
-        selector,
-      ];
-    }
+      mediaPriority, priority, selector, query, partsAnd, iAnd, lAnd, fragment,
+      outputQuery, outputSelector, tmp, medias = [], name, names = [], queries = []; // eslint-disable-line
 
     // get media priority
-    if (priorityMatch = regexpMediaPriority.exec(mediaName)) {
-      mediaName = priorityMatch[1];
-      priority = parseInt(priorityMatch[2]);
-    }
-    if (priority === 0) priority--;
-
-    try {
-      if (mediaName === 'x') throw new TypeError('empty parts');
-      const mediaParts = mediaName.split('x');
-
-      if (mp = parseMediaPart(mediaParts[0])) {
-        if (v = mp[0]) {
-          query += '(min-width: ' + v + 'px)';
-        }
-        if (v = mp[1]) {
-          priority = priority || -v;
-          if (query) query += ' and ';
-          query += '(max-width: ' + v + 'px)';
-        }
-      }
-
-      if (mp = parseMediaPart(mediaParts[1])) {
-        if (v = mp[0]) {
-          if (query) query += ' and ';
-          query += '(min-height: ' + v + 'px)';
-        }
-        if (v = mp[1]) {
-          priority = priority || -v;
-          if (query) query += ' and ';
-          query += '(max-height: ' + v + 'px)';
-        }
-      }
-    } catch (ex) {
-      query = mediaName;
+    if (tmp = regexpMediaPriority.exec(mediaExpression)) {
+      mediaExpression = tmp[1];
+      mediaPriority = parseInt(tmp[2]);
     }
 
-    priority = priority || MN_DEFAULT_PRIORITY;
-    priority++;
+    // eslint-disable-next-line
+    let partsOr = splitSelector(mediaExpression), iOr = 0, lOr = partsOr.length;
+    for (;iOr < lOr; iOr++) {
+      partsAnd = splitAmp(name = partsOr[iOr]);
+      lAnd = partsAnd.length;
+      iAnd = 0;
+      outputQuery = [];
+      outputSelector = [];
+      priority = mediaPriority;
+      for (;iAnd < lAnd; iAnd++) {
+        (fragment = partsAnd[iAnd]) && (
+          (media = $$media[fragment]) ? (
+            (query = media.query) && push(outputQuery, query),
+            (selector = media.selector) && push(outputSelector, selector),
+            isDefined(priority) || (priority = media.priority)
+          ) : (
+            tmp = parseMediaTemplate(fragment),
+            (query = tmp[0]) && push(outputQuery, query),
+            isDefined(priority) || (priority = tmp[1])
+          )
+        );
+      }
 
-    return [priority, query, selector];
+      query = joinAnd(outputQuery);
+      (selector = joinOnly(outputSelector))
+        ? push(medias, [name, priority, query, selector])
+        : query && (
+          push(names, name),
+          push(queries, query)
+        );
+    }
+
+    (query = joinComma(queries))
+      && push(medias, [joinComma(names), mediaPriority, query, '']);
+    return medias;
   }
-  mn.parseMediaName = parseMediaName;
 
-  function __mode(context, mediaName) {
+  function parseMediaTemplate(mediaName) {
+    if (mediaName === 'x') {
+      return [mediaName];
+    }
+    // eslint-disable-next-line
+    let queries = [], mp, v, priority, input = mediaName.split('x');
+    try {
+      (mp = parseMediaPart(input[0])) && (
+        (v = mp[0]) && push(queries, '(min-width: ' + v + 'px)'),
+        (v = mp[1]) && (
+          priority = -v,
+          push(queries, '(max-width: ' + v + 'px)')
+        )
+      );
+      (mp = parseMediaPart(input[1])) && (
+        (v = mp[0]) && push(queries, '(min-height: ' + v + 'px)'),
+        (v = mp[1]) && (
+          isDefined(priority) || (priority = -v),
+          push(queries, '(max-height: ' + v + 'px)')
+        )
+      );
+    } catch (ex) {
+      return [mediaName];
+    }
+    return [joinAnd(queries), priority];
+  }
+  mn.parseMediaExpression = parseMediaExpression;
+
+  function generate(context, mediaExpression) {
     function prefixIteratee(selector) {
       return selectorPrefix + selector;
     }
-    const media = parseMediaName(mediaName);
-    const [mediaPriority, mediaQuery, mediaSelector] = media;
-    const selectorPrefix = ($$selectorPrefix || '')
-      + (mediaSelector ? (mediaSelector + ' ') : '');
-    const selectorsIteratee = selectorPrefix
-      ? ((selectors) => joinComma(map(selectors, prefixIteratee)) + cssText)
-      : ((selectors) => joinComma(selectors) + cssText);
 
     // eslint-disable-next-line
-    let essenceName, contextEssence, essence, cssText, output, isContinue = 1;
-    for (essenceName in context) { // eslint-disable-line
-      (contextEssence = context[essenceName])
-        && contextEssence[MN_CONTEXT_ESSENCE_UPDATED]
-        && (
-          isContinue = 0,
-          cssText = contextEssence[MN_CONTEXT_ESSENCE_CSS_TEXT],
-          contextEssence[MN_CONTEXT_ESSENCE_CONTENT] = cssText ? joinOnly(map(
-              getEessenceSelectors(contextEssence[MN_CONTEXT_ESSENCE_MAP]),
-              selectorsIteratee,
-          )) : '',
-          contextEssence[MN_CONTEXT_ESSENCE_UPDATED] = 0
-        );
+    let
+      medias = parseMediaExpression(mediaExpression), lMedia = medias.length, // eslint-disable-line
+      iMedia = 0, media, mediaPriority, mediaQuery, essenceName, updated = {}, // eslint-disable-line
+      contextEssence, cssText, output, selectorPrefix, selectorsIteratee,
+      isContinue;
+
+    for (; iMedia < lMedia; iMedia++) {
+      isContinue = 1;
+      media = medias[iMedia];
+      [mediaName, mediaPriority, mediaQuery, mediaSelector] = media;
+      selectorPrefix = ($$selectorPrefix || '')
+        + (mediaSelector ? (mediaSelector + ' ') : '');
+      selectorsIteratee = selectorPrefix
+        ? ((selectors) => joinComma(map(selectors, prefixIteratee)) + cssText)
+        : ((selectors) => joinComma(selectors) + cssText);
+
+      for (essenceName in context) { // eslint-disable-line
+        (contextEssence = context[essenceName])
+          && contextEssence[MN_CONTEXT_ESSENCE_UPDATED]
+          && (
+            isContinue = 0,
+            updated[essenceName] = 1,
+            cssText = contextEssence[MN_CONTEXT_ESSENCE_CSS_TEXT],
+            contextEssence[MN_CONTEXT_ESSENCE_CONTENT][mediaName] = cssText
+              ? joinOnly(map(
+                  getEessenceSelectors(contextEssence[MN_CONTEXT_ESSENCE_MAP]),
+                  selectorsIteratee,
+              ))
+              : ''
+          );
+      }
+
+      isContinue || (
+        output = joinOnly(map(
+            __values(context).sort(priotitySortContext),
+            [MN_CONTEXT_ESSENCE_CONTENT, mediaName],
+        )),
+        mediaQuery && mediaQuery !== 'all' && output
+          && (output = joinOnly(['@media ', mediaQuery, '{', output, '}'])),
+        setStyle(
+            'media.' + mediaName,
+            output,
+            isDefined(mediaPriority) ? mediaPriority : MN_DEFAULT_PRIORITY,
+        )
+      );
     }
-    isContinue || (
-      output = joinOnly(map(
-          __values(context).sort(priotitySortContext),
-          MN_CONTEXT_ESSENCE_CONTENT,
-      )),
-      mediaQuery && output
-        && (output = joinOnly(['@media ', mediaQuery, '{', output, '}'])),
-      setStyle('media.' + mediaName, output, mediaPriority)
-    );
+    for (essenceName in updated) { // eslint-disable-line
+      context[essenceName][MN_CONTEXT_ESSENCE_UPDATED] = 0;
+    }
   }
 
   function __assignCore(
       assigned, comboNames, selectors, defaultMediaName, excludes,
   ) {
     defaultMediaName = defaultMediaName || 'all';
-    let name, selector, l, i, items, essenceName, item, // eslint-disable-line
-      essencesNames, childSelectors, mediaName, actx; // eslint-disable-line
+    // eslint-disable-next-line
+    let
+      name, selector, l, i, items, essenceName, item,
+      essencesNames, childSelectors, mediaName, actx;
     for (name in comboNames) { // eslint-disable-line
       for (selector in selectors) { // eslint-disable-line
         for (
@@ -603,31 +648,40 @@ function MinimalistNotationProvider(options) {
       : iteratee(comboNames, selectors);
   }, mn);
 
-  function __initEssence(suffix, matchs, ni, name, handle, essence, params) {
-    return (matchs = regexpMatchName.exec(suffix)) && (
-      name = matchs[1],
-      (matchs = regexpMatchImportant.exec(suffix = matchs[2])) && (
-        suffix = matchs[1],
-        ni = matchs[2]
-      ),
-      (handle = $$handlerMap[name]) && (
-        params = {
-          name: name,
-          suffix: suffix,
-          ni: ni || '',
-        },
-        handle.skip || (matchs = regexpMatchValue.exec(suffix)) && (
-          params.value = matchs[2],
-          params.camel = matchs[3],
-          params.num = matchs[4],
-          params.negative = matchs[5],
-          params.unit = matchs[6],
-          params.other = matchs[7]
+  function __initEssence(
+      value, matchs, ni, name, handle, essence, params, suffix, err,
+  ) {
+    try {
+      return (matchs = regexpMatchName.exec(value)) && (
+        name = matchs[1],
+        (matchs = regexpMatchImportant.exec(suffix = matchs[2])) && (
+          suffix = matchs[1],
+          ni = matchs[2]
         ),
-        (essence = handle(params)) && (essence.important = ni ? 1 : 0),
-        essence
-      )
-    );
+        (handle = $$handlerMap[name]) && (
+          params = {
+            name: name,
+            suffix: suffix,
+            ni: ni || '',
+          },
+          handle.skip || (matchs = regexpMatchValue.exec(suffix)) && (
+            params.value = matchs[2],
+            params.camel = matchs[3],
+            params.num = matchs[4],
+            params.negative = matchs[5],
+            params.unit = matchs[6],
+            params.other = matchs[7]
+          ),
+          (essence = handle(params)) && (essence.important = ni ? 1 : 0),
+          essence
+        )
+      );
+    } catch (ex) {
+      err = new Error('MN parsing error for essence "'
+        + value + '": ' + ex.message);
+      $$onError(err);
+      emitError(err);
+    }
   }
   function initEssence(essenceName, essence, excludes) {
     let _essence;
@@ -699,7 +753,7 @@ function MinimalistNotationProvider(options) {
       essence.priority || 0,
       essence.cssText,
       0,
-      0,
+      {},
     ];
   }
   function updateEssence(
@@ -812,7 +866,7 @@ function MinimalistNotationProvider(options) {
     }
     $$keyframes[1] && keyframesRender();
     $$css[1] && cssRender();
-    forIn($$root, __mode);
+    forIn($$root, generate);
     $$updated && styleRender();
     $$updated = $$force = 0;
   }, mn);

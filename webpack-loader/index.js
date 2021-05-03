@@ -31,6 +31,7 @@ const __exports = module.exports = function(source) {
 __exports.defaultPluginSettings = {
   output: './dist/app.css',
   attrs: {
+    'className': 'class',
     'class': 'class',
     'm-n': 'm-n',
     'm': 'm',
@@ -42,6 +43,9 @@ __exports.defaultPluginSettings = {
     require('../presets/states'),
     // require('../presets/main'),
   ],
+  onError(e) {
+    console.error(e);
+  },
 };
 __exports.defaultLoaderSettings = {
   attrs: {

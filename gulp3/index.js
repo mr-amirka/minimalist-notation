@@ -62,6 +62,9 @@ const defaultSettings = gulpMN.defaultSettings = {
     require('../presets/states'),
     // require('../presets/main'),
   ],
+  onError(e) {
+    console.error(e);
+  },
 };
 
 module.exports = gulpMN;

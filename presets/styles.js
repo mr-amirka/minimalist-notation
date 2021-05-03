@@ -153,7 +153,10 @@ function styleWrap(style, priority) {
   return {style, priority: priority || 0};
 }
 function toFixed(v) {
-  return replace((Math.floor(v * 100) * 0.01).toFixed(2), reZero, '') || '0';
+  if (isNaN(v = v * 100)) {
+    throw new Error('param is invalid');
+  }
+  return replace((Math.floor(v) * 0.01).toFixed(2), reZero, '') || '0';
 }
 function normalizeDefault(p, def) {
   return {
@@ -241,6 +244,7 @@ module.exports = (mn) => {
         }
       };
     }
+
     function handleProvider(sidesSet) {
       return (p, camel, total, num, add) => {
         return p.suffix ? (
@@ -279,7 +283,7 @@ module.exports = (mn) => {
       const propSuffix = args[1] || '';
       mn(pfx + suffix, handleProvider(
           sidesSetter((side) => propName + side + propSuffix),
-      ), MARGIN_PATTERN, 1);
+      ), MARGIN_PATTERN, 1);//
     });
 
     mn('s' + suffix, handleProvider(
@@ -637,11 +641,6 @@ module.exports = (mn) => {
         boxDirection: 'normal',
         boxOrient: 'horizontal',
         flexDirection: 'row',
-        boxPack: 'start',
-        justifyContent: 'flex-start',
-        boxAlign: 'center',
-        alignItems: 'center',
-        alignContent: 'center',
       },
     },
 
