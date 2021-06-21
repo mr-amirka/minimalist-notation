@@ -1,5 +1,4 @@
 const loaderUtils = require('loader-utils');
-const writeFile = require('mn-utils/node/writeFile');
 const eachAsync = require('mn-utils/eachAsync');
 const noop = require('mn-utils/noop');
 const extend = require('mn-utils/extend');
@@ -10,6 +9,7 @@ const isString = require('mn-utils/isString');
 const isArray = require('mn-utils/isArray');
 const isFunction = require('mn-utils/isFunction');
 const values = require('mn-utils/values');
+const writeFile = require('mn-utils/node/writeFile');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
 const parseSource = require('../node/parseSource');

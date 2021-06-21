@@ -54,7 +54,7 @@ try {
   fs.accessSync(configPath, fs.constants.R_OK);
   hasFile = true;
 } catch (err) {
-  console.log('config file is not found');
+  console.warn('Warn: Config file is not found');
 }
 if (hasFile) {
   try {

@@ -7,6 +7,7 @@ const values = require('mn-utils/values');
 const reduce = require('mn-utils/reduce');
 const noop = require('mn-utils/noop');
 const isEmpty = require('mn-utils/isEmpty');
+const writeFile = require('mn-utils/node/writeFile');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
 const parseSource = require('./parseSource');
