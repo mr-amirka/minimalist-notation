@@ -5,7 +5,6 @@ const merge = require('mn-utils/merge');
 const map = require('mn-utils/map');
 const values = require('mn-utils/values');
 const reduce = require('mn-utils/reduce');
-const merge = require('mn-utils/merge');
 const noop = require('mn-utils/noop');
 const isEmpty = require('mn-utils/isEmpty');
 const parserProvider = require('../mnParserProvider');
