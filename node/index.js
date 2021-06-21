@@ -71,7 +71,7 @@ function compileSourceBase(path, commonOptions, entries) {
           attrData = sourcesMap[path];
           for (attrKey in attrsMap) { // eslint-disable-line
             attrName = attrsMap[attrKey];
-            dst = mergedData[attrName] = {};
+            dst = mergedData[attrName] || (mergedData[attrName] = {});
             src = attrData[attrName];
             for (name in src) { // eslint-disable-line
               (dst[name] || (dst[name] = {

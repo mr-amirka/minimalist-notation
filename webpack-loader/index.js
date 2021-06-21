@@ -3,7 +3,6 @@ const eachAsync = require('mn-utils/eachAsync');
 const noop = require('mn-utils/noop');
 const extend = require('mn-utils/extend');
 const merge = require('mn-utils/merge');
-const forIn = require('mn-utils/forIn');
 const forEach = require('mn-utils/forEach');
 const isString = require('mn-utils/isString');
 const isArray = require('mn-utils/isArray');
@@ -117,17 +116,20 @@ function MnPlugin(options) {
 
   function base() {
     const attrsMap = {};
-    forIn(sourcesMap, (source) => {
-      forIn(source, (attrsMapItem, attrName) => {
-        const essencesMap = attrsMap[attrName] || (attrsMap[attrName] = {});
-        forIn(attrsMapItem, (value, name) => {
+    let source, path, essencesMap, attrsMapItem, name; // eslint-disable-line
+    for (path in sourcesMap) { // eslint-disable-line
+      source = sourcesMap[path];
+      for (attrName in source) { // eslint-disable-line
+        attrsMapItem = source[attrName];
+        essencesMap = attrsMap[attrName] || (attrsMap[attrName] = {});
+        for (name in attrsMapItem) { // eslint-disable-line
           (essencesMap[name] || (essencesMap[name] = {
             name,
             count: 0,
-          })).count += value.count;
-        });
-      });
-    });
+          })).count += attrsMapItem[name].count;
+        }
+      }
+    }
     const content = compile(attrsMap);
     onDone(content, sourcesMap);
     return eachAsync(outputs, (outputFileName, i, done) => {
