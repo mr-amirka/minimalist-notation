@@ -60,7 +60,7 @@ function compileSourceBase(path, commonOptions, entries) {
     extend(allAttrsMap, attrsMap);
     handlersMap[name] = (sourcesMap) => {
       // eslint-disable-next-line
-      let mergedData = {}, path, attrName, attrData, attrKey, attrName, dst, src, name;
+      let mergedData = {}, path, attrData, attrKey, attrName, dst, src, name;
       for (path in sourcesMap) { // eslint-disable-line
         if (!isExclude(path)) {
           attrData = sourcesMap[path];
