@@ -145,16 +145,18 @@ function MnPlugin(options) {
           settings.exclude,
           [settings.include, settings.template],
       ),
-      onDone(commonData) {
-        extend(sourcesMap, commonData);
-        base();
+      onDone(commonData, changed) {
+        changed && (
+          extend(sourcesMap, commonData),
+          base()
+        );
       },
     });
 
     compiler.plugin('emit', (compilation, callback) => {
       const targetPresets = [...presets];
 
-      forEach(values(dynamicPresetsScope), (preset, path) => {
+      forEach(values(dynamicPresetsScope), (preset) => {
         isFunction(preset) && targetPresets.push(preset);
       });
 

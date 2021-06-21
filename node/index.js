@@ -110,7 +110,8 @@ function compileSourceBase(path, commonOptions, entries) {
       }
       return true;
     },
-    onDone(commonData) {
+    onDone(commonData, changed) {
+      if (!changed) return;
       let k;
       for (k in handlersMap) { // eslint-disable-line
         handlersMap[k](commonData);

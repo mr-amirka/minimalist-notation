@@ -20,6 +20,7 @@ module.exports = (path, options) => {
   const onDone = options.onDone || noop;
   const data = {};
 
+  let changed = 0;
   finallyAll((inc, dec) => {
     inc();
     const commonEach = options.each || noop;
@@ -31,6 +32,7 @@ module.exports = (path, options) => {
       exclude: options.exclude,
       callback: dec,
       each: (eventType, path) => {
+        changed = 1;
         if (eventType === 'remove') {
           commonData[path] = null;
           return;
@@ -45,6 +47,7 @@ module.exports = (path, options) => {
       },
     });
   }, () => {
-    onDone(data);
+    onDone(data, changed);
+    changed = 0;
   });
 };
