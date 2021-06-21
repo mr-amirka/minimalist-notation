@@ -11,6 +11,9 @@ const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
 const parseSource = require('./parseSource');
 const getExclude = require('./getExclude');
+const {
+  getAttrs,
+} = parserProvider;
 
 const defaultSettings = exports.defaultSettings = {
   path: './',
