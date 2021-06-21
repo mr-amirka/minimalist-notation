@@ -5,7 +5,10 @@ const program = require('commander');
 const forIn = require('mn-utils/forIn');
 const isString = require('mn-utils/isString');
 const pkg = require('../package.json');
-const {compileSource, defaultSettings} = require('../node');
+const {
+  compileSource,
+  defaultSettings,
+} = require('../node');
 
 const DEFAULT_CONFIG_PATH = './mn-config.js';
 
@@ -70,11 +73,11 @@ attrs && isString(attrs) && (settings.attrs = attrs);
 
 if (!settings.path) return program.help();
 
-settings.each = (path, count) => {
+settings.each = (path, count, data) => {
   // console.log('MN parsed', count, 'in', path);
 };
-settings.finish = () => {
-  console.log('MN finished: ' + (new Date()));
+settings.onDone = () => {
+  console.log('MN: done ' + (new Date()));
 };
 
 compileSource(settings);

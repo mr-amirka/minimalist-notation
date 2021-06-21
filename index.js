@@ -14,13 +14,14 @@ const eachTry = require('mn-utils/eachTry');
 const mergeDepth = require('mn-utils/mergeDepth');
 const flags = require('mn-utils/flags');
 const joinMaps = require('mn-utils/joinMaps');
+const joinArrays = require('mn-utils/joinArrays');
 const routeParseProvider = require('mn-utils/routeParseProvider');
 const forIn = require('mn-utils/forIn');
 const forEach = require('mn-utils/forEach');
 const reduce = require('mn-utils/reduce');
 const cssPropertiesStringifyProvider
   = require('mn-utils/cssPropertiesStringifyProvider');
-const cssPropertiesParse = require('mn-utils/cssPropertiesParse');
+const cssPropertiesParse = require('mn-utils/cssPropertiesParseSimple');
 const push = require('mn-utils/push');
 const pushArray = require('mn-utils/pushArray');
 const splitProvider = require('mn-utils/splitProvider');
@@ -29,12 +30,14 @@ const joinComma = require('mn-utils/joinComma');
 const withDefer = require('mn-utils/withDefer');
 const withResult = require('mn-utils/withResult');
 const map = require('mn-utils/map');
+const trim = require('mn-utils/trim');
 const __values = require('mn-utils/values');
 const merge = require('mn-utils/merge');
 const isString = require('mn-utils/isString');
 const noop = require('mn-utils/noop');
 const variants = require('mn-utils/variants');
 const keys = require('mn-utils/keys');
+const filter = require('mn-utils/filter');
 const color = require('mn-utils/color');
 const joinProvider = require('mn-utils/joinProvider');
 const colorGetBackground = require('mn-utils/colorGetBackground');
@@ -84,12 +87,12 @@ const utils = MinimalistNotationProvider.utils = merge([
     flags,
     flagsSet: require('mn-utils/flagsSet'),
     joinMaps,
-    joinArrays: require('mn-utils/joinArrays'),
+    joinArrays,
     routeParseProvider,
     forIn,
     forEach,
     reduce,
-    filter: require('mn-utils/filter'),
+    filter,
     cssPropertiesStringifyProvider,
     cssPropertiesParse,
     push,
@@ -111,6 +114,7 @@ const utils = MinimalistNotationProvider.utils = merge([
     escapeRegExp: require('mn-utils/escapeRegExp'),
     escapeCss: require('mn-utils/escapeCss'),
     escapedHalfProvider: require('mn-utils/escapedHalfProvider'),
+    trim,
     upperFirst: require('mn-utils/upperFirst'),
     lowerFirst: require('mn-utils/lowerFirst'),
     camelToKebabCase: require('mn-utils/camelToKebabCase'),
@@ -142,6 +146,7 @@ const MN_KEYFRAMES_TOKEN = 'keyframes';
 const MN_DEFAULT_PRIORITY = -2000;
 const MN_DEFAULT_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 2000;
 const MN_DEFAULT_OTHER_CSS_PRIORITY = MN_DEFAULT_PRIORITY - 4000;
+const reSpace = /\s+/gim;
 const splitSpace = splitProvider(/\s+/);
 const splitSelector = splitProvider(/\s*,+\s*/);
 const splitAmp = splitProvider(/\s*&+\s*/);
@@ -158,8 +163,8 @@ const normalizeComboNames = normalizeMapProvider((namesMap, name) => {
   return flags(splitSpace(name), namesMap);
 });
 function normalizeSelectorsIteratee(selectorsMap, selector) {
-  forEach(splitSelector(selector), (selector) => {
-    flags(map(variants(selector), selectorNormalize), selectorsMap);
+  forEach(splitSelector(trim(selector).replace(reSpace, ' ')), (selector) => {
+    selector && flags(map(variants(selector), selectorNormalize), selectorsMap);
   });
   return selectorsMap;
 }
@@ -300,7 +305,7 @@ function MinimalistNotationProvider(options) {
   function updateOptions() {
     const options = mn.options || {};
     $$onError = options.onError || noop;
-    $$selectorPrefix = options.selectorPrefix || '';
+    $$selectorPrefixes = keys(normalizeSelectors(options.selectorPrefix || ''));
     $$altColor = options.altColor !== 'off';
   }
   function mn(essencePath, extendedEssence, paramsMatchPath, skip) {
@@ -463,7 +468,7 @@ function MinimalistNotationProvider(options) {
   let $$media = mn.media = options.media || {};
   let $$handlerMap = mn.handlerMap = {};
   let $$force;
-  let $$selectorPrefix;
+  let $$selectorPrefixes;
   let $$altColor;
   let $$revision = 0;
 
@@ -546,25 +551,31 @@ function MinimalistNotationProvider(options) {
   mn.parseMediaExpression = parseMediaExpression;
 
   function generate(context, mediaExpression) {
-    function prefixIteratee(selector) {
-      return selectorPrefix + selector;
-    }
-
     // eslint-disable-next-line
     let
       medias = parseMediaExpression(mediaExpression), lMedia = medias.length, // eslint-disable-line
       iMedia = 0, media, mediaPriority, mediaQuery, essenceName, updated = {}, // eslint-disable-line
-      contextEssence, cssText, output, selectorPrefix, selectorsIteratee,
+      contextEssence, cssText, output, globalSelectorPrefixes = $$selectorPrefixes, // eslint-disable-line
+      lGSP = globalSelectorPrefixes.length, selectorPrefixes, selectorsIteratee, // eslint-disable-line
       isContinue;
 
     for (; iMedia < lMedia; iMedia++) {
       isContinue = 1;
       media = medias[iMedia];
       [mediaName, mediaPriority, mediaQuery, mediaSelector] = media;
-      selectorPrefix = ($$selectorPrefix || '')
-        + (mediaSelector ? (mediaSelector + ' ') : '');
-      selectorsIteratee = selectorPrefix
-        ? ((selectors) => joinComma(map(selectors, prefixIteratee)) + cssText)
+
+      selectorPrefixes = lGSP
+        ? (
+            mediaSelector
+              ? joinArrays([mediaSelector], globalSelectorPrefixes, ' ')
+              : globalSelectorPrefixes
+        )
+        : (mediaSelector ? [mediaSelector] : 0);
+
+      selectorsIteratee = selectorPrefixes
+        ? ((selectors) => (
+          joinComma(joinArrays(selectorPrefixes, selectors, ' ')) + cssText
+        ))
         : ((selectors) => joinComma(selectors) + cssText);
 
       for (essenceName in context) { // eslint-disable-line
@@ -576,7 +587,9 @@ function MinimalistNotationProvider(options) {
             cssText = contextEssence[MN_CONTEXT_ESSENCE_CSS_TEXT],
             contextEssence[MN_CONTEXT_ESSENCE_CONTENT][mediaName] = cssText
               ? joinOnly(map(
-                  getEessenceSelectors(contextEssence[MN_CONTEXT_ESSENCE_MAP]),
+                  getEessenceSelectors(
+                      contextEssence[MN_CONTEXT_ESSENCE_MAP],
+                  ),
                   selectorsIteratee,
               ))
               : ''
@@ -774,7 +787,7 @@ function MinimalistNotationProvider(options) {
     extend(
         contextEssence[MN_CONTEXT_ESSENCE_MAP],
         selectors = joinMaps(
-            {}, selectors, contextEssence[MN_CONTEXT_ESSENCE_SELECTORS],
+            selectors, contextEssence[MN_CONTEXT_ESSENCE_SELECTORS],
         ),
     );
     function __childsHandle(childs, separator) {

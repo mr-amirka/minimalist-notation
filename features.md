@@ -2,6 +2,48 @@
 # Features
 
 
+
+For version 1.7.0 (2021-06-21):
+
+- Added new syntax rule.  
+
+  In the previous version, dots that needed to be interpreted as part of a style
+  value rather than as part of selector had to be escaped with a slash,
+  but now there are some exceptions.  
+
+  Now, if the dot is in front of the digit, then you can be left blank with a slash.  
+
+  This is quite elegant because in CSS class names cannot start with numbers.  
+
+  As it was before:  
+  ```html
+  <div class="cF00\.5">...</div>
+  ```
+
+  ```css
+  .cF00\\\.5 {
+    color: rgba(255,0,0,.5);
+  }
+  ```
+
+  Now you can do this:  
+  ```html
+  <div class="cF00.5">...</div>
+  ```
+  ```css
+  .cF00\.5 {
+    color: rgba(255,0,0,.5);
+  }
+  ```
+
+
+- Added smart parser for selectorPrefix option.  
+
+- Added re-rendering when editing templates and matching of watched files using regular expressions.  
+
+
+
+
 For version 1.6.0:
 
 - Added error output. (added optional param "onError" and instance property "error$" as emitter)  
@@ -11,12 +53,12 @@ For version 1.6.0:
 - Syntax of media queries are expanded.  
 ```html
 <div
-  m="w200@d,m&x200-400^2"
+  m-n="w200@d,m&x200-400^2"
 >...</div>
 ```
 ```css
 @media (min-width: 992px), (max-width: 991.98px) and (min-width: 200px) and (max-width: 400px) {
-  [m~="w200@d,m&x200-400^2"] {
+  [m-n~="w200@d,m&x200-400^2"] {
     width: 200px;
   }
 }
@@ -36,12 +78,12 @@ For version 1.3:
 Example:
 ```html
 <div
-  m="w200@0-300^10"
+  m-n="w200@0-300^10"
 >...</div>
 ```
 ```css
 @media (max-width: 300px) {
-  [m~="w200@0-300^10"] {
+  [m-n~="w200@0-300^10"] {
     width: 200px;
   }
 }

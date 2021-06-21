@@ -23,10 +23,15 @@ export interface IAttrsMap {
 
 export type IMNPreset = (mn: IMinimalistNotation) => any;
 
+export interface IMinimalistNotationProvider {
+  (options: IMinimalistNotationOptions): IMinimalistNotation;
+  utils: {[fnName: string]: any}
+}
 export interface IMinimalistNotationOptions {
   selectorPrefix?: string;
   presets?: IMNPreset[];
   altColor?: string;
+  onError?: fn,
 }
 
 export interface IMinimalistNotation extends selectorsCompile {
@@ -36,7 +41,6 @@ export interface IMinimalistNotation extends selectorsCompile {
     handler: IEssenceHandler,
     matches?: string | string[],
     defaultMatchOff?: number | boolean,
-    onError?: fn,
   ): IMinimalistNotation;
   (essences: IEssenceMapOptions): IMinimalistNotation;
   propertiesStringify: ICssPropertiesStringify;

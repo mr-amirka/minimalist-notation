@@ -1,15 +1,19 @@
-const fs = require('fs');
 const loaderUtils = require('loader-utils');
 const writeFile = require('mn-utils/node/writeFile');
 const eachAsync = require('mn-utils/eachAsync');
+const noop = require('mn-utils/noop');
+const extend = require('mn-utils/extend');
 const merge = require('mn-utils/merge');
 const forIn = require('mn-utils/forIn');
 const forEach = require('mn-utils/forEach');
+const isString = require('mn-utils/isString');
 const isArray = require('mn-utils/isArray');
 const isFunction = require('mn-utils/isFunction');
 const values = require('mn-utils/values');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
+const parseSource = require('../node/parseSource');
+const getExclude = require('../node/getExclude');
 
 const scope = {};
 const dynamicPresetsScope = {};
@@ -29,6 +33,13 @@ const __exports = module.exports = function(source) {
 };
 
 __exports.defaultPluginSettings = {
+  path: './',
+  include: [
+    /^.*\.(php|html?)$/,
+  ],
+  exclude: [
+    /\/node_modules\/|(.*\.tmp)/,
+  ],
   output: './dist/app.css',
   attrs: {
     'className': 'class',
@@ -57,66 +68,102 @@ __exports.defaultLoaderSettings = {
 };
 
 __exports.presetsReload = function(source) {
-  dynamicPresetsScope[this.resourcePath] = source;
+  const module = {};
+  try {
+    (new Function('module', source)).call(module, module);
+  } catch (e) {
+    console.error(e);
+  }
+  dynamicPresetsScope[this.resourcePath] = module.exports;
   return '';
 };
 
 __exports.MnPlugin = MnPlugin;
 
-function normalize(v) {
-  return v ? (isArray(v) ? (v.length ? v : null) : [v]) : null;
+function normalize(v, output) {
+  if (v) {
+    if (isString(v)) {
+      output.push(v);
+    } else if (isArray(v)) {
+      let i = 0, l = v.length; // eslint-disable-line
+      for (; i < l; i++) normalize(v[i], output);
+    }
+  }
+  return output;
 }
 
 function MnPlugin(options) {
   const settings = merge([__exports.defaultPluginSettings, options]);
+  const parse = parserProvider(settings.attrs);
   const id = settings.id || '';
+  const path = settings.path;
   const presets = settings.presets || [];
-  const {attrs} = settings;
-  const templates = normalize(settings.template);
-  const outputs = normalize(settings.output);
+  const onDone = settings.onDone || noop;
+  const commonEach = settings.each || noop;
+  const outputs = normalize(settings.output, []);
+  const sourcesMap = scope[id] || (scope[id] = {});
+
+  if (!(path && isString(path))) {
+    throw new Error('Path is invalid');
+  }
+  if (!parse) {
+    throw new Error('Attrs is invalid');
+  }
+
+  let compile = compileProvider({
+    ...settings,
+    presets,
+  });
+
+  function base() {
+    const attrsMap = {};
+    forIn(sourcesMap, (source) => {
+      forIn(source, (attrsMapItem, attrName) => {
+        const essencesMap = attrsMap[attrName] || (attrsMap[attrName] = {});
+        forIn(attrsMapItem, (value, name) => {
+          (essencesMap[name] || (essencesMap[name] = {
+            name,
+            count: 0,
+          })).count += value.count;
+        });
+      });
+    });
+    const content = compile(attrsMap);
+    onDone(content, sourcesMap);
+    return eachAsync(outputs, (outputFileName, i, done) => {
+      writeFile(outputFileName, content, done);
+    });
+  }
 
   this.apply = (compiler) => {
+    const options = compiler.options || {};
+    parseSource(path, {
+      watch: options.watch,
+      parse,
+      each: commonEach,
+      exclude: getExclude(
+          settings.exclude,
+          [settings.include, settings.template],
+      ),
+      onDone(commonData) {
+        extend(sourcesMap, commonData);
+        base();
+      },
+    });
+
     compiler.plugin('emit', (compilation, callback) => {
       const targetPresets = [...presets];
 
-      forEach(values(dynamicPresetsScope), (source) => {
-        const module = {};
-        (new Function('module', source)).call(module, module);
-        const {exports} = module;
-        isFunction(exports) && targetPresets.push(exports);
+      forEach(values(dynamicPresetsScope), (preset, path) => {
+        isFunction(preset) && targetPresets.push(preset);
       });
 
-      const compile = compileProvider({
+      compile = compileProvider({
         ...settings,
         presets: targetPresets,
       });
-      const parse = parserProvider(attrs);
-      const sourcesMap = scope[id] || {};
-      const attrsMap = {};
-      forIn(sourcesMap, (source) => {
-        forIn(source, (attrsMapItem, attrName) => {
-          const essencesMap = attrsMap[attrName] || (attrsMap[attrName] = {});
-          forIn(attrsMapItem, (value, name) => {
-            (essencesMap[name] || (essencesMap[name] = {
-              name,
-              count: 0,
-            })).count += value.count;
-          });
-        });
-      });
-      eachAsync(templates, (tpl, i, done) => {
-        fs.readFile(tpl, 'utf8', (err, text) => {
-          parse(attrsMap, text || '');
-          done(err);
-        });
-      })
-          .then(() => {
-            const content = compile(attrsMap);
-            return eachAsync(outputs, (outputFileName, i, done) => {
-              writeFile(outputFileName, content, done);
-            });
-          })
-          .then(callback);
+
+      base().then(callback);
     });
   };
 };

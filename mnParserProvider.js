@@ -77,16 +77,17 @@ function parser(attrs) {
 function getAttrs(attrs) {
   isString(attrs) && (attrs = splitAttrs(attrs));
   return isObject(attrs)
-    ? (
-      isArray(attrs) ? reduce(filter(attrs), (output, name) => {
+    ? filter(isArray(attrs) ? reduce(attrs, (output, name) => {
+      if (name) {
         const parts = splitKeyValue(name);
         name = parts[0];
         output[name] = parts[1] || name;
-        return output;
-      }, {}) : attrs
-    )
+      }
+      return output;
+    }, {}) : attrs, (v) => v && isString(v))
     : null;
 }
 
-module.exports = parser;
 parser.getAttrs = getAttrs;
+
+module.exports = parser;

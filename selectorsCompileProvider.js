@@ -1,8 +1,8 @@
 const extend = require('mn-utils/extend');
 const unslash = require('mn-utils/unslash');
 const escapedSplitProvider = require('mn-utils/escapedSplitProvider');
-const joinMaps = require('mn-utils/joinMaps');
 const escapedHalfProvider = require('mn-utils/escapedHalfProvider');
+const joinMaps = require('mn-utils/joinMaps');
 const variantsBase = require('mn-utils/variants').base;
 const reduce = require('mn-utils/reduce');
 const push = require('mn-utils/push');
@@ -12,19 +12,18 @@ const repeat = require('mn-utils/repeat');
 const scopeJoin = require('mn-utils/scopeJoin');
 const scopeSplit = require('mn-utils/scopeSplit');
 const selectorNormalize = require('./selectorNormalize');
-
-const splitSelector = escapedSplitProvider(/[<:\.\[\]#+~]/).base;
 const splitParent = escapedSplitProvider(/<|>\-/).base;
 const splitChild = escapedSplitProvider(/>|<\-/).base;
 const splitMedia = escapedSplitProvider('@').base;
 const splitState = escapedSplitProvider(':').base;
-const extractSuffix = escapedHalfProvider(/[<>:\.\[\]#+~@\!]/).base;
+const splitSelector = escapedSplitProvider(/[<>:\.\[\]#+~]/, /\\.|\.\d/).base;
+const extractSuffix = escapedHalfProvider(/[<>:\.\[\]#+~@\!]/, /\\.|\.\d/).base;
 const regexpDepth = /^(\d+)(.*)$/;
 const regexpMultiplier = /^(.*)\*([0-9]+)$/;
 const regexpScopeSuffix = /^(.*?)([+~])$/;
-
 const SCOPE_START = '[';
 const SCOPE_END = ']';
+
 
 function getScope(value) {
   const matches = regexpScopeSuffix.exec(value);
@@ -94,7 +93,6 @@ module.exports = (instance) => {
             reduce(parts, (selectors, partName) => {
               const part = getPart(partName, ' ');
               return joinMaps(
-                  {},
                   selectors,
                   getParents(mediaNames, part[1]),
                   part[0],
@@ -114,25 +112,28 @@ module.exports = (instance) => {
   function procMedia(mediaNames, partName) {
     const separators = [];
     // eslint-disable-next-line
-    return reduce(splitSelector(partName, separators), (output, selector, index) => {
+    return partName ? reduce(splitSelector(partName, separators), (output, selector, index) => {
       const mediaParts = splitMedia(selector);
       push(output, mediaParts[0] + (separators[index] || ''));
       mediaParts.length > 1 && push(mediaNames, unslash(mediaParts[1]));
       return output;
-    }, []).join('');
+    }, []).join('') : '';
   }
   function getParents(mediaNames, name, targetName) {
     const parts = splitParent(name);
     const l = parts.length;
     let essence = getEssence(procMedia(mediaNames, parts[0]));
-    let alts = joinMaps({}, getMap(((targetName || '') + essence[0])
+    let alts = joinMaps(getMap(((targetName || '') + essence[0])
       || (targetName === undefined ? '*' : '')), essence[1]);
     let part, i = 1; // eslint-disable-line
     for (;i < l; i++) {
       part = getPart(procMedia(mediaNames, parts[i]), ' ');
       essence = getEssence(part[1]);
-      alts = joinMaps({}, joinMaps({},
-          getMap(essence[0] || '*'), essence[1]), alts, part[0]);
+      alts = joinMaps(
+          joinMaps(getMap(essence[0] || '*'), essence[1]),
+          alts,
+          part[0],
+      );
     }
     return alts;
   }
@@ -154,7 +155,7 @@ module.exports = (instance) => {
     const length = states.length;
     let i = 0;
     // eslint-disable-next-line
-    for (; i < length; i++) alts = joinMaps({}, alts, getStatesMap(unslash(states[i])));
+    for (; i < length; i++) alts = joinMaps(alts, getStatesMap(unslash(states[i])));
     return alts;
   }
 
