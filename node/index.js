@@ -64,9 +64,10 @@ function compileSourceBase(path, commonOptions, entries) {
     extend(allAttrsMap, attrsMap);
     handlersMap[name] = (sourcesMap) => {
       // eslint-disable-next-line
-      let mergedData = {}, path, attrData, attrKey, attrName, dst, src, name;
+      let mergedData = {}, path, attrData, attrKey, attrName, dst, src, name, changed;
       for (path in sourcesMap) { // eslint-disable-line
         if (!isExclude(path)) {
+          changed = 1;
           attrData = sourcesMap[path];
           for (attrKey in attrsMap) { // eslint-disable-line
             attrName = attrsMap[attrKey];
@@ -81,6 +82,7 @@ function compileSourceBase(path, commonOptions, entries) {
           }
         }
       }
+      if (!changed) return;
       writeFile(outputFileName, compile(mergedData), __onFinally);
       metricsFiles && writeFile(metricsFiles, JSON.stringify(
           reduce(sourcesMap, (dst, attrsMap, path) => {
@@ -111,12 +113,13 @@ function compileSourceBase(path, commonOptions, entries) {
       return true;
     },
     onDone(commonData, changed) {
-      if (!changed) return;
-      let k;
-      for (k in handlersMap) { // eslint-disable-line
-        handlersMap[k](commonData);
+      if (changed) {
+        let k;
+        for (k in handlersMap) { // eslint-disable-line
+          handlersMap[k](commonData);
+        }
+        onDone(commonData);
       }
-      onDone(commonData);
     },
   });
 }

@@ -10,7 +10,7 @@ function scanPathWatch({path, each, callback, exclude}) {
     each,
     exclude,
     callback: () => {
-      fsWatch(path, {recursive: true}, each);
+      fsWatch(path, {recursive: true}, (e, p) => exclude(p) || each(e, p));
       callback && callback();
     },
   });
@@ -20,7 +20,7 @@ module.exports = (path, options) => {
   const onDone = options.onDone || noop;
   const data = {};
 
-  let changed = 0;
+  let changed;
   finallyAll((inc, dec) => {
     inc();
     const commonEach = options.each || noop;
