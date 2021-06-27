@@ -32,14 +32,14 @@ describe('MN instance', () => {
       content: '.p10{padding:10px}',
       name: 'media.all',
       priority: -2000,
-      updated: 1,
+      revision: 1,
     });
     expect(mn.emitter.getValue()).toEqual([
       {
         content: '.p10{padding:10px}',
         name: 'media.all',
         priority: -2000,
-        updated: 0,
+        revision: 1,
       },
     ]);
 
@@ -49,7 +49,7 @@ describe('MN instance', () => {
         content: '.p10{padding:10px}',
         name: 'media.all',
         priority: -2000,
-        updated: 0,
+        revision: 1,
       },
     ]);
     mn.compile();
@@ -58,7 +58,7 @@ describe('MN instance', () => {
         content: '.p10{padding:10px}.p25{padding:25px}',
         name: 'media.all',
         priority: -2000,
-        updated: 0,
+        revision: 2,
       },
     ]);
   });
@@ -92,7 +92,7 @@ describe('MN instance', () => {
         content: '[m~=\"p15\"]{padding:15px}',
         name: 'media.all',
         priority: -2000,
-        updated: 0,
+        revision: 1,
       },
     ]);
 
@@ -103,7 +103,7 @@ describe('MN instance', () => {
         content: '[m~=\"p15\"]{padding:15px}',
         name: 'media.all',
         priority: -2000,
-        updated: 0,
+        revision: 1,
       },
     ]);
     mn.compile();
@@ -112,7 +112,7 @@ describe('MN instance', () => {
         content: '[m~=\"p15\"]{padding:15px}[m~=\"p20\"]{padding:20px}',
         name: 'media.all',
         priority: -2000,
-        updated: 0,
+        revision: 2,
       },
     ]);
   });

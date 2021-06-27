@@ -48,6 +48,7 @@ const {
 } = require('./constants');
 const selectorsCompileProvider = require('./selectorsCompileProvider');
 const selectorNormalize = require('./selectorNormalize');
+const isInvalidSelector = require('./isInvalidSelector');
 
 const utils = MinimalistNotationProvider.utils = merge([
   {
@@ -305,7 +306,9 @@ function MinimalistNotationProvider(options) {
   function updateOptions() {
     const options = mn.options || {};
     $$onError = options.onError || noop;
-    $$selectorPrefixes = keys(normalizeSelectors(options.selectorPrefix || ''));
+    $$selectorPrefixes = keys(selectorsValidateFilter(
+        normalizeSelectors(options.selectorPrefix || ''),
+    ));
     $$altColor = options.altColor !== 'off';
   }
   function mn(essencePath, extendedEssence, paramsMatchPath, skip) {
@@ -376,6 +379,22 @@ function MinimalistNotationProvider(options) {
     );
   }
 
+  function getCompiler(attrName) {
+    return $$compilers[attrName]
+      || ($$compilers[attrName] = __compileProvider(attrName));
+  }
+
+  function setStyle(name, content, priority) {
+    $$stylesMap[name] = {
+      name,
+      priority: priority || 0,
+      content: content || '',
+      revision: ++$$revision,
+    };
+    $$updated = 1;
+    return mn;
+  }
+
   selectorsCompileProvider(mn);
   const parseComboNameProvider = mn.parseComboNameProvider;
   const __parseComboName = mn.parseComboName;
@@ -409,11 +428,6 @@ function MinimalistNotationProvider(options) {
     styleRender();
   }, mn);
 
-  function getCompiler(attrName) {
-    return $$compilers[attrName]
-      || ($$compilers[attrName] = __compileProvider(attrName));
-  }
-
   mn.getCompiler = getCompiler;
   mn.recursiveCheckByAttrs = withResult((node, attrs) => {
     eachApply( // eslint-disable-next-line
@@ -432,17 +446,6 @@ function MinimalistNotationProvider(options) {
         ? getCompiler(attrs)(v)
         : eachApply(map(attrs, getCompiler), [v]);
   }, mn);
-
-  function setStyle(name, content, priority) {
-    $$stylesMap[name] = {
-      name,
-      priority: priority || 0,
-      content: content || '',
-      revision: ++$$revision,
-    };
-    $$updated = 1;
-    return mn;
-  }
   mn.setStyle = (name, content, priority) => setStyle(
       name, content, priority || MN_DEFAULT_OTHER_CSS_PRIORITY,
   );
@@ -453,7 +456,8 @@ function MinimalistNotationProvider(options) {
   const cssPropertiesStringify = mn.propertiesStringify
     = cssPropertiesStringifyProvider();
   const emit = (mn.emitter = new Emitter([])).emit;
-  const emitError = (mn.error$ = new Emitter()).emit;
+  const error$ = mn.error$ = new Emitter();
+  const emitError = error$.emit;
   let $$onError = noop;
   let $$updated;
   let $$essences;
@@ -471,6 +475,20 @@ function MinimalistNotationProvider(options) {
   let $$selectorPrefixes;
   let $$altColor;
   let $$revision = 0;
+
+  error$.on((error) => {
+    $$onError(error);
+  });
+
+  function selectorsValidateFilter(selectorsMap) {
+    let selector, output = {}; // eslint-disable-line
+    for (selector in selectorsMap) { // eslint-disable-line
+      isInvalidSelector(selector)
+        ? emitError(new Error('Invalid selector: "' + selector + '"'))
+        : (output[selector] = 1);
+    }
+    return output;
+  }
 
   function parseMediaExpression(mediaExpression) {
     if (!mediaExpression) return [[]];
@@ -632,7 +650,7 @@ function MinimalistNotationProvider(options) {
         ) {
           item = items[i];
           essencesNames = item[SC_ESSENCES];
-          childSelectors = item[SC_SELECTORS];
+          childSelectors = selectorsValidateFilter(item[SC_SELECTORS]);
           mediaName = item[SC_MEDIA_NAME] || defaultMediaName;
           actx = assigned[mediaName] || (assigned[mediaName] = {});
           for (essenceName in essencesNames) { // eslint-disable-line
@@ -692,7 +710,6 @@ function MinimalistNotationProvider(options) {
     } catch (ex) {
       err = new Error('MN parsing error for essence "'
         + value + '": ' + ex.message);
-      $$onError(err);
       emitError(err);
     }
   }
@@ -806,8 +823,9 @@ function MinimalistNotationProvider(options) {
     exts && __assignCore($$assigned, exts, selectors, mediaName, excludes);
     return essence;
   }
-  function updateSelectorIteratee([essences, selectors, mediaName]) {
-    let essenceName;
+  function updateSelectorIteratee(item) {
+    // eslint-disable-next-line
+    let essenceName, essences = item[0], selectors = selectorsValidateFilter(item[1]), mediaName = item[2];
     for (essenceName in essences) updateEssence( // eslint-disable-line
         essenceName,
         selectors,
