@@ -2,6 +2,40 @@
 # Features
 
 
+For version 1.7.13 (2021-07-03):
+
+- Added new syntax rule.  
+
+  In the previous version, pluses that needed to be interpreted as part of a style
+  value rather than as part of selector had to be escaped with a slash,
+  but now there are some exceptions.  
+
+  Now, if the plus is in front of the digit, then you can be left blank with a slash.  
+
+  This is quite elegant because in CSS selector names cannot start with numbers.
+
+  As it was before:  
+  ```html
+  <div class="w1/3\+100">...</div>
+  ```
+
+  ```css
+  .w1\/3\\\+100 {
+    width: calc(33.33% + 100px);
+  }
+  ```
+
+  Now you can do this:  
+  ```html
+  <div class="w1/3+100">...</div>
+  ```
+
+  ```css
+  .w1\/3\+100 {
+    width: calc(33.33% + 100px);
+  }
+  ```
+
 
 For version 1.7.0 (2021-06-21):
 
@@ -13,7 +47,7 @@ For version 1.7.0 (2021-06-21):
 
   Now, if the dot is in front of the digit, then you can be left blank with a slash.  
 
-  This is quite elegant because in CSS class names cannot start with numbers.  
+  This is quite elegant because in CSS selector names cannot start with numbers.  
 
   As it was before:  
   ```html
@@ -30,6 +64,7 @@ For version 1.7.0 (2021-06-21):
   ```html
   <div class="cF00.5">...</div>
   ```
+
   ```css
   .cF00\.5 {
     color: rgba(255,0,0,.5);

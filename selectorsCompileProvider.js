@@ -16,8 +16,10 @@ const splitParent = escapedSplitProvider(/<|>\-/).base;
 const splitChild = escapedSplitProvider(/>|<\-/).base;
 const splitMedia = escapedSplitProvider('@').base;
 const splitState = escapedSplitProvider(':').base;
-const splitSelector = escapedSplitProvider(/[<>:\.\[\]#+~]/, /\\.|\.\d/).base;
-const extractSuffix = escapedHalfProvider(/[<>:\.\[\]#+~@\!]/, /\\.|\.\d/).base;
+const splitSelector
+  = escapedSplitProvider(/[<>:\.\[\]#+~]/, /\\.|[\.+]\d/).base;
+const extractSuffix
+  = escapedHalfProvider(/[<>:\.\[\]#+~@\!]/, /\\.|[\.+]\d/).base;
 const regexpDepth = /^(\d+)(.*)$/;
 const regexpMultiplier = /^(.*)\*([0-9]+)$/;
 const regexpScopeSuffix = /^(.*?)([+~])$/;
