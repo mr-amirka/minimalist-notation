@@ -2,6 +2,11 @@
 # Features
 
 
+For version 1.7.14 (2021-07-03):
+
+- Fixed media priority bug.
+
+
 For version 1.7.13 (2021-07-03):
 
 - Added new syntax rule.  

@@ -536,7 +536,7 @@ function MinimalistNotationProvider(options) {
     }
 
     (query = joinComma(queries))
-      && push(medias, [joinComma(names), mediaPriority, query, '']);
+      && push(medias, [joinComma(names), priority, query, '']);
     return medias;
   }
 
