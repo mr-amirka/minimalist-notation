@@ -51,7 +51,7 @@ Output:
 
 
 Try this tests:
-* https://jsfiddle.net/Amirka/k4qzpfL9/   
+* https://jsfiddle.net/L943aegk/  
 * https://jsfiddle.net/Amirka/36ey02f8/   
 
 
@@ -256,7 +256,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.7.13.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.7.14.js" async></script>
 ```
 
 -------------------------

@@ -2,6 +2,11 @@
 # Features
 
 
+For version 1.7.15 (2021-07-06):
+
+- Fixed a critical bug with checking selectors.
+
+
 For version 1.7.14 (2021-07-03):
 
 - Fixed media priority bug.
