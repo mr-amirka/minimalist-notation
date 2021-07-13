@@ -18,9 +18,25 @@ const {
 
 const defaultSettings = exports.defaultSettings = {
   path: './',
+  output: './mn.css',
   include: /^.*\.(php|html?|(js|ts)x?|vue)$/,
   exclude: /\/node_modules\/|\.tmp\./,
   watch: false,
+  attrs: {
+    'className': 'class',
+    'class': 'class',
+    'm-n': 'm-n',
+    'm': 'm',
+  },
+  watch: false,
+  metrics: false,
+  presets: [
+    require('../presets/medias'),
+    require('../presets/prefixes'),
+    require('../presets/styles'),
+    require('../presets/states'),
+    // require('../presets/main'),
+  ],
 };
 
 exports.compileSource = (__options) => {

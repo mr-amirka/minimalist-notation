@@ -3,7 +3,7 @@
  * @description This is a fork of the normalize.css v8.0.1
  * | github.com/necolas/normalize.css
  * @dependencies
- * mn-presets/styles
+ * minimalist-notation/presets/styles
  */
 
 /* eslint quote-props: ["error", "as-needed"] */
@@ -36,7 +36,7 @@ module.exports = (mn) => {
      * Correct the font size and margin on `h1` elements within `section` and
      * `article` contexts in Chrome, Firefox, and Safari.
      */
-    h1: 'f2em mv0\\.67em mh',
+    h1: 'f2em mv0.67em mh',
 
     /* Grouping content
   ========================================================================== */
@@ -91,9 +91,9 @@ module.exports = (mn) => {
      */
     'sub, sup': 'f75% lh0 rlv vaBL',
 
-    sub: 'sb-0\\.25em',
+    sub: 'sb-0.25em',
 
-    sup: 'st-0\\.5em',
+    sup: 'st-0.5em',
 
     /* Embedded content
   ========================================================================== */
@@ -143,7 +143,7 @@ module.exports = (mn) => {
     /**
     * Correct the padding in Firefox.
     */
-    fieldset: 'pt0\\.35em ph0\\.75em pb0\\.625em',
+    fieldset: 'pt0.35em ph0.75em pb0.625em',
 
     /**
      * 1. Correct the text wrapping in Edge and IE.
