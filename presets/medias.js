@@ -56,13 +56,14 @@ module.exports = (mn) => {
     media[v[0]] = {query: v[1], priority: i};
   });
 
+
   // user agents
   forEach([
     'linux', 'mozilla', 'firefox', 'opera', 'trident', 'edge', 'touch',
     'multitouch', 'orientation',
     'chrome', 'ubuntu', 'chromium', 'safari', 'msie', 'webkit', 'applewebkit',
     'mobile', 'ie', 'webtv', 'konqueror', 'blackberry', 'android', 'iron',
-    'iphone', 'ipod', 'ipad', 'mac', 'darwin', 'windows', 'freebsd',
+    'iphone', 'ios', 'ipod', 'ipad', 'mac', 'darwin', 'windows', 'freebsd',
   ], (name) => {
     media[name] = {selector: '.' + name};
   });

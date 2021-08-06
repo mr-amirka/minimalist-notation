@@ -181,7 +181,10 @@ function normalizeCalc(v, add) {
 }
 
 module.exports = (mn) => {
-  const {utils, setKeyframes} = mn;
+  const {
+    utils,
+    setKeyframes,
+  } = mn;
   const {
     isDefined,
     map,
@@ -622,14 +625,29 @@ module.exports = (mn) => {
     });
   });
 
+
   forIn({'': 0, x: 1, y: 1}, (priority, suffix) => {
-    mn('ov' + suffix, synonymProvider('overflow' + upperCase(suffix), {
+    const propName = 'overflow' + upperCase(suffix);
+    const handle = synonymProvider(propName, {
       '': 'Hidden',
       V: 'Visible',
       H: 'Hidden',
       S: 'Scroll',
       A: 'Auto',
-    }, priority));
+    }, priority);
+
+    mn('ov' + suffix, function() {
+      // eslint-disable-next-line
+      const essence = handle.apply(this, arguments);
+      if (essence) {
+        const s = essence.style;
+        const v = s && s[propName];
+        if (v === 'scroll' || v === 'auto') {
+          essence.exts = ['ovscT'];
+        }
+      }
+      return essence;
+    });
   });
 
 
