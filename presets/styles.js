@@ -170,7 +170,11 @@ function upperCase(v) {
   return v.toUpperCase();
 }
 function __wr(v) {
-  return v[0] == '-' ? '"' + v.substr(1) + '"' : v;
+  return v[0] == '-'
+    ? '"' + v.substr(1) + '"'
+    : (
+      v.indexOf(' ') > -1 ? '"' + v + '"' : v
+    );
 }
 function normalizeCalc(v, add) {
   return 'calc(' + v + ' ' + replace(add, regexpSign, '$1 ') + 'px)';
@@ -199,6 +203,18 @@ module.exports = (mn) => {
   function toKebabCase(v) {
     return camelToKebabCase(lowerFirst(v));
   }
+  function fontNameNormalize(s, c) {
+    c = s[0];
+    return spaceNormalize(
+        c == '_'
+          ? snakeLeftTrim(s)
+          : (
+            c == '\'' || c == '-'
+              ? s
+              : toKebabCase(s)
+          ),
+    );
+  }
   function synonymProvider(propName, synonyms, priority, props) {
     return isArray(propName)
       ? (props = flags(propName), ((p, s, style, synonym, propName) => {
@@ -206,7 +222,9 @@ module.exports = (mn) => {
           return normalizeDefault(p, synonym);
         }
         if (s) {
-          s = spaceNormalize(s[0] == '_' ? snakeLeftTrim(s) : toKebabCase(s));
+          // eslint-disable-next-line
+          // s = spaceNormalize(s[0] == '_' ? snakeLeftTrim(s) : toKebabCase(s));
+          s = fontNameNormalize(s);
           style = {};
           for (propName in props) style[propName] = s; // eslint-disable-line
           return styleWrap(style, priority);
@@ -780,6 +798,11 @@ module.exports = (mn) => {
       M: 'Move',
       MQ: 'Marquee',
     }),
+    ovsc: synonymProvider('overflowScrolling', {
+      '': 'Touch',
+      A: 'Auto',
+      T: 'Touch',
+    }),
     cp: synonymProvider('clip', {
       A: 'Auto',
       R: 'Rect\\(top_right_bottom_left\\)',
@@ -983,6 +1006,7 @@ module.exports = (mn) => {
     ec: synonymProvider('emptyCells', {
       S: 'Show',
       H: 'Hide',
+      U: 'Unset',
     }),
     bdcl: synonymProvider('borderCollapse', {
       C: 'Collapse',
@@ -1093,15 +1117,13 @@ module.exports = (mn) => {
     }),
     font: (p, s) => {
       return (s = p.s) && styleWrap({
-        font: spaceNormalize(s[0] == '_' ? snakeLeftTrim(s) : toKebabCase(s)),
+        font: fontNameNormalize(s),
       });
     },
     ff: (p, s) => {
       return (s = p.suffix) && styleWrap({
-        fontFamily: map(
-            spaceNormalize(s[0] == '_' ? snakeLeftTrim(s) : toKebabCase(s))
-                .split(regexpComma)
-            , __wr).join(','),
+        fontFamily: map(fontNameNormalize(s).split(regexpComma), __wr)
+            .join(','),
       }, 1);
     },
     cnt: (p, s, v) => {
@@ -1184,6 +1206,7 @@ module.exports = (mn) => {
     tem: ['textEmphasis'],
     temp: ['textEmphasisPosition', 1],
     tems: ['textEmphasisStyle', 1],
+    ir: ['imageRendering'],
   }, ([propName, priority], essenceName) => {
     mn(essenceName, (p, s, style) => {
       return (s = p.suffix)
@@ -1240,4 +1263,14 @@ module.exports = (mn) => {
     );
   // eslint-disable-next-line
   }, '^((((\\d+):w)x((\\d+):h))|(\\d+):oh)?([-+]\\d+):add?|(.*):other', 1);
+
+
+  mn({
+    contrast: styleWrap({
+      imageRendering: [
+        'optimize-contrast',
+        '-webkit-optimize-contrast',
+      ],
+    }),
+  });
 };

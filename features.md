@@ -2,6 +2,12 @@
 # Features
 
 
+For version 1.7.17 (2021-08-06):
+
+- Fixed minor bugs in presets.
+- Added props: 'overflow-scrolling' and 'image-rendering'.
+
+
 For version 1.7.15 (2021-07-06):
 
 - Fixed a critical bug with checking selectors.

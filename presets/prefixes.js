@@ -11,15 +11,24 @@ const // eslint-disable-line
   KHTML = '-khtml-'; // eslint-disable-line
 
 module.exports = (mn) => {
-  const {utils, propertiesStringify} = mn;
-  const {flags, extend} = utils;
-  const {prefixedAttrs} = propertiesStringify;
+  const {
+    utils,
+    propertiesStringify,
+  } = mn;
+  const {
+    flags,
+    extend,
+  } = utils;
+  const {
+    prefixedAttrs,
+  } = propertiesStringify;
   flags([
     WEBKIT, MOZ,
   ], propertiesStringify.prefixes);
 
   extend(prefixedAttrs, {
     appearance: flags([WEBKIT]),
+    overflowScrolling: flags([WEBKIT]),
   });
 
   flags([
