@@ -39,7 +39,7 @@ module.exports = (path, options) => {
       each: (eventType, path) => {
         changed = 1;
         if (eventType === 'remove') {
-          commonData[path] = null;
+          data[path] = null;
           return;
         }
         inc();
