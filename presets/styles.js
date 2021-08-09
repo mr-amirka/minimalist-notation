@@ -816,7 +816,7 @@ module.exports = (mn) => {
       M: 'Move',
       MQ: 'Marquee',
     }),
-    ovsc: synonymProvider('overflowScrolling', {
+    ovsc: synonymProvider('-webkitOverflowScrolling', {
       '': 'Touch',
       A: 'Auto',
       T: 'Touch',

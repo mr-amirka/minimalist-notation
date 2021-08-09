@@ -397,18 +397,20 @@ function MinimalistNotationProvider(options) {
 
   selectorsCompileProvider(mn);
   const parseComboNameProvider = mn.parseComboNameProvider;
-  const __parseComboName = mn.parseComboName;
+  const __parseComboName = withCatchParseComboNameDecorate(mn.parseComboName);
 
   // eslint-disable-next-line
   const updateAttrByMap = mn.updateAttrByMap = withResult((comboNamesMap, attrName) => {
-    let parseComboName = parseComboNameProvider(attrName), comboName; // eslint-disable-line
+    // eslint-disable-next-line
+    let parseComboName = withCatchParseComboNameDecorate(parseComboNameProvider(attrName)), comboName;
     for (comboName in comboNamesMap) forEach( // eslint-disable-line
         parseComboName(comboName), updateSelectorIteratee,
     );
   }, mn);
   // eslint-disable-next-line
   const updateAttrByValues = mn.updateAttrByValues = withResult((comboNames, attrName) => {
-    const parseComboName = parseComboNameProvider(attrName);
+    // eslint-disable-next-line
+    const parseComboName = withCatchParseComboNameDecorate(parseComboNameProvider(attrName));
     forEach(comboNames, (comboName) => {
       forEach(parseComboName(comboName), updateSelectorIteratee);
     });
@@ -479,6 +481,18 @@ function MinimalistNotationProvider(options) {
   error$.on((error) => {
     $$onError(error);
   });
+
+  function withCatchParseComboNameDecorate(parseComboNameFn) {
+    return function() {
+      try {
+        // eslint-disable-next-line
+        return parseComboNameFn.apply(this, arguments);
+      } catch (ex) {
+        emitError(ex);
+      }
+      return [];
+    };
+  }
 
   function selectorsValidateFilter(selectorsMap) {
     let selector, output = {}; // eslint-disable-line

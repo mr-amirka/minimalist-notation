@@ -3,13 +3,14 @@ const unslash = require('mn-utils/unslash');
 const escapedSplitProvider = require('mn-utils/escapedSplitProvider');
 const escapedHalfProvider = require('mn-utils/escapedHalfProvider');
 const joinMaps = require('mn-utils/joinMaps');
+const joinPrefix = require('mn-utils/joinPrefixToMap');
+const joinSuffix = require('mn-utils/joinSuffixToMap');
 const variantsBase = require('mn-utils/variants').base;
 const reduce = require('mn-utils/reduce');
 const push = require('mn-utils/push');
 const escapeQuote = require('mn-utils/escapeQuote');
 const escapeCss = require('mn-utils/escapeCss');
 const repeat = require('mn-utils/repeat');
-const scopeJoin = require('mn-utils/scopeJoin');
 const scopeSplit = require('mn-utils/scopeSplit');
 const selectorNormalize = require('./selectorNormalize');
 const splitParent = escapedSplitProvider(/<|>\-/).base;
@@ -27,18 +28,6 @@ const SCOPE_START = '[';
 const SCOPE_END = ']';
 
 
-function getScope(value) {
-  const matches = regexpScopeSuffix.exec(value);
-  const input = scopeSplit(matches ? matches[1] : value, SCOPE_START, SCOPE_END); // eslint-disable-line
-  const first = input.shift() || [];
-  const scope = first[1];
-  return [
-    first[0] || '',
-    (scope ? ('(' + scopeJoin(scope, SCOPE_START, SCOPE_END) + ')') : '')
-      + scopeJoin(input, SCOPE_START, SCOPE_END)
-      + (matches ? matches[2] : ''),
-  ];
-}
 function getPrefix(depth) {
   return depth < 1 ? '' : ('>' + repeat('*>', depth - 1));
 }
@@ -54,6 +43,11 @@ function suffixesReduce(suffixes, altComboName) {
   const suffix = extract[1];
   (suffixes[suffix] || (suffixes[suffix] = {}))[unslash(extract[0])] = 1;
   return suffixes;
+}
+function getMap(name) {
+  const synonyms = {};
+  synonyms[name] = 1;
+  return synonyms;
 }
 
 module.exports = (instance) => {
@@ -106,11 +100,7 @@ module.exports = (instance) => {
         [],
     );
   }
-  function getMap(name) {
-    const synonyms = {};
-    synonyms[name] = 1;
-    return synonyms;
-  }
+
   function procMedia(mediaNames, partName) {
     const separators = [];
     // eslint-disable-next-line
@@ -125,48 +115,78 @@ module.exports = (instance) => {
     const parts = splitParent(name);
     const l = parts.length;
     let essence = getEssence(procMedia(mediaNames, parts[0]));
-    let alts = joinMaps(getMap(((targetName || '') + essence[0])
-      || (targetName === undefined ? '*' : '')), essence[1]);
+    let alts = joinPrefix(((targetName || '') + essence[0])
+      || (targetName === undefined ? '*' : ''), essence[1]);
     let part, i = 1; // eslint-disable-line
     for (;i < l; i++) {
       part = getPart(procMedia(mediaNames, parts[i]), ' ');
       essence = getEssence(part[1]);
       alts = joinMaps(
-          joinMaps(getMap(essence[0] || '*'), essence[1]),
+          joinPrefix(essence[0] || '*', essence[1]),
           alts,
           part[0],
       );
     }
     return alts;
   }
-  function getStatesMap(state) {
-    const dst = {};
-    const scope = getScope(state);
-    const suffix = scope[1];
-    state = scope[0];
-    let ns, si; // eslint-disable-line
-    if ((ns = $$states[state]) && (si = ns.length)) {
-      for (;si--;) dst[ns[si] + suffix] = 1;
-    } else {
-      dst[':' + state + suffix] = 1;
-    }
-    return dst;
-  }
 
-  function joinStates(alts, states) {
-    const length = states.length;
-    let i = 0;
+  function getStates(value) {
     // eslint-disable-next-line
-    for (; i < length; i++) alts = joinMaps(alts, getStatesMap(unslash(states[i])));
+    let alts = getMap('');
+    base(scopeSplit(value, SCOPE_START, SCOPE_END, '\\'), 1);
     return alts;
+
+    function base(scopes, hasTop) {
+      const scopesL = scopes.length;
+      // eslint-disable-next-line
+      let scopesI = 0, scope, state, _state, states, childs, ns, si, statesL, statesI, head, matches, dst, suf;
+      for (; scopesI < scopesL; scopesI++) {
+        scope = scopes[scopesI];
+        states = splitState(scope[0]);
+        head = states.shift();
+        head && _pushSuffix(head);
+        statesL = states.length;
+        statesI = 0;
+
+        for (; statesI < statesL; statesI++) {
+          (matches = regexpScopeSuffix.exec(
+              _state = state = unslash(states[statesI]),
+          ))
+            ? (
+              state = matches[1],
+              suffix = matches[2]
+            )
+            : (suffix = '');
+
+          if ((ns = $$states[state]) && (si = ns.length)) {
+            dst = {};
+            for (;si--;) dst[ns[si] + suffix] = 1;
+            alts = joinMaps(alts, dst);
+          } else {
+            _pushSuffix(':' + _state);
+          }
+        }
+
+        if (childs = scope[1]) {
+          _pushSuffix(hasTop ? '(' : '[');
+          base(childs);
+          _pushSuffix(hasTop ? ')' : ']');
+        }
+      }
+    }
+    function _pushSuffix(suffix) {
+      alts = joinSuffix(alts, suffix);
+    }
   }
 
   function getEssence(name) {
-    const states = splitState(name);
-    return [
-      unslash(states.shift()),
-      joinStates({'': 1}, states),
-    ];
+    const i = name.indexOf(':');
+    return i < 0
+      ? [name, {'': 1}]
+      : [
+        unslash(name.substr(0, i)),
+        getStates(name.substr(i)),
+      ];
   }
 
   return extend(instance || (instance = parseComboName), {

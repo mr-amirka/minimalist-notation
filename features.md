@@ -2,6 +2,20 @@
 # Features
 
 
+For version 1.8.0 (2021-08-09):
+
+- Improved syntax of pseudo-selectors in nested scopes.  
+  Example:  
+  ```html
+  <div class="c00F:not[.clsName:n[2n+1]]:h">...</div>
+  ```
+  ```css
+  .c00F\:not\[\.clsName\:n\[2n\+1\]\]\:h:not(.clsName:nth-child[2n+1]):hover {
+    color: #00f;
+  }
+  ```
+
+
 For version 1.7.18 (2021-08-06):
 
 - Fixed minor bugs in presets.
