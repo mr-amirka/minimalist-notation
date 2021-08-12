@@ -59,7 +59,10 @@ const defaultSettings = gulpMN.defaultSettings = {
     require('../presets/medias'),
     require('../presets/prefixes'),
     require('../presets/styles'),
-    require('../presets/states'),
+
+    // require('../presets/states'),
+    require('../presets/synonymsWithMedias'),
+
     // require('../presets/main'),
   ],
   onError(e) {

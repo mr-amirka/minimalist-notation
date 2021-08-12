@@ -1,6 +1,14 @@
 
 # Features
 
+
+
+For version 1.9.1 (2021-08-12):
+
+- Added "synonymsWithMedia" instead of "states" to default presets.
+
+
+
 For version 1.9.0 (2021-08-12):
 
 - Added powerful syntax for synonyms instead of states.
