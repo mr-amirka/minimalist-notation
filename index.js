@@ -41,16 +41,14 @@ const filter = require('mn-utils/filter');
 const color = require('mn-utils/color');
 const joinProvider = require('mn-utils/joinProvider');
 const colorGetBackground = require('mn-utils/colorGetBackground');
-const {
-  SC_ESSENCES,
-  SC_SELECTORS,
-  SC_MEDIA_NAME,
-} = require('./constants');
 const selectorsCompileProvider = require('./selectorsCompileProvider');
+const {
+  extractMedia,
+} = selectorsCompileProvider;
 const selectorNormalize = require('./selectorNormalize');
 const isInvalidSelector = require('./isInvalidSelector');
 
-const utils = MinimalistNotationProvider.utils = merge([
+const utils = minimalistNotationProvider.utils = merge([
   {
     Emitter: Emitter,
     color,
@@ -60,6 +58,7 @@ const utils = MinimalistNotationProvider.utils = merge([
     noop,
     support: require('mn-utils/support'),
     size: require('mn-utils/size'),
+    concat: require('mn-utils/concat'),
     extend,
     merge,
     isPlainObject,
@@ -296,7 +295,7 @@ function __compileProvider(attrName) {
   return instance;
 }
 
-function MinimalistNotationProvider(options) {
+function minimalistNotationProvider(options) {
   function setPresets(presets) {
     isArray(presets) && eachTry(presets, [mn]);
   }
@@ -395,6 +394,7 @@ function MinimalistNotationProvider(options) {
     return mn;
   }
 
+
   selectorsCompileProvider(mn);
   const parseComboNameProvider = mn.parseComboNameProvider;
   const __parseComboName = withCatchParseComboNameDecorate(mn.parseComboName);
@@ -419,13 +419,9 @@ function MinimalistNotationProvider(options) {
   mn.recompileFrom = withResult((attrsMap) => {
     __clear();
     updateOptions();
-    setStyle(
-        'css',
-        joinOnly(reduce($$css.map, __cssReducer, [])),
-        MN_DEFAULT_CSS_PRIORITY,
-    );
     forIn(attrsMap, updateAttrByMap);
     forIn($$root, generate);
+    cssRender();
     keyframesRender();
     styleRender();
   }, mn);
@@ -449,7 +445,7 @@ function MinimalistNotationProvider(options) {
         : eachApply(map(attrs, getCompiler), [v]);
   }, mn);
   mn.setStyle = (name, content, priority) => setStyle(
-      name, content, priority || MN_DEFAULT_OTHER_CSS_PRIORITY,
+      'custom.' + name, content, priority || MN_DEFAULT_OTHER_CSS_PRIORITY,
   );
 
   options = mn.options = options || {};
@@ -499,7 +495,7 @@ function MinimalistNotationProvider(options) {
     for (selector in selectorsMap) { // eslint-disable-line
       isInvalidSelector(selector)
         ? emitError(new Error('Invalid selector: "' + selector + '"'))
-        : (output[selector] = 1);
+        : (output[selector] = selectorsMap[selector]);
     }
     return output;
   }
@@ -653,8 +649,8 @@ function MinimalistNotationProvider(options) {
     defaultMediaName = defaultMediaName || 'all';
     // eslint-disable-next-line
     let
-      name, selector, l, i, items, essenceName, item,
-      essencesNames, childSelectors, mediaName, actx;
+      name, selector, l, i, items, essenceName, item, selectorsMedias,
+      essencesNames, childSelectors, childSelector, mediaName, actx;
     for (name in comboNames) { // eslint-disable-line
       for (selector in selectors) { // eslint-disable-line
         for (
@@ -663,16 +659,18 @@ function MinimalistNotationProvider(options) {
           i++
         ) {
           item = items[i];
-          essencesNames = item[SC_ESSENCES];
-          childSelectors = selectorsValidateFilter(item[SC_SELECTORS]);
-          mediaName = item[SC_MEDIA_NAME] || defaultMediaName;
-          actx = assigned[mediaName] || (assigned[mediaName] = {});
-          for (essenceName in essencesNames) { // eslint-disable-line
-            extend(
-                actx[essenceName] || (actx[essenceName] = {}),
-                childSelectors,
-            );
-            updateEssence(essenceName, childSelectors, mediaName, excludes);
+          essencesNames = item[0];
+          selectorsMedias = selectorsValidateFilter(item[1]);
+          for (childSelector in selectorsMedias) { // eslint-disable-line
+            mediaName = selectorsMedias[childSelector] || defaultMediaName;
+            childSelectors = {};
+            childSelectors[childSelector] = 1;
+            actx = assigned[mediaName] || (assigned[mediaName] = {});
+            for (essenceName in essencesNames) { // eslint-disable-line
+              // eslint-disable-next-line
+              (actx[essenceName] || (actx[essenceName] = {}))[childSelector] = 1;
+              updateEssence(essenceName, childSelectors, mediaName, excludes);
+            }
           }
         }
       }
@@ -839,12 +837,25 @@ function MinimalistNotationProvider(options) {
   }
   function updateSelectorIteratee(item) {
     // eslint-disable-next-line
-    let essenceName, essences = item[0], selectors = selectorsValidateFilter(item[1]), mediaName = item[2];
-    for (essenceName in essences) updateEssence( // eslint-disable-line
-        essenceName,
-        selectors,
-        mediaName,
-    );
+    let essenceName, mediaName, selectors, essences = item[0], selectorsMedias = selectorsValidateFilter(item[1]);
+    for (selector in selectorsMedias) { // eslint-disable-line
+      mediaName = selectorsMedias[selector];
+      selectors = {};
+      selectors[selector] = 1;
+      for (essenceName in essences) { // eslint-disable-line
+        updateEssence(essenceName, selectors, mediaName);
+      }
+    }
+  }
+  function baseSetSynonyms(selectors, name) {
+    // eslint-disable-next-line
+    let selectorsMedias = {}, from, to, mediaNames;
+    selectors = normalizeSelectors(selectors);
+    for (from in selectors) { // eslint-disable-line
+      to = extractMedia(mediaNames = [], from);
+      selectorsMedias[to] = mediaNames[0];
+    }
+    (mn._synonyms || (mn._synonyms = {}))[name] = selectorsMedias;
   }
 
   function __assignItemCompile(actx, mediaName) {
@@ -961,6 +972,11 @@ function MinimalistNotationProvider(options) {
       : baseSetCSS(css, selector);
     $$css[1] = 1;
   }, mn);
+  mn.synonyms = withResult((synonym, selectors) => {
+    isObject(synonym)
+      ? forIn(synonym, baseSetSynonyms)
+      : baseSetSynonyms(selectors, synonym);
+  }, mn);
 
   mn.setPresets = withResult(setPresets, mn);
   mn.utils = extend(extend({}, utils), {
@@ -973,4 +989,4 @@ function MinimalistNotationProvider(options) {
   return mn;
 }
 
-module.exports = MinimalistNotationProvider;
+module.exports = minimalistNotationProvider;

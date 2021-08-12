@@ -1,6 +1,55 @@
 
 # Features
 
+For version 1.9.0 (2021-08-12):
+
+- Added powerful syntax for synonyms instead of states.
+  Example:  
+  ```js
+  mn.media.mouse = {
+    query: '(pointer: fine) and (hover: hover)',
+  };
+  mn.synonyms({
+    odd: ':nth-child\\(2n+1\\)',
+    n: ':nth-child',
+    i: ':(:-webkit-input-|:-moz-|:)placeholder',
+    h: ':hover@mouse', // here you can optionally use name of the media query
+  });
+  ```
+
+  ```html
+  <div class="c0F0:odd">...</div>
+  <div class="bg0F0:n[3n+1]">...</div>
+  <input class="c0:i"/>
+  <div class="c00F:h">...</div>
+  ```
+
+  ```css
+  .c0F0\:odd:nth-child(2n+1) {
+    color: #0f0;
+  }
+  .bg0F0\:n\[3n\+1\]:nth-child(3n+1) {
+    background: #0f0;
+  }
+  .c0\:i::-webkit-input-placeholder {
+    color: #000;
+  }
+  .c0\:i::-moz-placeholder {
+    color: #000;
+  }
+  .c0\:i::placeholder {
+    color: #000;
+  }
+  @media (pointer: fine) and (hover: hover) {
+    .c00F\:h:hover {
+      color: #00f;
+    }
+  }
+  ```
+
+ - The use of states is deprecated but still supported.  
+
+
 
 For version 1.8.0 (2021-08-09):
 
@@ -9,6 +58,15 @@ For version 1.8.0 (2021-08-09):
   ```html
   <div class="c00F:not[.clsName:n[2n+1]]:h">...</div>
   ```
+
+  As it was before:  
+  ```css
+  .c00F\:not\[\.clsName\:n\[2n\+1\]\]\:h:not(.clsName:n[2n+1]):hover {
+    color: #00f;
+  }
+  ```
+
+  As it became after:  
   ```css
   .c00F\:not\[\.clsName\:n\[2n\+1\]\]\:h:not(.clsName:nth-child[2n+1]):hover {
     color: #00f;
@@ -55,7 +113,7 @@ For version 1.7.13 (2021-07-03):
   }
   ```
 
-  Now you can do this:  
+  As it became after:
   ```html
   <div class="w1/3+100">...</div>
   ```
@@ -90,7 +148,7 @@ For version 1.7.0 (2021-06-21):
   }
   ```
 
-  Now you can do this:  
+  As it became after:  
   ```html
   <div class="cF00.5">...</div>
   ```

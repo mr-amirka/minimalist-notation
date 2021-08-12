@@ -256,7 +256,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.7.15.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.9.0.js" async></script>
 ```
 
 -------------------------
@@ -277,7 +277,10 @@ const mn = mnProvider({
     require('minimalist-notation/presets/medias'),
     require('minimalist-notation/presets/runtimePrefixes'),
     require('minimalist-notation/presets/styles'),
+
+    // require('minimalist-notation/presets/synonymsWithMedias'),
     require('minimalist-notation/presets/states'),
+
     // require('minimalist-notation/presets/main'),
     // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
     // require('./mn-my-preset'), // custom preset
@@ -314,4 +317,4 @@ render(<App/>, document.getElementById('app'));
 
 
 I would be grateful for your feedback and comments. Write me in a [telegram](https://t.me/mr_amirka).  
-With respect, mr.Amirka 🙂
+With respect, mr. Amirka 🙂

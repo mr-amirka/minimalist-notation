@@ -1,10 +1,9 @@
+const isDefined = require('mn-utils/isDefined');
 const extend = require('mn-utils/extend');
 const unslash = require('mn-utils/unslash');
 const escapedSplitProvider = require('mn-utils/escapedSplitProvider');
 const escapedHalfProvider = require('mn-utils/escapedHalfProvider');
-const joinMaps = require('mn-utils/joinMaps');
-const joinPrefix = require('mn-utils/joinPrefixToMap');
-const joinSuffix = require('mn-utils/joinSuffixToMap');
+const joinOnly = require('mn-utils/joinOnly');
 const variantsBase = require('mn-utils/variants').base;
 const reduce = require('mn-utils/reduce');
 const push = require('mn-utils/push');
@@ -23,35 +22,70 @@ const extractSuffix
   = escapedHalfProvider(/[<>:\.\[\]#+~@\!]/, /\\.|[\.+]\d/).base;
 const regexpDepth = /^(\d+)(.*)$/;
 const regexpMultiplier = /^(.*)\*([0-9]+)$/;
-const regexpScopeSuffix = /^(.*?)([+~])$/;
+const regexpScopeSuffix = /^([A-Za-z0-9-_$]+)(.*)$/;
 const SCOPE_START = '[';
 const SCOPE_END = ']';
 
 
-function getPrefix(depth) {
+function getCombinatorByDepth(depth) {
   return depth < 1 ? '' : ('>' + repeat('*>', depth - 1));
 }
-function getPart(name, defPrefix) {
+function getCombinator(name) {
   const depthMatchs = regexpDepth.exec(name);
   return depthMatchs ? [
-    getPrefix(parseInt(depthMatchs[1])),
+    getCombinatorByDepth(parseInt(depthMatchs[1])),
     depthMatchs[2] || '',
-  ] : [defPrefix || '', name];
+  ] : [' ', name];
+}
+function extractMedia(mediaNames, partName) {
+  const separators = [];
+  // eslint-disable-next-line
+  return partName ? joinOnly(reduce(splitSelector(partName, separators), (output, selector, index) => {
+    const mediaParts = splitMedia(selector);
+    push(output, mediaParts[0] + (separators[index] || ''));
+    mediaParts.length > 1 && push(mediaNames, unslash(mediaParts[1]));
+    return output;
+  }, [])) : '';
 }
 function suffixesReduce(suffixes, altComboName) {
   const extract = extractSuffix(altComboName);
-  const suffix = extract[1];
+  const suffix = selectorNormalize(extract[1]);
   (suffixes[suffix] || (suffixes[suffix] = {}))[unslash(extract[0])] = 1;
   return suffixes;
 }
-function getMap(name) {
-  const synonyms = {};
-  synonyms[name] = 1;
-  return synonyms;
+
+function joinMapsWithFirstValue(prefixes, suffixes, separator) {
+  separator = separator || '';
+  let output = {}, prefix, suffix, p, value, hasValue; // eslint-disable-line
+  for (prefix in prefixes) { // eslint-disable-line
+    hasValue = isDefined(value = prefixes[prefix]);
+    p = prefix + separator;
+    for (suffix in suffixes) { // eslint-disable-line
+      output[p + suffix] = hasValue ? value : suffixes[suffix];
+    }
+  }
+  return output;
 }
 
-module.exports = (instance) => {
-  let $$states;
+function joinPrefixWithFirstValue(prefix, suffixes, prefixValue) {
+  let output = {}, suffix, hasValue = isDefined(prefixValue); // eslint-disable-line
+  for (suffix in suffixes) { // eslint-disable-line
+    output[prefix + suffix] = hasValue ? prefixValue : suffixes[suffix];
+  }
+  return output;
+}
+
+function joinSuffixWithFirstValue(prefixes, suffix, suffixValue) {
+  let output = {}, prefix, value, hasValue; // eslint-disable-line
+  for (prefix in prefixes) { // eslint-disable-line
+    hasValue = isDefined(value = prefixes[prefix]);
+    output[prefix + suffix] = hasValue ? value : suffixValue;
+  }
+  return output;
+}
+
+function provider(instance) {
+  let $$states, $$synonyms; // eslint-disable-line
   const $$parsers = {
     'id': parseId,
     'class': parseClass,
@@ -72,57 +106,47 @@ module.exports = (instance) => {
         comboName, prefix + escapeQuote(comboName) + '"]',
     );
   }
+  function childsIteratee(alts, childName) {
+    const part = getCombinator(childName);
+    return joinMapsWithFirstValue(alts, getParents(part[1]), part[0]);
+  }
   function parseComboName(comboName, targetName, multiplierMatch, multiplier) {
     $$states = instance.states || {};
+    $$synonyms = instance._synonyms || {};
     if (multiplierMatch = regexpMultiplier.exec(comboName)) {
       comboName = multiplierMatch[1];
       (multiplier = parseInt(multiplierMatch[2])) > 1
         && (targetName = repeat(targetName, multiplier));
     }
-    return reduce(
-        reduce(variantsBase(comboName), suffixesReduce, {}),
-        (items, essences, suffix) => {
-          const mediaNames = [];
-          const parts = splitChild(selectorNormalize(suffix));
-          return push(items, [
-            essences,
-            reduce(parts, (selectors, partName) => {
-              const part = getPart(partName, ' ');
-              return joinMaps(
-                  selectors,
-                  getParents(mediaNames, part[1]),
-                  part[0],
-              );
-            }, getParents(mediaNames, parts.shift(), targetName)),
-            mediaNames[0] || '',
-          ]);
-        },
-        [],
-    );
+
+    // eslint-disable-next-line
+    return reduce(reduce(variantsBase(comboName), suffixesReduce, {}), (items, essences, suffix) => {
+      const childs = splitChild(suffix);
+      const first = getParents(childs.shift(), targetName);
+      return push(items, [
+        essences,
+        reduce(childs, childsIteratee, first),
+      ]);
+    }, []);
   }
 
-  function procMedia(mediaNames, partName) {
-    const separators = [];
-    // eslint-disable-next-line
-    return partName ? reduce(splitSelector(partName, separators), (output, selector, index) => {
-      const mediaParts = splitMedia(selector);
-      push(output, mediaParts[0] + (separators[index] || ''));
-      mediaParts.length > 1 && push(mediaNames, unslash(mediaParts[1]));
-      return output;
-    }, []).join('') : '';
-  }
-  function getParents(mediaNames, name, targetName) {
+  function getParents(name, targetName) {
     const parts = splitParent(name);
     const l = parts.length;
-    let essence = getEssence(procMedia(mediaNames, parts[0]));
-    let alts = joinPrefix(((targetName || '') + essence[0])
-      || (targetName === undefined ? '*' : ''), essence[1]);
-    let part, i = 1; // eslint-disable-line
+    let part, i = 1, mediaNames = []; // eslint-disable-line
+    let essence = getEssence(extractMedia(mediaNames, parts[0]));
+    let alts = joinPrefixWithFirstValue(((targetName || '') + essence[0])
+      || (isDefined(targetName) ? '' : '*'), essence[1], mediaNames[0]);
+
     for (;i < l; i++) {
-      part = getPart(procMedia(mediaNames, parts[i]), ' ');
+      part = getCombinator(extractMedia(mediaNames = [], parts[i]));
       essence = getEssence(part[1]);
-      alts = joinMaps(
-          joinPrefix(essence[0] || '*', essence[1]),
+      alts = joinMapsWithFirstValue(
+          joinPrefixWithFirstValue(
+              essence[0] || '*',
+              essence[1],
+              mediaNames[0],
+          ),
           alts,
           part[0],
       );
@@ -130,16 +154,15 @@ module.exports = (instance) => {
     return alts;
   }
 
-  function getStates(value) {
+  function getSynonyms(value) {
     // eslint-disable-next-line
-    let alts = getMap('');
+    let alts = {'': null};
     base(scopeSplit(value, SCOPE_START, SCOPE_END, '\\'), 1);
     return alts;
 
     function base(scopes, hasTop) {
-      const scopesL = scopes.length;
       // eslint-disable-next-line
-      let scopesI = 0, scope, state, _state, states, childs, ns, si, statesL, statesI, head, matches, dst, suf;
+      let scopesL = scopes.length, scopesI = 0, scope, state, _state, states, childs, ns, si, statesL, statesI, head, matches, suffix, synonyms;
       for (; scopesI < scopesL; scopesI++) {
         scope = scopes[scopesI];
         states = splitState(scope[0]);
@@ -158,12 +181,17 @@ module.exports = (instance) => {
             )
             : (suffix = '');
 
-          if ((ns = $$states[state]) && (si = ns.length)) {
-            dst = {};
-            for (;si--;) dst[ns[si] + suffix] = 1;
-            alts = joinMaps(alts, dst);
+          if (synonyms = $$synonyms[state]) {
+            alts = joinMapsWithFirstValue(alts, synonyms);
           } else {
-            _pushSuffix(':' + _state);
+            // deprecated
+            if ((ns = $$states[state]) && (si = ns.length)) {
+              synonyms = {};
+              for (;si--;) synonyms[ns[si] + suffix] = null;
+              alts = joinMapsWithFirstValue(alts, synonyms);
+            } else {
+              _pushSuffix(':' + _state);
+            }
           }
         }
 
@@ -175,17 +203,17 @@ module.exports = (instance) => {
       }
     }
     function _pushSuffix(suffix) {
-      alts = joinSuffix(alts, suffix);
+      alts = joinSuffixWithFirstValue(alts, suffix);
     }
   }
 
   function getEssence(name) {
     const i = name.indexOf(':');
     return i < 0
-      ? [name, {'': 1}]
+      ? [name, {'': null}]
       : [
         unslash(name.substr(0, i)),
-        getStates(name.substr(i)),
+        getSynonyms(name.substr(i)),
       ];
   }
 
@@ -196,4 +224,9 @@ module.exports = (instance) => {
     parseId,
     parseClass,
   });
-};
+}
+
+provider.getCombinatorByDepth = getCombinatorByDepth;
+provider.getCombinator = getCombinator;
+provider.extractMedia = extractMedia;
+module.exports = provider;
