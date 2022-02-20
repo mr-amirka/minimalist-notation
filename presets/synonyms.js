@@ -1,9 +1,10 @@
 /**
- * @overview MinimalistNotation preset "statesWithMedia"
+ * @overview MinimalistNotation preset "synonyms"
  * @author Amir Absalyamov <mr.amirka@ya.ru>
  */
 
 module.exports = (mn) => {
+  // synonyms
   mn.synonyms({
     a: ':active',
     c: ':checked',

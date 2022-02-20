@@ -27,7 +27,7 @@ gulp.task('build', function() {
         require('minimalist-notation/presets/states'),
         // require('minimalist-notation/presets/main'),
         // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
-        // require('./mn-my-preset'), // custom preset
+        // require('./mn-my-preset'), // custom handlers
       ],
     }))
     .pipe(gulp.dest('./dest/'))

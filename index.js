@@ -115,6 +115,7 @@ const utils = minimalistNotationProvider.utils = merge([
     escapeCss: require('mn-utils/escapeCss'),
     escapedHalfProvider: require('mn-utils/escapedHalfProvider'),
     trim,
+    toUpper: require('mn-utils/toUpper'),
     upperFirst: require('mn-utils/upperFirst'),
     lowerFirst: require('mn-utils/lowerFirst'),
     camelToKebabCase: require('mn-utils/camelToKebabCase'),
@@ -272,7 +273,7 @@ function __compileProvider(attrName) {
   function instance(v) {
     if (!v) return;
     // eslint-disable-next-line
-    for (var vs = splitSpace(v || ''), i = 0, l = vs.length, k; i < l; i++) {
+    for (let vs = splitSpace(v || ''), i = 0, l = vs.length, k; i < l; i++) {
       _cache[k = vs[i]] || (
         _cache[k] = 1,
         push(_values, k)
@@ -296,8 +297,9 @@ function __compileProvider(attrName) {
 }
 
 function minimalistNotationProvider(options) {
+  options = options || {};
   function setPresets(presets) {
-    isArray(presets) && eachTry(presets, [mn]);
+    isArray(presets) && eachTry(presets, [mn], mn, emitError);
   }
   function styleRender() {
     emit(__values($$stylesMap).sort(priotitySort));
@@ -448,7 +450,7 @@ function minimalistNotationProvider(options) {
       'custom.' + name, content, priority || MN_DEFAULT_OTHER_CSS_PRIORITY,
   );
 
-  options = mn.options = options || {};
+  mn.options = extend({}, options);
   const $$data = mn.data = {};
   const $$compilers = $$data.compilers = {};
   const cssPropertiesStringify = mn.propertiesStringify
@@ -853,7 +855,7 @@ function minimalistNotationProvider(options) {
     selectors = normalizeSelectors(selectors);
     for (from in selectors) { // eslint-disable-line
       to = extractMedia(mediaNames = [], from);
-      selectorsMedias[to] = mediaNames[0];
+      selectorsMedias[to] = [0, mediaNames[0]];
     }
     (mn._synonyms || (mn._synonyms = {}))[name] = selectorsMedias;
   }
@@ -984,6 +986,7 @@ function minimalistNotationProvider(options) {
     colorGetBackground: (v) => colorGetBackground(v, $$altColor),
   });
 
+  updateOptions();
   setPresets(options.presets);
 
   return mn;

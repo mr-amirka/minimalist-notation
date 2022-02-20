@@ -1,21 +1,27 @@
-const isDefined = require('mn-utils/isDefined');
 const extend = require('mn-utils/extend');
 const unslash = require('mn-utils/unslash');
 const escapedSplitProvider = require('mn-utils/escapedSplitProvider');
 const escapedHalfProvider = require('mn-utils/escapedHalfProvider');
 const joinOnly = require('mn-utils/joinOnly');
 const variantsBase = require('mn-utils/variants').base;
+const slice = require('mn-utils/slice');
+const forEach = require('mn-utils/forEach');
 const reduce = require('mn-utils/reduce');
+const map = require('mn-utils/map');
+const filter = require('mn-utils/filter');
 const push = require('mn-utils/push');
+const pushArray = require('mn-utils/pushArray');
 const escapeQuote = require('mn-utils/escapeQuote');
 const escapeCss = require('mn-utils/escapeCss');
 const repeat = require('mn-utils/repeat');
 const scopeSplit = require('mn-utils/scopeSplit');
+const indexOf = require('mn-utils/indexOf');
 const selectorNormalize = require('./selectorNormalize');
 const splitParent = escapedSplitProvider(/<|>\-/).base;
 const splitChild = escapedSplitProvider(/>|<\-/).base;
 const splitMedia = escapedSplitProvider('@').base;
 const splitState = escapedSplitProvider(':').base;
+const splitComma = escapedSplitProvider(',').base;
 const splitSelector
   = escapedSplitProvider(/[<>:\.\[\]#+~]/, /\\.|[\.+]\d/).base;
 const extractSuffix
@@ -27,6 +33,20 @@ const SCOPE_START = '[';
 const SCOPE_END = ']';
 
 
+function mediaFilterIteratee(mediaNames) {
+  const excludes = [];
+  const mainMedia = mediaNames.shift();
+  mediaNames = filter(mediaNames, (mediaName) => {
+    return mediaName && indexOf(excludes, mediaName) < 0
+      ? (push(excludes, mediaName), 1)
+      : 0;
+  });
+  return mainMedia
+    ? map(splitComma(mainMedia), (mainMedia) => {
+      return pushArray([mainMedia], mediaNames).join('&');
+    }).join(',')
+    : mediaNames.join('&');
+}
 function getCombinatorByDepth(depth) {
   return depth < 1 ? '' : ('>' + repeat('*>', depth - 1));
 }
@@ -54,35 +74,33 @@ function suffixesReduce(suffixes, altComboName) {
   return suffixes;
 }
 
-function joinMapsWithFirstValue(prefixes, suffixes, separator) {
+function joinMapsWithFirstValue(prefixes, suffixes, separator, end) {
   separator = separator || '';
-  let output = {}, prefix, suffix, p, value, hasValue; // eslint-disable-line
+  end = end || '';
+  let output = {}, prefix, suffix, p, pv, tmp; // eslint-disable-line
   for (prefix in prefixes) { // eslint-disable-line
-    hasValue = isDefined(value = prefixes[prefix]);
+    pv = prefixes[prefix];
     p = prefix + separator;
     for (suffix in suffixes) { // eslint-disable-line
-      output[p + suffix] = hasValue ? value : suffixes[suffix];
+      tmp = output[p + suffix + end] = slice(suffixes[suffix]);
+      tmp[0] = pv[0] || tmp[0];
+      pushArray(tmp, slice(pv, 1));
     }
   }
   return output;
 }
 
-function joinPrefixWithFirstValue(prefix, suffixes, prefixValue) {
-  let output = {}, suffix, hasValue = isDefined(prefixValue); // eslint-disable-line
+function joinPrefixWithFirstValue(prefix, suffixes, pv) {
+  let output = {}, suffix, tmp; // eslint-disable-line
   for (suffix in suffixes) { // eslint-disable-line
-    output[prefix + suffix] = hasValue ? prefixValue : suffixes[suffix];
+    tmp = output[prefix + suffix] = slice(suffixes[suffix]);
+    tmp[0] = pv || tmp[0];
+    // output[prefix + suffix] = [pv, suffixes[suffix]];
+    // output[prefix + suffix] = pv || suffixes[suffix];
   }
   return output;
 }
 
-function joinSuffixWithFirstValue(prefixes, suffix, suffixValue) {
-  let output = {}, prefix, value, hasValue; // eslint-disable-line
-  for (prefix in prefixes) { // eslint-disable-line
-    hasValue = isDefined(value = prefixes[prefix]);
-    output[prefix + suffix] = hasValue ? value : suffixValue;
-  }
-  return output;
-}
 
 function provider(instance) {
   let $$states, $$synonyms; // eslint-disable-line
@@ -108,7 +126,7 @@ function provider(instance) {
   }
   function childsIteratee(alts, childName) {
     const part = getCombinator(childName);
-    return joinMapsWithFirstValue(alts, getParents(part[1]), part[0]);
+    return joinMapsWithFirstValue(alts, getParents(part[1], 0, '*'), part[0]);
   }
   function parseComboName(comboName, targetName, multiplierMatch, multiplier) {
     $$states = instance.states || {};
@@ -122,22 +140,20 @@ function provider(instance) {
     // eslint-disable-next-line
     return reduce(reduce(variantsBase(comboName), suffixesReduce, {}), (items, essences, suffix) => {
       const childs = splitChild(suffix);
-      const first = getParents(childs.shift(), targetName);
+      const first = getParents(childs.shift(), targetName, '');
       return push(items, [
         essences,
-        reduce(childs, childsIteratee, first),
+        map(reduce(childs, childsIteratee, first), mediaFilterIteratee),
       ]);
     }, []);
   }
 
-  function getParents(name, targetName) {
-    const parts = splitParent(name);
-    const l = parts.length;
+  function getParents(name, targetName, alt) {
+    const parts = splitParent(name), l = parts.length; // eslint-disable-line
     let part, i = 1, mediaNames = []; // eslint-disable-line
     let essence = getEssence(extractMedia(mediaNames, parts[0]));
     let alts = joinPrefixWithFirstValue(((targetName || '') + essence[0])
-      || (isDefined(targetName) ? '' : '*'), essence[1], mediaNames[0]);
-
+      || alt, essence[1], mediaNames[0]);
     for (;i < l; i++) {
       part = getCombinator(extractMedia(mediaNames = [], parts[i]));
       essence = getEssence(part[1]);
@@ -156,7 +172,7 @@ function provider(instance) {
 
   function getSynonyms(value) {
     // eslint-disable-next-line
-    let alts = {'': null};
+    let alts = {'': []};
     base(scopeSplit(value, SCOPE_START, SCOPE_END, '\\'), 1);
     return alts;
 
@@ -182,12 +198,12 @@ function provider(instance) {
             : (suffix = '');
 
           if (synonyms = $$synonyms[state]) {
-            alts = joinMapsWithFirstValue(alts, synonyms);
+            alts = joinMapsWithFirstValue(alts, synonyms, 0, suffix);
           } else {
             // deprecated
             if ((ns = $$states[state]) && (si = ns.length)) {
               synonyms = {};
-              for (;si--;) synonyms[ns[si] + suffix] = null;
+              for (;si--;) synonyms[ns[si] + suffix] = [];
               alts = joinMapsWithFirstValue(alts, synonyms);
             } else {
               _pushSuffix(':' + _state);
@@ -203,14 +219,18 @@ function provider(instance) {
       }
     }
     function _pushSuffix(suffix) {
-      alts = joinSuffixWithFirstValue(alts, suffix);
+      let prefixes = alts, prefix; // eslint-disable-line
+      alts = {};
+      for (prefix in prefixes) { // eslint-disable-line
+        alts[prefix + suffix] = prefixes[prefix];
+      }
     }
   }
 
   function getEssence(name) {
     const i = name.indexOf(':');
     return i < 0
-      ? [name, {'': null}]
+      ? [name, {'': []}]
       : [
         unslash(name.substr(0, i)),
         getSynonyms(name.substr(i)),

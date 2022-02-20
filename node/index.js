@@ -7,7 +7,7 @@ const values = require('mn-utils/values');
 const reduce = require('mn-utils/reduce');
 const noop = require('mn-utils/noop');
 const isEmpty = require('mn-utils/isEmpty');
-const writeFile = require('mn-utils/node/writeFile');
+const writeFile = require('mn-utils/node/file/write');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
 const parseSource = require('./parseSource');
@@ -31,12 +31,12 @@ const defaultSettings = exports.defaultSettings = {
   watch: false,
   metrics: false,
   presets: [
-    require('../presets/medias'),
     require('../presets/prefixes'),
     require('../presets/styles'),
+    require('../presets/medias'),
 
     // require('../presets/states'),
-    require('../presets/synonymsWithMedias')
+    require('../presets/synonyms'),
 
     // require('../presets/main'),
   ],

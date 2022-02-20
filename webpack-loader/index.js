@@ -8,7 +8,7 @@ const isString = require('mn-utils/isString');
 const isArray = require('mn-utils/isArray');
 const isFunction = require('mn-utils/isFunction');
 const values = require('mn-utils/values');
-const writeFile = require('mn-utils/node/writeFile');
+const writeFile = require('mn-utils/node/file/write');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
 const parseSource = require('../node/parseSource');
@@ -47,12 +47,12 @@ __exports.defaultPluginSettings = {
     'm': 'm',
   },
   presets: [
-    require('../presets/medias'),
     require('../presets/prefixes'),
     require('../presets/styles'),
+    require('../presets/medias'),
 
     // require('../presets/states'),
-    require('../presets/synonymsWithMedias')
+    require('../presets/synonyms'),
 
     // require('../presets/main'),
   ],

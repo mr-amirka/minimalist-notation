@@ -6,7 +6,7 @@ const isObject = require('mn-utils/isObject');
 const isString = require('mn-utils/isString');
 const isArray = require('mn-utils/isArray');
 const eachAsync = require('mn-utils/eachAsync');
-const writeFile = require('mn-utils/node/writeFile');
+const writeFile = require('mn-utils/node/file/write');
 
 function normalize(v) {
   return v ? (isArray(v) ? (v.length ? v : null) : [v]) : null;
@@ -56,12 +56,12 @@ const defaultSettings = gulpMN.defaultSettings = {
     'm': 'm',
   },
   presets: [
-    require('../presets/medias'),
     require('../presets/prefixes'),
     require('../presets/styles'),
+    require('../presets/medias'),
 
     // require('../presets/states'),
-    require('../presets/synonymsWithMedias'),
+    require('../presets/synonyms'),
 
     // require('../presets/main'),
   ],

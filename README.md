@@ -51,7 +51,7 @@ Output:
 
 
 Try this tests:
-* https://jsfiddle.net/L943aegk/  
+* https://jsfiddle.net/Amirka/vu761tb4/
 * https://jsfiddle.net/Amirka/36ey02f8/   
 
 
@@ -155,13 +155,13 @@ module.exports = {
         // './src/other.html',
       ],
       presets: [
-        require('minimalist-notation/presets/medias'),
         require('minimalist-notation/presets/prefixes'),
         require('minimalist-notation/presets/styles'),
-        require('minimalist-notation/presets/states'),
+        require('minimalist-notation/presets/medias'),
+        require('minimalist-notation/presets/synonyms'),
         // require('minimalist-notation/presets/main'),
         // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
-        // require('./mn-my-preset'), // custom preset
+        // require('./mn-my-preset'), // custom handlers
       ]
     }),
     /* ... */
@@ -189,13 +189,13 @@ gulp.task('build', function() {
       // selectorPrefix: '',
       // attrs: {'class': 'class'},
       presets: [
-        require('minimalist-notation/presets/medias'),
         require('minimalist-notation/presets/prefixes'),
         require('minimalist-notation/presets/styles'),
-        require('minimalist-notation/presets/states'),
+        require('minimalist-notation/presets/medias'),
+        require('minimalist-notation/presets/synonyms'),
         // require('minimalist-notation/presets/main'),
         // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
-        // require('./mn-my-preset'), // custom preset
+        // require('./mn-my-preset'), // custom handlers
       ],
     }))
     .pipe(gulp.dest('./dest/'))
@@ -215,13 +215,13 @@ const mnProvider = require('minimalist-notation');
 const mn = mnProvider({
   // selectorPrefix: '',
   presets: [
-    require('minimalist-notation/presets/medias'),
     require('minimalist-notation/presets/runtimePrefixes'),
     require('minimalist-notation/presets/styles'),
-    require('minimalist-notation/presets/states'),
+    require('minimalist-notation/presets/medias'),
+    require('minimalist-notation/presets/synonyms'),
     // require('minimalist-notation/presets/main'),
     // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
-    // require('./mn-my-preset'), // custom preset
+    // require('./mn-my-preset'), // custom handlers
     ...(window.mnPresets || []),
   ],
 });
@@ -274,16 +274,14 @@ const mnProvider = require('minimalist-notation');
 const mn = mnProvider({
   // selectorPrefix: '.mn-scope ',
   presets: [
-    require('minimalist-notation/presets/medias'),
     require('minimalist-notation/presets/runtimePrefixes'),
     require('minimalist-notation/presets/styles'),
-
-    // require('minimalist-notation/presets/synonymsWithMedias'),
-    require('minimalist-notation/presets/states'),
+    require('minimalist-notation/presets/medias'),
+    require('minimalist-notation/presets/synonyms'),
 
     // require('minimalist-notation/presets/main'),
     // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
-    // require('./mn-my-preset'), // custom preset
+    // require('./mn-my-preset'), // custom handlers
     ...(window.mnPresets || []),
   ],
 });

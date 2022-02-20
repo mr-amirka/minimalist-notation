@@ -18,20 +18,23 @@ const reZero =/^0+|\.?0+$/g;
 const regexpSpaceNormalize = /(\\_)|(_)/g;
 const regexpFilterName = /^([A-Za-z]+)([0-9]*)(.*)$/;
 const regexpFilterSep = /_+/;
-const BASE_COLOR_PATTERN
-  = '([A-Z][a-z][A-Za-z]+):camel|([A-Fa-f0-9]+(\\.[0-9]+)?):color';
-const COLOR_PATTERN = '^(' + BASE_COLOR_PATTERN + '):value';
+const regexpDots = /\./g;
 
-// eslint-disable-next-line
-const WIDTH_PATTERN = '^(([A-Z][A-Za-z]*):camel|([0-9]*\\.[0-9]+|[0-9]+):num(/([0-9]*\\.[0-9]+|[0-9]+):total?)?):value?([a-z%]+):unit?([-+]([0-9]*\\.[0-9]+|[0-9]+)):add?$';
-// eslint-disable-next-line
-const MARGIN_PATTERN = '^(([A-Z][A-Za-z]*):camel|([-+]):sign?([0-9]*\\.[0-9]+|[0-9]+):num(/([0-9]*\\.[0-9]+|[0-9]+):total?)?):value?([a-z%]+):unit?([-+]([0-9]*\\.[0-9]+|[0-9]+)):add?$';
+const PATTERN_DIGITS = '(-?[0-9\\.]+)';
+const PATTERN_BASE_COLOR
+  = '([A-Z][a-z][A-Za-z]+):camel|([A-Fa-f0-9]+(\\.[0-9]+)?):color';
+const PATTERN_COLOR = '^(' + PATTERN_BASE_COLOR + '):value';
+
+const PATTERN_MARGIN = '^(([A-Z][A-Za-z]*):camel|([-+]):sign?'
+  + PATTERN_DIGITS + ':num(/' + PATTERN_DIGITS
+  + ':total?)?):value?([a-z%]+):unit?([-+]([0-9\\.]+)):add?$';
+
 const SHADOW_PATTERNS = [
   '(r|R)(\\-?[0-9]+):r',
   '(x|X)(\\-?[0-9]+):x',
   '(y|Y)(\\-?[0-9]+):y',
   '(m|M)([0-9]+):m',
-  'c(' + BASE_COLOR_PATTERN + '):c',
+  'c(' + PATTERN_BASE_COLOR + '):c',
   '(in):in',
 ];
 const TOP = '-top';
@@ -137,6 +140,19 @@ const FILTER_MAP = {
   sepia: ['sepia', 100, '%'],
 };
 
+function throwInvalid() {
+  throw new Error('param is invalid');
+}
+function floatNormalize(v, nosign) {
+  const m = v && v.match(regexpDots);
+  (m && m.length > 1 || isNaN(v = parseFloat(v)) || (v < 0 && nosign))
+    && throwInvalid();
+  return v;
+}
+
+function replacerSpaceNormalize(all, escaped) {
+  return escaped ? '_' : ' ';
+}
 function replacerSpaceNormalize(all, escaped) {
   return escaped ? '_' : ' ';
 }
@@ -153,9 +169,7 @@ function styleWrap(style, priority) {
   return {style, priority: priority || 0};
 }
 function toFixed(v) {
-  if (isNaN(v = v * 100)) {
-    throw new Error('param is invalid');
-  }
+  isNaN(v = v * 100) && throwInvalid();
   return replace((Math.floor(v) * 0.01).toFixed(2), reZero, '') || '0';
 }
 function normalizeDefault(p, def) {
@@ -164,10 +178,9 @@ function normalizeDefault(p, def) {
   };
 }
 function stylePosition(position, priority) {
-  return styleWrap({position: position}, priority);
-}
-function upperCase(v) {
-  return v.toUpperCase();
+  return styleWrap({
+    position: position,
+  }, priority);
 }
 function __wr(v) {
   return v[0] == '-'
@@ -193,6 +206,7 @@ module.exports = (mn) => {
     forEach,
     upperFirst,
     lowerFirst,
+    toUpper,
     camelToKebabCase,
     isArray,
     flags,
@@ -266,7 +280,7 @@ module.exports = (mn) => {
       };
     }
 
-    function handleProvider(sidesSet) {
+    function handleProvider(sidesSet, nosign) {
       return (p, camel, total, num, add) => {
         return p.suffix ? (
           (camel = p.camel) === 'A'
@@ -280,11 +294,11 @@ module.exports = (mn) => {
                         ? num
                         : (
                           num = (p.sign || '') + ((total = p.total)
-                            ? toFixed(100 * parseFloat(num)
-                              / parseFloat(total)) + '%'
+                            ? toFixed(100 * floatNormalize(num, nosign)
+                              / floatNormalize(total, nosign)) + '%'
                             : toFixed(num) + (p.unit || 'px')),
                           (add = p.add)
-                            ? normalizeCalc(num, add)
+                            ? normalizeCalc(num, floatNormalize(add))
                             : num
                         )
                     ),
@@ -296,15 +310,16 @@ module.exports = (mn) => {
     }
 
     forIn({
-      p: ['padding'],
+      p: ['padding', 0, 1],
       m: ['margin'],
-      b: ['border', '-width'],
+      b: ['border', '-width', 1],
     }, (args, pfx) => {
       const propName = args[0];
       const propSuffix = args[1] || '';
       mn(pfx + suffix, handleProvider(
           sidesSetter((side) => propName + side + propSuffix),
-      ), MARGIN_PATTERN, 1);//
+          args[2],
+      ), PATTERN_MARGIN, 1);
     });
 
     mn('s' + suffix, handleProvider(
@@ -316,7 +331,7 @@ module.exports = (mn) => {
           left: v,
           right: v,
         }),
-    ), MARGIN_PATTERN, 1);
+    ), PATTERN_MARGIN, 1);
     mn('bs' + suffix, (p, s, synonym) => {
       return (synonym = borderStyleSynonyms[s = p.suffix])
         ? normalizeDefault(p, synonym)
@@ -334,7 +349,7 @@ module.exports = (mn) => {
             : getColor(v || '0'),
         ), priority + 1)
         : normalizeDefault(p);
-    }, COLOR_PATTERN, 1);
+    }, PATTERN_COLOR, 1);
     mn('bi' + suffix, (p, s) => {
       return styleWrap(biSidesSet(
         (s = p.suffix)
@@ -369,14 +384,17 @@ module.exports = (mn) => {
         v = camel ? toKebabCase(camel) : (
           (total = p.total) && (
             unit = '%',
-            num = toFixed(100 * parseFloat(num) / parseFloat(total))
+            num = toFixed(100 * floatNormalize(num, 1)
+              / floatNormalize(total, 1))
           ),
           v = num ? (num == '0' ? num : (num + unit)) : '100%',
-          (add = p.add) ? normalizeCalc(v, add) : v
+          (add = p.add) ? normalizeCalc(v, floatNormalize(add)) : v
         );
         for (propName in propMap) style[propName] = v; // eslint-disable-line
         return styleWrap(style, priority);
-      }, WIDTH_PATTERN, 1);
+      }, '^(([A-Z][A-Za-z]*):camel|' + PATTERN_DIGITS + ':num(/'
+        + PATTERN_DIGITS
+        + ':total?)?):value?([a-z%]+):unit?([-+]([0-9\\.])):add?$', 1);
     });
   });
 
@@ -473,7 +491,7 @@ module.exports = (mn) => {
           styleWrap(s, priority)
         )
         : normalizeDefault(p);
-    }, COLOR_PATTERN);
+    }, PATTERN_COLOR);
   });
 
   forIn({
@@ -519,14 +537,18 @@ module.exports = (mn) => {
     const z = p.z;
     return styleWrap({
       transform:
-        'translate(' + ((p.x || '0') + (p.xu || 'px')) + ','
-        + ((p.y || '0') + (p.yu || 'px')) + ')'
-        + (z ? (' translateZ(' + (z || '0') + (p.zu || 'px') + ')') : '')
-        + (scale ? (' scale(' + (0.01 * scale) + ')') : '')
-        + (angle ? (' rotate' + upperCase(p.dir)
-        + '(' + angle + (p.unit || 'deg') + ')') : ''),
+        'translate(' + (floatNormalize(p.x || '0') + (p.xu || 'px')) + ','
+        + (floatNormalize(p.y || '0') + (p.yu || 'px')) + ')'
+        + (z ? (' translateZ('
+          + floatNormalize(z || '0') + (p.zu || 'px') + ')') : '')
+        + (scale ? (' scale(' + (0.01 * floatNormalize(scale)) + ')') : '')
+        + (angle ? (' rotate' + toUpper(p.dir)
+        + '(' + floatNormalize(angle) + (p.unit || 'deg') + ')') : ''),
     }); // eslint-disable-next-line
-  }, '^(-?[0-9]+):x?(%):xu?([yY](-?[0-9]+):y(%):yu?)?([zZ](-?[0-9]+):z(%):zu?)?([sS]([0-9]+):s)?([rR](x|y|z):dir(-?[0-9]+):angle([a-z]+):unit?)?$');
+  }, '^' + PATTERN_DIGITS + ':x?(%):xu?([yY]' + PATTERN_DIGITS
+    + ':y(%):yu?)?([zZ]' + PATTERN_DIGITS
+    + ':z(%):zu?)?([sS]([0-9\\.]+):s)?([rR](x|y|z):dir'
+    + PATTERN_DIGITS + ':angle([a-z]+):unit?)?$');
 
   mn('spnr', (p, v) => {
     return isNaN(v = (v = p.value) ? parseInt(v) : 3000) || v < 1 ? 0 : (
@@ -541,7 +563,7 @@ module.exports = (mn) => {
   });
 
   forEach(['x', 'y', 'z'], (suffix) => {
-    const prefix = 'rotate' + upperCase(suffix) + '(';
+    const prefix = 'rotate' + toUpper(suffix) + '(';
     mn('r' + suffix, (p, v) => {
       return (v = p.value) ? styleWrap({
         transform: prefix + v + (p.unit || 'deg') + ')',
@@ -627,7 +649,7 @@ module.exports = (mn) => {
 
 
   forIn({'': 0, x: 1, y: 1}, (priority, suffix) => {
-    const propName = 'overflow' + upperCase(suffix);
+    const propName = 'overflow' + toUpper(suffix);
     const handle = synonymProvider(propName, {
       '': 'Hidden',
       V: 'Visible',
@@ -842,6 +864,7 @@ module.exports = (mn) => {
       M: 'Move',
       P: 'Pointer',
       T: 'Text',
+      N: 'None',
       NA: 'NotAllowed',
     }),
     jc: synonymProvider('justifyContent', {
@@ -1236,31 +1259,6 @@ module.exports = (mn) => {
         : 0;
     });
   });
-
-  /*
-  forIn({
-    '': 'width',
-    l: 'marginLeft',
-    r: 'marginRight',
-  }, (propName, suffix) => {
-    mn('col' + suffix, (p, style, add, v) => {
-      if (!p.suffix) return normalizeDefault(p, '12/12');
-      return p.camel || p.other ? 0 : {
-        exts: ['hmin1-i'],
-        style: (
-          v = toFixed(
-              100 * parseFloat(p.num || 12) / parseFloat(p.total || 12),
-          ) + '%',
-          style = {},
-          style[propName] = (add = p.add)
-            ? normalizeCalc(v, add)
-            : v,
-          style
-        ),
-      };
-    }, WIDTH_PATTERN, 1);
-  });
-  */
 
   mn('ratio', (p, add, v) => {
     return p.other ? 0 : (
