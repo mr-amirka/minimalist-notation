@@ -12,29 +12,114 @@ The advantage over the traditional technologies of CSS-preprocessing is that the
 The developer no longer needs to control which styles are used in his markup and which ones are not, for from now on the styles are generated dynamically only for what is present in the markup.
 
 
-### Example
+### Example 1
 
 Input:
 
 ```html
-<div class="f12 p10 mb10 f14:h cF00<.parent c0F0@mediaName sq40 bg0F0">...</div>
+<div class="ParentA">
+  <div
+    class="f12 p10 mb10 f14:h cF00<.ParentA c0F0@mediaName sq40 bg0F0 bg7F7.active"
+  >...</div>
+</div>
 ```
 
 Output:
 
 ```css
-@media mediaName{
-  .c0F0\@mediaName{color:rgb(0,255,0)}
+.p10 {
+  padding: 10px;
 }
-.f12{font-size:12px}
-.f14\:h:hover{font-size:14px}
-.parent .cF00\<\.parent{color:rgb(255,0,0)}
-.bg0F0{background:rgb(0,255,0)}
-.sq40{width:40px;height:40px}
-.p10{padding:10px}
-.mb10{margin-bottom:10px}
-
+.ParentA .cF00\<\.ParentA {
+  color: #f00;
+}
+.sq40 {
+  width: 40px;
+  height: 40px;
+}
+.bg0F0 {
+  background: #0f0;
+}
+.bg7F7\.active.active {
+  background: #7f7;
+}
+.f12 {
+  font-size: 12px;
+}
+.mb10 {
+  margin-bottom: 10px;
+}
+@media mediaName {
+  .c0F0\@mediaName {
+    color: #0f0;
+  }
+}
+@media (pointer: fine) and (hover: hover) {
+  .f14\:h:hover {
+    font-size: 14px;
+  }
+}
 ```
+
+### Example 2
+
+Input:
+
+```html
+<div class="ParentA">
+  <div class="ParentB ovyS">
+    <div
+      class="(c0F0|tdU):h@768-1024&mobile,-320 (sq50|bgF00.5)@d"
+    >...</div>
+    <div class="fw6<.ParentA<.ParentB>.Child1 fw7>.Child1">
+      <div class="Child1">...</div>
+    </div>
+  </div>
+</div>
+```
+
+Output:
+
+```css
+.ovyS {
+  -webkit-overflow-scrolling: touch;
+}
+.ovyS {
+  overflow-y: scroll;
+}
+.ParentB .ParentA .fw6\<\.ParentA\<\.ParentB\>\.Child1 .Child1 {
+  font-weight: 600;
+}
+.fw7\>\.Child1 .Child1 {
+  font-weight: 700;
+}
+@media (min-width: 768px) and (max-width: 1024px) and (pointer: fine) and (hover: hover) {
+  .mobile .\(c0F0\|tdU\)\:h\@768-1024\&mobile\,-320:hover {
+    color: #0f0;
+  }
+  .mobile .\(c0F0\|tdU\)\:h\@768-1024\&mobile\,-320:hover {
+    text-decoration: underline;
+  }
+}
+@media (max-width: 320px) and (pointer: fine) and (hover: hover) {
+  .\(c0F0\|tdU\)\:h\@768-1024\&mobile\,-320:hover {
+    color: #0f0;
+  }
+  .\(c0F0\|tdU\)\:h\@768-1024\&mobile\,-320:hover {
+    text-decoration: underline;
+  }
+}
+@media (min-width: 992px) {
+  .\(sq50\|bgF00\.5\)\@d {
+    width: 50px;
+    height: 50px;
+  }
+  .\(sq50\|bgF00\.5\)\@d {
+    background: rgba(255,0,0,0.50);
+  }
+}
+```
+
 
 
 * [CLI](#cli)  
@@ -256,7 +341,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.9.0.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.9.15.js" async></script>
 ```
 
 -------------------------
