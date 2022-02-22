@@ -344,7 +344,7 @@ We remember only the basic notation rules and interpretation rules for parameter
 
 
 We can add our own handler that generates essences of styles.
-Examples are in the repository https://github.com/mr-amirka/mn-presets.   
+Examples are in the repository https://github.com/mr-amirka/minimalist-notation/tree/master/presets.   
 
 
 For the runtime version of the library, I tried to make the parsing and CSS generation as optimal as possible:  
