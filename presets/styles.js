@@ -13,7 +13,6 @@ TODO:
 const regexpComma = /(?:\s*,\s*)+/;
 const regexpTrimSnakeLeft = /^_+/g;
 const regexpTrimKebabLeft = /^-+/g;
-const regexpSign = /([-+])/;
 const reZero =/^0+|\.?0+$/g;
 const regexpSpaceNormalize = /(\\_)|(_)/g;
 const regexpFilterName = /^([A-Za-z]+)([0-9]*)(.*)$/;
@@ -150,9 +149,7 @@ function floatNormalize(v, nosign) {
   return v;
 }
 
-function replacerSpaceNormalize(all, escaped) {
-  return escaped ? '_' : ' ';
-}
+
 function replacerSpaceNormalize(all, escaped) {
   return escaped ? '_' : ' ';
 }
@@ -160,7 +157,7 @@ function spaceNormalize(v) {
   return replace(v, regexpSpaceNormalize, replacerSpaceNormalize);
 }
 function replace(v, from, to) {
-  return v.replace(from, to);
+  return ('' + v).replace(from, to);
 }
 function snakeLeftTrim(v) {
   return replace(v, regexpTrimSnakeLeft, '');
@@ -190,7 +187,8 @@ function __wr(v) {
     );
 }
 function normalizeCalc(v, add) {
-  return 'calc(' + v + ' ' + replace(add, regexpSign, '$1 ') + 'px)';
+  return 'calc(' + v + (add < 0 ? '' : ' + ')
+    + replace(add, '-', ' - ') + 'px)';
 }
 
 module.exports = (mn) => {
@@ -394,7 +392,7 @@ module.exports = (mn) => {
         return styleWrap(style, priority);
       }, '^(([A-Z][A-Za-z]*):camel|' + PATTERN_DIGITS + ':num(/'
         + PATTERN_DIGITS
-        + ':total?)?):value?([a-z%]+):unit?([-+]([0-9\\.])):add?$', 1);
+        + ':total)?):value?([a-z%]+):unit?([-+][0-9\\.]*):add?$', 1);
     });
   });
 

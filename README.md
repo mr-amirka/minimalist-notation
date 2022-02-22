@@ -61,13 +61,14 @@ Output:
 }
 ```
 
+
 ### Example 2
 
 Input:
 
 ```html
-<div class="ParentA">
-  <div class="ParentB ovyS">
+<div class="ParentA w1/3 rlv h100vh mh5%+10">
+  <div class="ParentB abs s ovyS">
     <div
       class="(c0F0|tdU):h@768-1024&mobile,-320 (sq50|bgF00.5)@d"
     >...</div>
@@ -81,17 +82,39 @@ Input:
 Output:
 
 ```css
+.rlv {
+  position: relative;
+}
+.abs {
+  position: absolute;
+}
+.s {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
 .ovyS {
   -webkit-overflow-scrolling: touch;
 }
 .ovyS {
   overflow-y: scroll;
 }
+.w1\/3 {
+  width: 33.33%;
+}
+.h100vh {
+  height: 100vh;
+}
 .ParentB .ParentA .fw6\<\.ParentA\<\.ParentB\>\.Child1 .Child1 {
   font-weight: 600;
 }
 .fw7\>\.Child1 .Child1 {
   font-weight: 700;
+}
+.mh5\%\+10 {
+  margin-left: calc(5% + 10px);
+  margin-right: calc(5% + 10px);
 }
 @media (min-width: 768px) and (max-width: 1024px) and (pointer: fine) and (hover: hover) {
   .mobile .\(c0F0\|tdU\)\:h\@768-1024\&mobile\,-320:hover {
@@ -115,7 +138,7 @@ Output:
     height: 50px;
   }
   .\(sq50\|bgF00\.5\)\@d {
-    background: rgba(255,0,0,0.50);
+    background: rgba(255,0,0,.5);
   }
 }
 ```
@@ -341,7 +364,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.9.15.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.9.17.js" async></script>
 ```
 
 -------------------------
