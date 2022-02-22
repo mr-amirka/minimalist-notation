@@ -79,21 +79,21 @@ The essence of the approach is to define in each CSS class a minimal set of styl
 
 The idea of creating MN technology arose at a time when in the process of professional activity I got into the habit of writing CSS in approximately this way:  
 ```css
-.p10{
+.p10 {
   padding: 10px;
 }
-.pl10{
+.pl10 {
   padding-left: 10px;
 }
-.mh5{
+.mh5 {
   margin-left: 5px;
   margin-right: 5px;
 }
 @media (max-width: 768px){
-  .p10-xs{
+  .p10-xs {
     padding: 10px;
   }
-  .pr10-xs{
+  .pr10-xs {
     padding-right: 10px;
   }
 }
