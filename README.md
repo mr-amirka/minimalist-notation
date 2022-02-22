@@ -153,7 +153,7 @@ Output:
     * [Integrating "Minimalist Notation" into  React](#integrating-minimalist-notation-into-react)
 
 * [More documentation](https://github.com/mr-amirka/minimalist-notation/blob/master/docs.md)  
-* [Presets](https://github.com/mr-amirka/minimalist-notation/presets/blob/master/README.md)  
+* [Presets](https://github.com/mr-amirka/minimalist-notation/blob/master/presets/README.md)  
 * [From author](https://github.com/mr-amirka/minimalist-notation/blob/master/from-author.md)  
 
 
