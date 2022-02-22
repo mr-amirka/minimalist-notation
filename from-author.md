@@ -20,7 +20,7 @@ Using many CSS frameworks, for example, such as Twitter Bootstrap, We write html
 ```html
 <div style="text-align: center;">...</div>
 ```
-In practice, this approach is similar to the old “criminal” for some inline way of setting styles for elements. The difference is only in a slightly reduced form of writing and priority of styles.  
+In practice, this approach is similar to the old “criminal” inline way of setting styles for elements. The difference is only in a slightly reduced form of writing and priority of styles.  
 
 In fact, in such examples, using classes instead of inline styles makes little sense.  
 
