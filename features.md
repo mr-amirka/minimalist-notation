@@ -2,9 +2,98 @@
 
 
 
-For version 1.9.1 (2021-08-12):
+For version 1.10.0 (2022-02-24):
 
-- Added "synonymsWithMedia" instead of "states" to default presets.
+- Added "synonyms" instead of "states" to default presets.  
+
+
+- Improved media query notation.  
+  Example:  
+  ```html
+  <div class="sq100@320-768x200-600&iphone,firefox">
+    <div class="bgF:h@m f12@m cF00:h">A</div>
+  </div>
+  ```
+  ```css
+  .firefox .sq100\@320-768x200-600\&iphone\,firefox {
+    width: 100px;
+    height: 100px;
+  }
+  @media (min-width: 320px) and (max-width: 768px) and (min-height: 200px) and (max-height: 600px) {
+    .iphone .sq100\@320-768x200-600\&iphone\,firefox {
+      width: 100px;
+      height: 100px;
+    }
+  }
+  @media (max-width: 991.98px) and (pointer: fine) and (hover: hover) {
+    .bgF\:h\@m:hover {
+      background: #fff;
+    }
+  }
+  @media (max-width: 991.98px) {
+    .f12\@m {
+      font-size: 12px;
+    }
+  }
+  @media (pointer: fine) and (hover: hover) {
+    .cF00\:h:hover {
+      color: #f00;
+    }
+  }
+  ```
+
+
+- Support for CSS variables has been added to the notation.  
+  Example:  
+  https://jsfiddle.net/Amirka/327q8w9n/1/  
+  ```html
+  <div class="--a=\#F00">
+    <div class="sq100 bg--a,\#00F;p10-Fp80 bc--a bs b4">
+      A
+    </div>
+  </div>
+  <div class="--a=\#0F0 mt10">
+    <div class="sq100 bg--a,\#00F;p10-Fp80 bc--a bs b4">
+      B
+    </div>
+  </div>
+  <div class="--a=\#00F mt10">
+    <div class="sq100 bg--a,\#00F;p10-Fp80 bc--a bs b4">
+      C
+    </div>
+  </div>
+  ```
+  ```css
+  .--a\=\\\#F00 {
+    --a: #F00;
+  }
+  .sq100 {
+    width: 100px;
+    height: 100px;
+  }
+  .bg--a\,\\\#00F\;p10-Fp80 {
+    background: linear-gradient(180deg,var(--a,#00F) 10%,#fff 80%);
+  }
+  .b4 {
+    border-width: 4px;
+  }
+  .--a\=\\\#0F0 {
+    --a: #0F0;
+  }
+  .--a\=\\\#00F {
+    --a: #00F;
+  }
+  .bc--a {
+    border-color: var(--a);
+  }
+  .bs {
+    border-style: solid;
+  }
+  .mt10 {
+    margin-top: 10px;
+  }
+  ```
+
 
 
 

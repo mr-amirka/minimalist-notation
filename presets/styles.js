@@ -14,14 +14,16 @@ const regexpComma = /(?:\s*,\s*)+/;
 const regexpTrimSnakeLeft = /^_+/g;
 const regexpTrimKebabLeft = /^-+/g;
 const reZero =/^0+|\.?0+$/g;
-const regexpSpaceNormalize = /(\\_)|(_)/g;
 const regexpFilterName = /^([A-Za-z]+)([0-9]*)(.*)$/;
 const regexpFilterSep = /_+/;
 const regexpDots = /\./g;
 
+
+const CURRENT_COLOR = 'CurrentColor';
+
 const PATTERN_DIGITS = '(-?[0-9\\.]+)';
-const PATTERN_BASE_COLOR
-  = '([A-Z][a-z][A-Za-z]+):camel|([A-Fa-f0-9]+(\\.[0-9]+)?):color';
+// eslint-disable-next-line
+const PATTERN_BASE_COLOR = '([A-Z][a-z][A-Za-z]+):camel|([A-Fa-f0-9]+(\\.[0-9]+)?):color|(-?--[^;]+):var';
 const PATTERN_COLOR = '^(' + PATTERN_BASE_COLOR + '):value';
 
 const PATTERN_MARGIN = '^(([A-Z][A-Za-z]*):camel|([-+]):sign?'
@@ -149,13 +151,6 @@ function floatNormalize(v, nosign) {
   return v;
 }
 
-
-function replacerSpaceNormalize(all, escaped) {
-  return escaped ? '_' : ' ';
-}
-function spaceNormalize(v) {
-  return replace(v, regexpSpaceNormalize, replacerSpaceNormalize);
-}
 function replace(v, from, to) {
   return ('' + v).replace(from, to);
 }
@@ -213,6 +208,7 @@ module.exports = (mn) => {
     floatval,
     color: getColor,
     colorGetBackground,
+    spaceNormalize,
   } = utils;
 
   function toKebabCase(v) {
@@ -711,10 +707,18 @@ module.exports = (mn) => {
 
     olcI: 'olcInvert',
 
+    cCT: 'c' + CURRENT_COLOR,
+    stroke: 'stroke' + CURRENT_COLOR,
+    fill: 'fill' + CURRENT_COLOR,
+    olc: 'olc' + CURRENT_COLOR,
+    bgc: 'bgc' + CURRENT_COLOR,
+    temc: 'temc' + CURRENT_COLOR,
+    tdc: 'tdc' + CURRENT_COLOR,
+
     // background: (...)
     bg: (p, v) => {
       return !p.negative && ((v = p.suffix) ? styleWrap({
-        background: v === 'CT' ? 'currentColor' : colorGetBackground(v),
+        background: colorGetBackground(v),
       }) : normalizeDefault(p));
     },
 

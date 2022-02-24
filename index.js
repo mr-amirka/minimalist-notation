@@ -47,6 +47,15 @@ const {
 } = selectorsCompileProvider;
 const selectorNormalize = require('./selectorNormalize');
 const isInvalidSelector = require('./isInvalidSelector');
+const regexpSpaceNormalize = /(\\_)|(_)/g;
+
+function replacerSpaceNormalize(all, escaped) {
+  return escaped ? '_' : ' ';
+}
+function spaceNormalize(v) {
+  return v.replace(regexpSpaceNormalize, replacerSpaceNormalize);
+}
+
 
 const utils = minimalistNotationProvider.utils = merge([
   {
@@ -124,6 +133,7 @@ const utils = minimalistNotationProvider.utils = merge([
     scopeJoin: require('mn-utils/scopeJoin'),
     scopeSplit: require('mn-utils/scopeSplit'),
     slice: require('mn-utils/slice'),
+    spaceNormalize,
   },
   require('mn-utils/anyval'),
 ]);
@@ -151,6 +161,7 @@ const reSpace = /\s+/gim;
 const splitSpace = splitProvider(/\s+/);
 const splitSelector = splitProvider(/\s*,+\s*/);
 const splitAmp = splitProvider(/\s*&+\s*/);
+const regexpMatchVar = /^(--[^=]+)=(.*)$/;
 const regexpMatchName = /^([a-z]+)(.*)$/;
 const regexpMatchImportant = /^(.*)(-i)$/;
 const regexpMatchValue = /^((([A-Z][A-Za-z]*)|((-)?[0-9.]+))([a-z%]+)?)?(.*)?$/;
@@ -697,6 +708,13 @@ function minimalistNotationProvider(options) {
       value, matchs, ni, name, handle, essence, params, suffix, err,
   ) {
     try {
+      if (matchs = regexpMatchVar.exec(value)) {
+        params = {};
+        params[matchs[1]] = spaceNormalize(matchs[2]);
+        return {
+          style: params,
+        };
+      }
       return (matchs = regexpMatchName.exec(value)) && (
         name = matchs[1],
         (matchs = regexpMatchImportant.exec(suffix = matchs[2])) && (

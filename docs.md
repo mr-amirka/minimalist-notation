@@ -127,7 +127,7 @@ mn('bTheme', {
 
 PS: If it is necessary to set several alternative values for one attribute by analogy with this in CSS:
 ```css
-.theme-bg{
+.theme-bg {
   background-color: #CCC;
   background-color: rgba(0,0,0,0.2);
 }
@@ -353,7 +353,7 @@ In the process of applying the MN, there may be situations when you need to esca
 We will not get what we expect, since the dot is a service symbol.  
 ``` pt33.3%  ```  ->  
 ```css
-[m-n~='pt33.3%'].3%{padding-top:33px}
+[m-n~='pt33.3%'].3% {padding-top:33px}
 ```
 
 
@@ -364,7 +364,7 @@ If we want the dot to fall into the parameters of the essence, then we must esca
 Thus, we get the desired:  
 ``` pt33\.3% ``` ->  
 ```css
-[m-n~='pt33\\.3%']{padding-top:33.3%}
+[m-n~='pt33\\.3%'] {padding-top:33.3%}
 ```
 
 
@@ -508,12 +508,12 @@ Dynamic essences are set by setting of the generating function of essence option
 How style essences are created:  
 
 ```js
-// Статическая эссенция
+// Static Essence
 mn('btnTheme', {
-  //priority: 10, - можно задать приоритет эссенции
-  //exts: [ 'dn250' /*, ... */ ], - так можно наследовать свойства других эссенций, аналогично @extend в SASS
-  //include: [ 'dn250' /*, ... */ ], - так можно примешивать свойства других эссенций, аналогично @include в SASS
-  style: { //здесь указываем стили эссенции
+  // priority: 10, - Essence priority can be set
+  // exts: [ 'dn250' /*, ... */ ], - This way you can inherit the properties of other essences, similar to @extend in SASS
+  // include: [ 'dn250' /*, ... */ ], - So you can mix in the properties of other essences, similar to @include in SASS
+  style: { // Here we specify the styles of the essence
     fontSize: '16px',
     display: 'inline-block',
     borderRadius: '3px',
@@ -521,11 +521,11 @@ mn('btnTheme', {
     position: 'relative',
     cursor: 'pointer'
   },
-  childs: { //здесь мы можем добавлять определения для дочерних/вложенных элементов эссенции
-    inner: { // inner - это просто именованное значение дочернего элемента для навигации по вложенным элементам
-      selectors: [ ' .btn-inner' ], // здесь можно задать селекторы дочернего элемента
-      //priority: 10, - приоритет можно задать дочерним элементам эссенции
-      style: { //здесь указываем стили дочернего элемента эссенции
+  childs: { // This is where we can add definitions for child/nested elements of the essence
+    inner: { // inner - It's just a child element's named value for navigating nested elements
+      selectors: [ ' .btn-inner' ], // Here you can set child element selectors
+      // priority: 10, - Priority can be set to child elements of the essence
+      style: { // Here we specify the styles of the child element of the essence
         width: '200px',
         maxWidth: '100%',
         color: '#FFF',
@@ -537,9 +537,9 @@ mn('btnTheme', {
         borderWidth: '0px',
         borderBottomWidth: '3px'
       }
-      //,childs: { ... } - вложенностей может быть сколько угодно
+      //, childs: { ... } - Attachments can be as many as you like.
     }
-    //,other: { ... } - другой дочерний элемент
+    //, other: { ... } - Another child element
   },
   media: {
     print: {
@@ -547,7 +547,7 @@ mn('btnTheme', {
         display: none;
       }
     },
-    //sm ...
+    // sm ...
   }
 });
 ```
@@ -737,7 +737,7 @@ mn('x', p => {
 <div m-n="x10y5">...</div>
 ```
 ```css
-[m-n~='x10y5']{
+[m-n~='x10y5'] {
   -khtml-transform:translate(10px,5px);
   -ms-transform:translate(10px,5px);
   -o-transform:translate(10px,5px);
@@ -752,7 +752,7 @@ mn('x', p => {
 <div m-n="x12">...</div>
 ```
 ```css
-[m-n~='x12']{
+[m-n~='x12'] {
   -khtml-transform:translate(12px,0px);
   -ms-transform:translate(12px,0px);
   -o-transform:translate(12px,0px);
@@ -767,7 +767,7 @@ mn('x', p => {
 <div m-n="x0y20%">...</div>
 ```
 ```css
-[m-n~='x0y20%']{
+[m-n~='x0y20%'] {
   -khtml-transform:translate(0px,20%);
   -ms-transform:translate(0px,20%);
   -o-transform:translate(0px,20%);
@@ -782,7 +782,7 @@ mn('x', p => {
 <div m-n="x0y20">...</div>
 ```
 ```css
-[m-n~='x0y20']{
+[m-n~='x0y20'] {
   -khtml-transform:translate(0px,20px);
   -ms-transform:translate(0px,20px);
   -o-transform:translate(0px,20px);
@@ -797,7 +797,7 @@ mn('x', p => {
 <div m-n="x7%y20%">...</div>
 ```
 ```css
-[m-n~='x7%y20%']{
+[m-n~='x7%y20%'] {
   -khtml-transform:translate(7%,20%);
   -ms-transform:translate(7%,20%);
   -o-transform:translate(7%,20%);
@@ -812,7 +812,7 @@ mn('x', p => {
 <div m-n="x0y20s90">...</div>
 ```
 ```css
-[m-n~='x0y20s90']{
+[m-n~='x0y20s90'] {
   -webkit-transform:translate(0px,20px) scale(0.9);
   -moz-transform:translate(0px,20px) scale(0.9);
   -o-transform:translate(0px,20px) scale(0.9);
@@ -882,7 +882,7 @@ mn.utils.extend(mn.states, {
 
 Output:
 ```css
-[m-n~='x10:h']:hover{
+[m-n~='x10:h']:hover {
   -khtml-transform:translate(10px,0px);
   -ms-transform:translate(10px,0px);
   -o-transform:translate(10px,0px);
@@ -891,12 +891,12 @@ Output:
   transform:translate(10px,0px)
 }
 [m-n~='cF00:a']:active,
-[m-n~='cF00:a'].active{
+[m-n~='cF00:a'].active {
   color:rgba(255,0,0,1)
 }
 [m-n~='f16:(h|a)']:hover,
 [m-n~='f16:(h|a)']:active,
-[m-n~='f16:(h|a)'].active{
+[m-n~='f16:(h|a)'].active {
   font-size: 16px;
 }
 ```
@@ -904,10 +904,10 @@ Output:
 If you specify any other undeclared state, then it is displayed as it is:
 ```css
 f16:hz ->
-[m-n~='f16:hz']:hz{font-size: 16px;}
+[m-n~='f16:hz']:hz {font-size: 16px;}
 
 f16:hover ->
-[m-n~='f16:hover']:hover{font-size: 16px;}
+[m-n~='f16:hover']:hover {font-size: 16px;}
 ```
 
 
@@ -919,7 +919,7 @@ mn.states.n = [ ':nth-child' ];
 
 ```css
 f16:n[3n+2] ->
-[m-n~='f16:n[3n+2]']:nth-child(3n+2){font-size: 16px;}
+[m-n~='f16:n[3n+2]']:nth-child(3n+2) {font-size: 16px;}
 ```
 
 PS: Due to the fact that the parentheses are the service characters MN, necessary for grouping the substrings, square brackets are used instead.  
@@ -928,16 +928,16 @@ PS: Due to the fact that the parentheses are the service characters MN, necessar
 You can write down the pseudo-class of denial without problems in the notation:
 ```css
 f16:not[.active] ->
-[m-n~='f16:not[.active]']:not(.active){font-size: 16px;}
+[m-n~='f16:not[.active]']:not(.active) {font-size: 16px;}
 
 f16:not[[type=number]] ->
-[m-n~='f16:not[[type=number]]']:not([type=number]){font-size: 16px;}
+[m-n~='f16:not[[type=number]]']:not([type=number]) {font-size: 16px;}
 ```
 
 You can specify several states in the notation:
 ```css
 f16:(hover|active) ->
-[m-n~='f16:(hover|active)']:hover, [m-n~='f16:(hover|active)']:active{font-size: 16px;}
+[m-n~='f16:(hover|active)']:hover, [m-n~='f16:(hover|active)']:active {font-size: 16px;}
 ```
 
 
@@ -1082,7 +1082,7 @@ Output:
 [m-n~='cF00:a']:active{
   color:rgba(255,0,0,1)
 }
-a:hover [m-n~='x10<a:h']{
+a:hover [m-n~='x10<a:h'] {
   -khtml-transform:translate(10px,0px);
   -ms-transform:translate(10px,0px);
   -o-transform:translate(10px,0px);
@@ -1091,17 +1091,17 @@ a:hover [m-n~='x10<a:h']{
   transform:translate(10px,0px)
 }
 .parent1 [m-n~='c0F0:a<.parent1']:active,
-.parent1 [m-n~='c0F0:a<.parent1'].active{
+.parent1 [m-n~='c0F0:a<.parent1'].active {
   color:rgba(0,255,0,1)
 }
 .parent1[m-n~='c065:a<0.parent1']:active,
-.parent1[m-n~='c065:a<0.parent1'].active{
+.parent1[m-n~='c065:a<0.parent1'].active {
   color:rgba(0,102,85,1)
 }
-.parent2 .parent1 [m-n~='bg02<.parent1<.parent2']{
+.parent2 .parent1 [m-n~='bg02<.parent1<.parent2'] {
   background-color:rgba(0,0,0,0.13333333333333333)
 }
-.parent2:hover .parent1>*>*>[m-n~='bgD852<3.parent1<.parent2:h']{
+.parent2:hover .parent1>*>*>[m-n~='bgD852<3.parent1<.parent2:h'] {
   background-color:rgba(221,136,85,0.13333333333333333)
 }
 ```
@@ -1116,20 +1116,20 @@ Input:
 ```
 Output:
 ```css
-.anyClass>*>[m-n~='(sq50|bg0)<2.anyClass']{
+.anyClass>*>[m-n~='(sq50|bg0)<2.anyClass'] {
   background:rgba(0,0,0,1)
 }
-.anyClass>*>[m-n~='(sq50|bg0)<2.anyClass']{
+.anyClass>*>[m-n~='(sq50|bg0)<2.anyClass'] {
   width:50px;
   height:50px
 }
-[m-n~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
+[m-n~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem {
   background:rgba(0,0,255,0.5333333333333333)
 }
-[m-n~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
+[m-n~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem {
   height:5px
 }
-[m-n~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem{
+[m-n~='(w50|h5|bg00F8)>5.innerItem']>*>*>*>*>.innerItem {
   width:50px
 }
 ```
