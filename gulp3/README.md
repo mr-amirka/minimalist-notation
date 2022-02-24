@@ -24,7 +24,7 @@ gulp.task('build', function() {
         require('minimalist-notation/presets/medias'),
         require('minimalist-notation/presets/prefixes'),
         require('minimalist-notation/presets/styles'),
-        require('minimalist-notation/presets/states'),
+        require('minimalist-notation/presets/synonyms'),
         // require('minimalist-notation/presets/main'),
         // require('minimalist-notation/presets/normalize'), // normalize.css v8.0.1
         // require('./mn-my-preset'), // custom handlers
