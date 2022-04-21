@@ -4,6 +4,9 @@ const Path = require('path');
 const program = require('commander');
 const forIn = require('mn-utils/forIn');
 const isString = require('mn-utils/isString');
+const {
+  getRFC3339,
+} = require('mn-utils/formatTime');
 const pkg = require('../package.json');
 const {
   compileSource,
@@ -77,7 +80,7 @@ settings.each = (path, count, data) => {
   // console.log('MN parsed', count, 'in', path);
 };
 settings.onDone = () => {
-  console.log('MN: done ' + (new Date()));
+  console.log('MN: done ' + getRFC3339());
 };
 
 compileSource(settings);

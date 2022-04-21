@@ -11,19 +11,19 @@ npm install -g minimalist-notation
 
 #### For directory
 ```sh
-mn --compile ./src --output ./dist/styles.css
+mn --compile ./src --output ./dist/styles.css --watch
 ```
 
 
 #### For one file
 ```sh
-mn --compile ./index.html --output ./dist/styles.css
+mn --compile ./index.html --output ./dist/styles.css --watch
 ```
 
 
 ### Run with configuration
 ```sh
-mn --config ./mn-config.js
+mn --config ./mn-config.js --watch
 ```
 
 #### Configuration example

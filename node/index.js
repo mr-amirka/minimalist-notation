@@ -87,16 +87,17 @@ function compileSourceBase(path, commonOptions, entries) {
       for (path in sourcesMap) { // eslint-disable-line
         if (!isExclude(path)) {
           changed = 1;
-          attrData = sourcesMap[path];
-          for (attrKey in attrsMap) { // eslint-disable-line
-            attrName = attrsMap[attrKey];
-            dst = mergedData[attrName] || (mergedData[attrName] = {});
-            src = attrData[attrName];
-            for (name in src) { // eslint-disable-line
-              (dst[name] || (dst[name] = {
-                name,
-                count: 0,
-              })).count += src[name].count;
+          if (attrData = sourcesMap[path]) {
+            for (attrKey in attrsMap) { // eslint-disable-line
+              attrName = attrsMap[attrKey];
+              dst = mergedData[attrName] || (mergedData[attrName] = {});
+              src = attrData[attrName];
+              for (name in src) { // eslint-disable-line
+                (dst[name] || (dst[name] = {
+                  name,
+                  count: 0,
+                })).count += src[name].count;
+              }
             }
           }
         }

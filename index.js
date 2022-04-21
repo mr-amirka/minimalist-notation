@@ -82,6 +82,7 @@ const utils = minimalistNotationProvider.utils = merge([
     isLength: require('mn-utils/isLength'),
     isDefined,
     isEmpty,
+    indexOf: require('mn-utils/indexOf'),
     once: require('mn-utils/once'),
     delay: require('mn-utils/delay'),
     removeOf: require('mn-utils/removeOf'),
@@ -340,13 +341,10 @@ function minimalistNotationProvider(options) {
     const type = typeof(extendedEssence);
     type === FUNCTION
       ? (
-        $$handlerMap[essencePath] = paramsMatchPath
-          ? (
-            v = handlerWrap(extendedEssence, paramsMatchPath),
-            v.skip = skip || 0,
-            v
-          )
-          : extendedEssence
+        v = $$handlerMap[essencePath] = paramsMatchPath
+          ? handlerWrap(extendedEssence, paramsMatchPath)
+          : extendedEssence,
+        v.skip = skip || 0
       )
       : (
         type === OBJECT

@@ -8,6 +8,7 @@ module.exports = (mn) => {
   mn.synonyms({
     a: ':active',
     c: ':checked',
+    d: ':disabled',
     f: ':focus',
     h: ':hover@mouse',
     i: ':(:-webkit-input-|:-moz-|-ms-input-|:)placeholder',

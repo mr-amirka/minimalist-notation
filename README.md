@@ -159,8 +159,8 @@ Output:
 
 
 Try this tests:
-* https://jsfiddle.net/Amirka/vu761tb4/
-* https://jsfiddle.net/Amirka/36ey02f8/   
+* https://jsfiddle.net/Amirka/p15dzucn/  
+* https://jsfiddle.net/Amirka/v2rLq7j1/  
 
 
 Try check how this work with using MN Viewer:  
@@ -183,7 +183,12 @@ npm install -g minimalist-notation
 ```
 
 ```sh
-mn --compile ./src --output ./dist/styles.css
+mn --compile ./src --output ./dist/styles.css --watch
+```
+
+or
+```sh
+mn --config ./mn-config.js --watch
 ```
 
 [More about CLI](https://github.com/mr-amirka/minimalist-notation/blob/master/cli/README.md)
@@ -199,7 +204,9 @@ npm install minimalist-notation --save-dev
 
 Example:
 ```js
-const {MnPlugin} = require('minimalist-notation/webpack-loader');
+const {
+  MnPlugin,
+} = require('minimalist-notation/webpack-loader');
 
 module.exports = {
   /* ... */
@@ -364,7 +371,7 @@ Example:
     });
   })
 </script>
-<script src="https://minimalist-notation.org/dest/standalone-mn.1.10.0.js" async></script>
+<script src="https://minimalist-notation.org/dest/standalone-mn.1.11.0.js" async></script>
 ```
 
 -------------------------
