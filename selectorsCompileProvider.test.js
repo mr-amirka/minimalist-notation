@@ -14,32 +14,28 @@ describe('MN instance', () => {
     expect(parseClass(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'.cF00': 1},
-        '',
+        {'.cF00': ''},
       ],
     ]);
 
     expect(parseId(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'#cF00': 1},
-        '',
+        {'#cF00': ''},
       ],
     ]);
 
     expect(parseComboNameProvider('m')(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'[m~=\"cF00\"]': 1},
-        '',
+        {'[m~=\"cF00\"]': ''},
       ],
     ]);
 
     expect(parseComboNameProvider('m-n')(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'[m-n~=\"cF00\"]': 1},
-        '',
+        {'[m-n~=\"cF00\"]': ''},
       ],
     ]);
 
@@ -47,8 +43,7 @@ describe('MN instance', () => {
     expect(parseComboName(testNotation1, targetName)).toEqual([
       [
         {'cF00': 1},
-        {'.anyClass': 1},
-        '',
+        {'.anyClass': ''},
       ],
     ]);
   });
@@ -67,60 +62,52 @@ describe('MN instance', () => {
     expect(parseClass(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'.cF00\\>\\.anyChildClass .anyChildClass': 1},
-        '',
+        {'.cF00\\>\\.anyChildClass .anyChildClass': ''},
       ],
     ]);
     expect(parseClass(testNotation2)).toEqual([
       [
         {'ph10': 1},
-        {'.ph10\\>div div': 1},
-        '',
+        {'.ph10\\>div div': ''},
       ],
     ]);
 
     expect(parseId(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'#cF00\\>\\.anyChildClass .anyChildClass': 1},
-        '',
+        {'#cF00\\>\\.anyChildClass .anyChildClass': ''},
       ],
     ]);
     expect(parseId(testNotation2)).toEqual([
       [
         {'ph10': 1},
-        {'#ph10\\>div div': 1},
-        '',
+        {'#ph10\\>div div': ''},
       ],
     ]);
 
     expect(parseComboNameProvider('m')(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'[m~=\"cF00>.anyChildClass\"] .anyChildClass': 1},
-        '',
+        {'[m~=\"cF00>.anyChildClass\"] .anyChildClass': ''},
       ],
     ]);
     expect(parseComboNameProvider('m')(testNotation2)).toEqual([
       [
         {'ph10': 1},
-        {'[m~=\"ph10>div\"] div': 1},
-        '',
+        {'[m~=\"ph10>div\"] div': ''},
       ],
     ]);
 
     expect(parseComboNameProvider('m-n')(testNotation1)).toEqual([
       [
         {'cF00': 1},
-        {'[m-n~=\"cF00>.anyChildClass\"] .anyChildClass': 1},
-        '',
+        {'[m-n~=\"cF00>.anyChildClass\"] .anyChildClass': ''},
       ],
     ]);
     expect(parseComboNameProvider('m-n')(testNotation2)).toEqual([
       [
         {'ph10': 1},
-        {'[m-n~=\"ph10>div\"] div': 1},
-        '',
+        {'[m-n~=\"ph10>div\"] div': ''},
       ],
     ]);
 
@@ -128,15 +115,13 @@ describe('MN instance', () => {
     expect(parseComboName(testNotation1, targetName)).toEqual([
       [
         {'cF00': 1},
-        {'.anyClass .anyChildClass': 1},
-        '',
+        {'.anyClass .anyChildClass': ''},
       ],
     ]);
     expect(parseComboName(testNotation2, targetName)).toEqual([
       [
         {'ph10': 1},
-        {'.anyClass div': 1},
-        '',
+        {'.anyClass div': ''},
       ],
     ]);
   });
@@ -150,15 +135,13 @@ describe('MN instance', () => {
     expect(parseClass(testNotation1)).toEqual([
       [
         {'cF': 1},
-        {'.cF\\>1\\.anyChildClass>.anyChildClass': 1},
-        '',
+        {'.cF\\>1\\.anyChildClass>.anyChildClass': ''},
       ],
     ]);
     expect(parseComboName(testNotation1, 'targetSelector')).toEqual([
       [
         {'cF': 1},
-        {'targetSelector>.anyChildClass': 1},
-        '',
+        {'targetSelector>.anyChildClass': ''},
       ],
     ]);
 
@@ -166,15 +149,13 @@ describe('MN instance', () => {
     expect(parseClass(testNotation2)).toEqual([
       [
         {'bg0': 1},
-        {'.bg0\\>1div>div': 1},
-        '',
+        {'.bg0\\>1div>div': ''},
       ],
     ]);
     expect(parseComboName(testNotation2, 'targetSelector')).toEqual([
       [
         {'bg0': 1},
-        {'targetSelector>div': 1},
-        '',
+        {'targetSelector>div': ''},
       ],
     ]);
 
@@ -182,15 +163,13 @@ describe('MN instance', () => {
     expect(parseClass(testNotation3)).toEqual([
       [
         {'cF': 1},
-        {'.cF\\>3\\.anyChildClass>*>*>.anyChildClass': 1},
-        '',
+        {'.cF\\>3\\.anyChildClass>*>*>.anyChildClass': ''},
       ],
     ]);
     expect(parseComboName(testNotation3, 'targetSelector')).toEqual([
       [
         {'cF': 1},
-        {'targetSelector>*>*>.anyChildClass': 1},
-        '',
+        {'targetSelector>*>*>.anyChildClass': ''},
       ],
     ]);
 
@@ -198,15 +177,13 @@ describe('MN instance', () => {
     expect(parseClass(testNotation4)).toEqual([
       [
         {'bg0': 1},
-        {'.bg0\\>3div>*>*>div': 1},
-        '',
+        {'.bg0\\>3div>*>*>div': ''},
       ],
     ]);
     expect(parseComboName(testNotation4, 'targetSelector')).toEqual([
       [
         {'bg0': 1},
-        {'targetSelector>*>*>div': 1},
-        '',
+        {'targetSelector>*>*>div': ''},
       ],
     ]);
 
@@ -214,15 +191,13 @@ describe('MN instance', () => {
     expect(parseClass(testNotation5)).toEqual([
       [
         {'cF': 1},
-        {'.cF\\>1>*': 1},
-        '',
+        {'.cF\\>1>*': ''},
       ],
     ]);
     expect(parseComboName(testNotation5, 'targetSelector')).toEqual([
       [
         {'cF': 1},
-        {'targetSelector>*': 1},
-        '',
+        {'targetSelector>*': ''},
       ],
     ]);
 
@@ -230,15 +205,13 @@ describe('MN instance', () => {
     expect(parseClass(testNotation6)).toEqual([
       [
         {'bg0': 1},
-        {'.bg0\\>3>*>*>*': 1},
-        '',
+        {'.bg0\\>3>*>*>*': ''},
       ],
     ]);
     expect(parseComboName(testNotation6, 'targetSelector')).toEqual([
       [
         {'bg0': 1},
-        {'targetSelector>*>*>*': 1},
-        '',
+        {'targetSelector>*>*>*': ''},
       ],
     ]);
   });

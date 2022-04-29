@@ -6,10 +6,14 @@
 
 import {IFlagsMap} from "mn-utils/global";
 
+
+interface ISelectorToMedianameMap {
+  [name: string]: string;
+}
+
 type IEssenceOptions = [
   IFlagsMap,
-  IFlagsMap,
-  string
+  ISelectorToMedianameMap
 ];
 type parseMethod = (comboName: string) => IEssenceOptions[];
 

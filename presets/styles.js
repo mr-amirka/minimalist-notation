@@ -1200,9 +1200,16 @@ module.exports = (mn) => {
       VR: 'VerticalRl',
       VL: 'VerticalLr',
     }),
+    fxd: synonymProvider('flexDirection', {
+      C: 'Column',
+      CR: 'ColumnReverse',
+      R: 'Row',
+      RR: 'RowReverse',
+      U: 'Unset',
+    }, 1),
     font: (p, s) => {
-      return (s = p.s) && styleWrap({
-        font: fontNameNormalize(s),
+      return (s = p.suffix) && styleWrap({
+        font: spaceNormalize(s),
       });
     },
     ff: (p, s) => {
@@ -1267,7 +1274,6 @@ module.exports = (mn) => {
     gc: ['gridColumn', 1],
 
     fx: ['flex'],
-    fxd: ['flexDirection', 1],
     fxb: ['flexBasis', 1],
     fxf: ['flexFlow', 1],
     fxw: ['flexWrap', 1],
