@@ -9,8 +9,8 @@ module.exports = {
     'google',
   ],
   rules: {
-    "operator-linebreak": [ "error", "before" ],
-    "require-jsdoc": ["error", {
+    'operator-linebreak': ['error', 'before'],
+    'require-jsdoc': ['error', {
       require: {
         FunctionDeclaration: false,
         MethodDefinition: false,

@@ -375,11 +375,11 @@ function minimalistNotationProvider(options) {
   }
 
   function baseSetEssense(_essencePath, extendedEssence) {
-    var //eslint-disable-line
-      essencePath = _essencePath.split('.'),
-      essenceName = essencePath[0],
-      path = [essenceName],
-      i = 1, l = essencePath.length;
+    const essencePath = _essencePath.split('.');
+    const essenceName = essencePath[0];
+    const path = [essenceName];
+    const l = essencePath.length;
+    let i = 1;
     for (;i < l; i++) push(path, 'childs', essencePath[i]);
     baseSetEssenseBase(essenceName, path, extendedEssence);
     // for important
@@ -514,9 +514,22 @@ function minimalistNotationProvider(options) {
   function parseMediaExpression(mediaExpression) {
     if (!mediaExpression) return [[]];
 
-    let // eslint-disable-line
-      mediaPriority, priority, selector, query, partsAnd, iAnd, lAnd, fragment,
-      outputQuery, outputSelector, tmp, medias = [], name, names = [], queries = []; // eslint-disable-line
+    let mediaPriority;
+    let priority;
+    let selector;
+    let query;
+    let partsAnd;
+    let iAnd;
+    let lAnd;
+    let fragment;
+    let outputQuery;
+    let outputSelector;
+    let tmp;
+    let name;
+    let media;
+    const medias = [];
+    const names = [];
+    const queries = [];
 
     // get media priority
     if (tmp = regexpMediaPriority.exec(mediaExpression)) {
@@ -590,13 +603,24 @@ function minimalistNotationProvider(options) {
   mn.parseMediaExpression = parseMediaExpression;
 
   function generate(context, mediaExpression) {
-    // eslint-disable-next-line
-    let
-      medias = parseMediaExpression(mediaExpression), lMedia = medias.length, // eslint-disable-line
-      iMedia = 0, media, mediaPriority, mediaQuery, essenceName, updated = {}, // eslint-disable-line
-      contextEssence, cssText, output, globalSelectorPrefixes = $$selectorPrefixes, // eslint-disable-line
-      lGSP = globalSelectorPrefixes.length, selectorPrefixes, selectorsIteratee, // eslint-disable-line
-      isContinue;
+    const medias = parseMediaExpression(mediaExpression);
+    const lMedia = medias.length;
+    const updated = {};
+    const globalSelectorPrefixes = $$selectorPrefixes;
+    const lGSP = globalSelectorPrefixes.length;
+    let iMedia = 0;
+    let media;
+    let mediaPriority;
+    let mediaQuery;
+    let essenceName;
+    let contextEssence;
+    let cssText;
+    let output;
+    let selectorPrefixes;
+    let selectorsIteratee;
+    let isContinue;
+    let mediaName;
+    let mediaSelector;
 
     for (; iMedia < lMedia; iMedia++) {
       isContinue = 1;
@@ -658,10 +682,20 @@ function minimalistNotationProvider(options) {
       assigned, comboNames, selectors, defaultMediaName, excludes,
   ) {
     defaultMediaName = defaultMediaName || 'all';
-    // eslint-disable-next-line
-    let
-      name, selector, l, i, items, essenceName, item, selectorsMedias,
-      essencesNames, childSelectors, childSelector, mediaName, actx;
+    let name;
+    let selector;
+    let l;
+    let i;
+    let items;
+    let essenceName;
+    let item;
+    let selectorsMedias;
+    let essencesNames;
+    let childSelectors;
+    let childSelector;
+    let mediaName;
+    let actx;
+
     for (name in comboNames) { // eslint-disable-line
       for (selector in selectors) { // eslint-disable-line
         for (
@@ -847,15 +881,23 @@ function minimalistNotationProvider(options) {
           childs[childName],
       );
     }
-    const {childs, media, exts} = essence;
+    const {
+      childs,
+      media,
+      exts,
+    } = essence;
     childs && __childsHandle(childs, '.');
     media && __childsHandle(media, '@');
     exts && __assignCore($$assigned, exts, selectors, mediaName, excludes);
     return essence;
   }
   function updateSelectorIteratee(item) {
-    // eslint-disable-next-line
-    let essenceName, mediaName, selectors, essences = item[0], selectorsMedias = selectorsValidateFilter(item[1]);
+    let selector;
+    let essenceName;
+    let mediaName;
+    let selectors;
+    const essences = item[0];
+    const selectorsMedias = selectorsValidateFilter(item[1]);
     for (selector in selectorsMedias) { // eslint-disable-line
       mediaName = selectorsMedias[selector];
       selectors = {};

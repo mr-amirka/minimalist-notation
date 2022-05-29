@@ -50,11 +50,7 @@ __exports.defaultPluginSettings = {
     require('../presets/prefixes'),
     require('../presets/styles'),
     require('../presets/medias'),
-
-    // require('../presets/states'),
     require('../presets/synonyms'),
-
-    // require('../presets/main'),
   ],
   onError(e) {
     console.error(e);
