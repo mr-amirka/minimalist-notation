@@ -22,7 +22,7 @@ const PATTERN_DIGITS = '(-?[0-9\\.]+)';
 const PATTERN_BASE_COLOR = '([A-Z][a-z][A-Za-z]+):camel|([A-Fa-f0-9]+(\\.[0-9]+)?):color|(-?--[^;]+):vv';
 const PATTERN_COLOR = '^(' + PATTERN_BASE_COLOR + '):value';
 
-const PATTERN_VAL = '^(((([A-Z][A-Za-z]*):camel|([-]):sign?'
+const PATTERN_VAL = '^(((([A-Za-z]+):otherName|([-]):sign?'
   + PATTERN_DIGITS + ':num(/' + PATTERN_DIGITS
   + ':total?)?):value([a-z%]+):unit?)|'
   + PATTERN_VAR + '):vl(([-+]):sa(([0-9\\.]+):addv([a-z%]+):addu?|'
@@ -61,6 +61,10 @@ const SIDES_MAP = {
   rt: [TOP, RIGHT],
   lb: [BOTTOM, LEFT],
   rb: [BOTTOM, RIGHT],
+};
+const COLOR_SYNONYMS = {
+  CT: 'CurrentColor',
+  T: 'Transparent',
 };
 const borderStyleSynonyms = {
   N: 'None',
@@ -221,7 +225,7 @@ module.exports = (mn) => {
     if (!unit || indexOf(UNITS, unit) > -1) return unit;
     throwInvalid('Unit "' + unit + '" is invalid');
   }
-  function getVal(suffix, positive, one, defaultUnit, noCamel) {
+  function getVal(suffix, positive, one, defaultUnit, noOtherName, symonyms) {
     defaultUnit = defaultUnit || 'px';
     const parts = ('' + suffix).split('_');
     const l = parts.length;
@@ -229,7 +233,7 @@ module.exports = (mn) => {
     l > 4 && throwInvalid('There should not be more than 4 parameters');
     const output = new Array(l);
     let i = 0;
-    let camel;
+    let otherName;
     let add;
     let total;
     let vv;
@@ -240,9 +244,9 @@ module.exports = (mn) => {
     let sa;
     for (; i < l; i++) {
       parseVals(parts[i], p = {});
-      if (camel = p.camel) {
-        noCamel && throwInvalid();
-        output[i] = toKebabCase(camel);
+      if (otherName = p.otherName) {
+        noOtherName && throwInvalid();
+        output[i] = toKebabCase(symonyms && symonyms[otherName] || otherName);
         continue;
       }
       p.vl || throwInvalid();
@@ -339,12 +343,12 @@ module.exports = (mn) => {
     }
 
     function handleProvider(sidesSet, nosign, one) {
-      return (p, suffix) => {
+      return (p, suffix, synonym) => {
         return (suffix = p.suffix) ? (
-          suffix === 'A'
-            ? normalizeDefault(p, 'Auto')
+          (synonym = sizeSynonyms[suffix])
+            ? normalizeDefault(p, synonym)
             : styleWrap(
-                sidesSet(getVal(suffix, nosign, one, 'px')),
+                sidesSet(getVal(suffix, nosign, one, 'px', 0, sizeSynonyms)),
                 priority,
             )
         ) : normalizeDefault(p, 0);
@@ -386,14 +390,14 @@ module.exports = (mn) => {
             : normalizeDefault(p, 'Solid')
         );
     });
-    mn('bc' + suffix, (p, v) => {
-      return (v = p.value)
-        ? styleWrap(bcSidesSet(
-          p.suffix === 'CT'
-            ? 'currentColor'
-            : getColor(v || '0'),
-        ), priority + 1)
-        : normalizeDefault(p);
+    mn('bc' + suffix, (p, v, suffix, synonym) => {
+      return (synonym = COLOR_SYNONYMS[suffix = p.suffix || 'CT'])
+        ? normalizeDefault(p, synonym)
+        : (
+          (v = p.value)
+            ? styleWrap(bcSidesSet(getColor(v)), priority + 1)
+            : normalizeDefault(p)
+        );
     }, PATTERN_COLOR, 1);
     mn('bi' + suffix, (p, s) => {
       return styleWrap(biSidesSet(
@@ -423,7 +427,7 @@ module.exports = (mn) => {
         if (!suffix) return normalizeDefault(p, '100%');
         const synonym = sizeSynonyms[suffix];
         if (synonym) return normalizeDefault(p, synonym);
-        const value = getVal(suffix, 1, 1, 'px');
+        const value = getVal(suffix, 1, 1, 'px', 0, sizeSynonyms);
         const style = {};
         let propName;
         for (propName in propMap) style[propName] = value; // eslint-disable-line
@@ -515,9 +519,9 @@ module.exports = (mn) => {
   }, (options, pfx) => {
     const propName = options[0];
     const priority = options[1] || 0;
-    mn(pfx, (p, s, suffix, v) => {
-      return !(suffix = p.suffix) || suffix == 'CT'
-        ? normalizeDefault(p, 'CurrentColor')
+    mn(pfx, (p, s, suffix, v, synonym) => {
+      return (synonym = COLOR_SYNONYMS[suffix = p.suffix || 'CT'])
+        ? normalizeDefault(p, synonym)
         : (
           v = p.value,
           v || throwInvalid(),
@@ -684,7 +688,8 @@ module.exports = (mn) => {
         ? normalizeDefault(p, synonym)
         : (
           style = {},
-          style[propName] = getVal(suffix || defaultValue, 1, one, 'px'),
+          style[propName] = getVal(suffix || defaultValue,
+              1, one, 'px', 0, synonyms),
           styleWrap(style, priority)
         );
     });
