@@ -644,6 +644,13 @@ module.exports = (mn) => {
   });
 
 
+  mn('r', (p) => {
+    return styleWrap({
+      borderRadius: getVal(p.suffix || 10000, 1, 0, 'px', 1),
+    }, 2);
+  }, 0, 1);
+
+
   // border-radius by sides
   forIn({
     lt: 'top-left',
@@ -659,11 +666,11 @@ module.exports = (mn) => {
     }, 0, 1);
   });
 
+
   forIn({
     f: ['fontSize', '', 1, 1, {
       I: 'Inherit',
     }],
-    r: ['borderRadius', 10000],
     sw: ['strokeWidth', 0],
     olw: ['outlineWidth', 0, 1],
     gg: ['gridGap', 0, 1, 0, {
