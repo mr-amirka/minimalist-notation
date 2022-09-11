@@ -225,7 +225,15 @@ module.exports = (mn) => {
     if (!unit || indexOf(UNITS, unit) > -1) return unit;
     throwInvalid('Unit "' + unit + '" is invalid');
   }
-  function getVal(suffix, positive, one, defaultUnit, noOtherName, symonyms) {
+  function getVal(
+      suffix,
+      positive,
+      one,
+      defaultUnit,
+      noOtherName,
+      symonyms,
+      seprarator,
+  ) {
     defaultUnit = defaultUnit || 'px';
     const parts = ('' + suffix).split('_');
     const l = parts.length;
@@ -279,7 +287,10 @@ module.exports = (mn) => {
               + validateUnit(p.addu || defaultUnit)),
       ) : val;
     }
-    return output.join(' ');
+    return [
+      output.join(seprarator || ' '),
+      l - 1,
+    ];
   }
 
   function toKebabCase(v) {
@@ -344,14 +355,14 @@ module.exports = (mn) => {
 
     function handleProvider(sidesSet, nosign, one) {
       return (p, suffix, synonym) => {
-        return (suffix = p.suffix) ? (
-          (synonym = sizeSynonyms[suffix])
-            ? normalizeDefault(p, synonym)
-            : styleWrap(
-                sidesSet(getVal(suffix, nosign, one, 'px', 0, sizeSynonyms)),
-                priority,
-            )
-        ) : normalizeDefault(p, 0);
+        if (!(suffix = p.suffix)) {
+          return normalizeDefault(p, 0);
+        }
+        if (synonym = sizeSynonyms[suffix]) {
+          return normalizeDefault(p, synonym);
+        }
+        const v = getVal(suffix, nosign, one, 'px', 0, sizeSynonyms);
+        return styleWrap(sidesSet(v[0]), priority + v[1]);
       };
     }
 
@@ -427,11 +438,12 @@ module.exports = (mn) => {
         if (!suffix) return normalizeDefault(p, '100%');
         const synonym = sizeSynonyms[suffix];
         if (synonym) return normalizeDefault(p, synonym);
-        const value = getVal(suffix, 1, 1, 'px', 0, sizeSynonyms);
+        const v = getVal(suffix, 1, 1, 'px', 0, sizeSynonyms);
+        const [value] = v;
         const style = {};
         let propName;
         for (propName in propMap) style[propName] = value; // eslint-disable-line
-        return styleWrap(style, priority);
+        return styleWrap(style, priority + v[1]);
       }, 0, 1);
     });
   });
@@ -645,9 +657,10 @@ module.exports = (mn) => {
 
 
   mn('r', (p) => {
+    const v = getVal(p.suffix || 10000, 1, 0, 'px', 1);
     return styleWrap({
-      borderRadius: getVal(p.suffix || 10000, 1, 0, 'px', 1),
-    }, 2);
+      borderRadius: v[0],
+    }, v[1]);
   }, 0, 1);
 
 
@@ -659,9 +672,9 @@ module.exports = (mn) => {
     rb: 'bottom-right',
   }, (side, suffix) => {
     const propName = 'border-' + side + '-radius';
-    mn('r' + suffix, (p, style) => {
-      style = {};
-      style[propName] = getVal(p.suffix || 10000, 1, 1, 'px', 1);
+    mn('r' + suffix, (p) => {
+      const style = {};
+      style[propName] = getVal(p.suffix || 10000, 1, 1, 'px', 1)[0];
       return styleWrap(style, 2);
     }, 0, 1);
   });
@@ -690,14 +703,15 @@ module.exports = (mn) => {
     const priority = options[2] || 0;
     const one = options[3];
     const synonyms = options[4] || {};
-    mn(pfx, (p, style, suffix, synonym) => {
+    mn(pfx, (p, style, suffix, synonym, v) => {
       return (synonym = synonyms[suffix = p.suffix])
         ? normalizeDefault(p, synonym)
         : (
-          style = {},
-          style[propName] = getVal(suffix || defaultValue,
+          v = getVal(suffix || defaultValue,
               1, one, 'px', 0, synonyms),
-          styleWrap(style, priority)
+          style = {},
+          style[propName] = v[0],
+          styleWrap(style, priority + v[1])
         );
     });
   }, 0, 1);
@@ -846,6 +860,16 @@ module.exports = (mn) => {
           : ((num = p.num) == '0' ? num : (num + (p.unit || 'px'))),
       }) : normalizeDefault(p));
     },
+
+    of: synonymProvider('objectFit', {
+      '': 'Cover',
+      F: 'Fill',
+      CT: 'Contain',
+      CV: 'Cover',
+      N: 'None',
+      SD: 'ScaleDown',
+    }),
+
     d: synonymProvider('display', {
       '': 'Block',
       B: 'Block',
