@@ -1,4 +1,4 @@
-const Emitter = require('mn-utils/Emitter');
+const Observable = require('mn-utils/Observable');
 const extend = require('mn-utils/extend');
 const isPlainObject = require('mn-utils/isPlainObject');
 const isObject = require('mn-utils/isObject');
@@ -59,7 +59,7 @@ function spaceNormalize(v) {
 
 const utils = minimalistNotationProvider.utils = merge([
   {
-    Emitter: Emitter,
+    Observable: Observable,
     color,
     colorGetBackground,
     half: require('mn-utils/half'),
@@ -132,7 +132,7 @@ const utils = minimalistNotationProvider.utils = merge([
     kebabToCamelCase: require('mn-utils/kebabToCamelCase'),
     defer: require('mn-utils/defer'),
     scopeJoin: require('mn-utils/scopeJoin'),
-    scopeSplit: require('mn-utils/scopeSplit'),
+    scopeSplit: require('mn-utils/scopeSplit2'),
     slice: require('mn-utils/slice'),
     spaceNormalize,
   },
@@ -464,8 +464,8 @@ function minimalistNotationProvider(options) {
   const $$compilers = $$data.compilers = {};
   const cssPropertiesStringify = mn.propertiesStringify
     = cssPropertiesStringifyProvider();
-  const emit = (mn.emitter = new Emitter([])).emit;
-  const error$ = mn.error$ = new Emitter();
+  const emit = (mn.styles$ = new Observable([])).emit;
+  const error$ = mn.error$ = new Observable();
   const emitError = error$.emit;
   let $$onError = noop;
   let $$updated;

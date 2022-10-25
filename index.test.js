@@ -18,13 +18,13 @@ describe('MN instance', () => {
     const check = mn.getCompiler('class');
     mn('p', paddingHandle);
 
-    expect(mn.emitter.getValue()).toEqual([]);
+    expect(mn.styles$.getValue()).toEqual([]);
 
     check('p10');
-    expect(mn.emitter.getValue()).toEqual([]);
+    expect(mn.styles$.getValue()).toEqual([]);
 
     let outputMediaItem;
-    mn.emitter.on((styles) => {
+    mn.styles$.on((styles) => {
       outputMediaItem = cloneDepth(styles[0], CLONE_DEPTH);
     });
     mn.compile();
@@ -34,7 +34,7 @@ describe('MN instance', () => {
       priority: -2000,
       revision: 1,
     });
-    expect(mn.emitter.getValue()).toEqual([
+    expect(mn.styles$.getValue()).toEqual([
       {
         content: '.p10{padding:10px}',
         name: 'media.all',
@@ -44,7 +44,7 @@ describe('MN instance', () => {
     ]);
 
     check('p25');
-    expect(mn.emitter.getValue()).toEqual([
+    expect(mn.styles$.getValue()).toEqual([
       {
         content: '.p10{padding:10px}',
         name: 'media.all',
@@ -53,7 +53,7 @@ describe('MN instance', () => {
       },
     ]);
     mn.compile();
-    expect(mn.emitter.getValue()).toEqual([
+    expect(mn.styles$.getValue()).toEqual([
       {
         content: '.p10{padding:10px}.p25{padding:25px}',
         name: 'media.all',
@@ -69,13 +69,13 @@ describe('MN instance', () => {
     const check = mn.getCompiler('m');
     mn('p', paddingHandle);
 
-    expect(mn.emitter.getValue()).toEqual([]);
+    expect(mn.styles$.getValue()).toEqual([]);
 
     check('p15');
-    expect(mn.emitter.getValue()).toEqual([]);
+    expect(mn.styles$.getValue()).toEqual([]);
 
     let outputMediaItem; // eslint-disable-line
-    mn.emitter.on((styles) => {
+    mn.styles$.on((styles) => {
       outputMediaItem = cloneDepth(styles[0], CLONE_DEPTH);
     });
     mn.compile();
@@ -87,7 +87,7 @@ describe('MN instance', () => {
       updated: 1,
     });
     */
-    expect(mn.emitter.getValue()).toEqual([
+    expect(mn.styles$.getValue()).toEqual([
       {
         content: '[m~=\"p15\"]{padding:15px}',
         name: 'media.all',
@@ -98,7 +98,7 @@ describe('MN instance', () => {
 
 
     check('p20');
-    expect(mn.emitter.getValue()).toEqual([
+    expect(mn.styles$.getValue()).toEqual([
       {
         content: '[m~=\"p15\"]{padding:15px}',
         name: 'media.all',
@@ -107,7 +107,7 @@ describe('MN instance', () => {
       },
     ]);
     mn.compile();
-    expect(mn.emitter.getValue()).toEqual([
+    expect(mn.styles$.getValue()).toEqual([
       {
         content: '[m~=\"p15\"]{padding:15px}[m~=\"p20\"]{padding:20px}',
         name: 'media.all',

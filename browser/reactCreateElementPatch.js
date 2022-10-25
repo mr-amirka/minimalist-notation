@@ -24,7 +24,9 @@ const forIn = require('mn-utils/forIn');
 module.exports = function patchCreateElement(
     createElement, attrs, mn, hasDefer,
 ) {
-  const {getCompiler} = mn;
+  const {
+    getCompiler,
+  } = mn;
   const compile = hasDefer ? mn.deferCompile : mn.compile;
   const handlers = {};
   isArray(attrs)

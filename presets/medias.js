@@ -65,6 +65,7 @@ module.exports = (mn) => {
     // if has mouse, touch pad, advanced stylus digitizers
     ['mouse', '(pointer: fine) and (hover: hover)'],
 
+    ['dark', '(prefers-color-scheme: dark)'],
   ], (v, i) => {
     media[v[0]] = {query: v[1], priority: i};
   });
@@ -72,6 +73,7 @@ module.exports = (mn) => {
 
   // user agents
   forEach([
+    'iframe',
     'linux', 'mozilla', 'firefox', 'opera', 'trident', 'edge', 'touch',
     'multitouch', 'orientation',
     'chrome', 'ubuntu', 'chromium', 'safari', 'msie', 'webkit', 'applewebkit',

@@ -3,7 +3,7 @@
  * @author Amir Absalyamov <mr.amirka@ya.ru>
  */
 
-import {Emitter} from "mn-utils/Emitter/emitter";
+import {Observable} from "mn-utils/Observable";
 import {ICssPropertiesStringify, ICssProps, IFlagsMap, fn} from "mn-utils/global";
 import {selectorsCompile} from "./selectorsCompileProvider";
 
@@ -74,8 +74,8 @@ export interface IMinimalistNotation extends selectorsCompile {
   set: IMinimalistNotation;
   setStyle: (name: string, content: string, priority?: number) => IMinimalistNotation;
   setPresets: (presets: IMNPreset[]) => IMinimalistNotation;
-  emitter: Emitter<IStyle[]>;
-  error$: Emitter<Error>;
+  emitter: Observable<IStyle[]>;
+  error$: Observable<Error>;
   utils: any;
 }
 export interface IHandlerMap {

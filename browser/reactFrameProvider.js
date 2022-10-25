@@ -50,8 +50,15 @@ const invoke = require('mn-utils/invoke');
  */
 
 module.exports = (env) => {
-  const {createElement, mn, Frame} = env;
-  const {on, getValue} = mn.emitter;
+  const {
+    createElement,
+    mn,
+    Frame,
+  } = env;
+  const {
+    on,
+    getValue,
+  } = mn.styles$;
   return (props) => createElement(Frame, extend(extend({}, props), {
     onMount: function(win, doc) {
       const stylesRender = stylesRenderProvider(doc, 'mn.');
