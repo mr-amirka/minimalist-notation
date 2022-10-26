@@ -345,7 +345,7 @@ const stylesRenderProvider = require('mn-utils/stylesRenderProvider');
 const styleTagIdPrefix = 'mn.';
 const stylesRender = stylesRenderProvider(document, styleTagIdPrefix);
 
-mn.emitter.on(stylesRender);
+mn.styles$.on(stylesRender);
 
 onDocumentReady(() => {
   mn.getCompiler('class').recursiveCheck(document);
@@ -404,7 +404,7 @@ const stylesRenderProvider = require('mn-utils/stylesRenderProvider');
 const styleTagIdPrefix = 'mn.';
 const stylesRender = stylesRenderProvider(document, styleTagIdPrefix);
 
-mn.emitter.on(stylesRender);
+mn.styles$.on(stylesRender);
 
 React.createElement = reactCreateElementPatch(React.createElement, {
   className: 'class',
