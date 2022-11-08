@@ -4,14 +4,15 @@ const scanPath = require('mn-utils/node/scanPath');
 const finallyAll = require('mn-utils/finallyAll');
 const noop = require('mn-utils/noop');
 
-const regexpNormalize = /\\/gim;
 
 function scanPathWatch(options) {
-  scanPath(options).then(() => {
+  return scanPath(options).then(() => {
+    const _each = options.each || noop;
+    const _exclude = options.exclude || noop;
     fsWatch(options.path, {
       recursive: true,
     }, (e, p) => {
-      exclude(p.replace(regexpNormalize, '/')) || each(e, p);
+      _exclude(p) || _each(e, p);
     });
   });
 }
