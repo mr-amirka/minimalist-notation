@@ -19,6 +19,8 @@ const routeParseProvider = require('mn-utils/routeParseProvider');
 const forIn = require('mn-utils/forIn');
 const forEach = require('mn-utils/forEach');
 const reduce = require('mn-utils/reduce');
+const reduceIn = require('mn-utils/reduceIn');
+const reduceEach = require('mn-utils/reduceEach');
 const cssPropertiesStringifyProvider
   = require('mn-utils/cssPropertiesStringifyProvider');
 const cssPropertiesParse = require('mn-utils/cssPropertiesParseSimple');
@@ -30,6 +32,8 @@ const joinComma = require('mn-utils/joinComma');
 const withDefer = require('mn-utils/withDefer');
 const withResult = require('mn-utils/withResult');
 const map = require('mn-utils/map');
+const mapIn = require('mn-utils/mapIn');
+const mapEach = require('mn-utils/mapEach');
 const trim = require('mn-utils/trim');
 const __values = require('mn-utils/values');
 const merge = require('mn-utils/merge');
@@ -102,6 +106,8 @@ const utils = minimalistNotationProvider.utils = merge([
     forIn,
     forEach,
     reduce,
+    reduceIn,
+    reduceEach,
     filter,
     cssPropertiesStringifyProvider,
     cssPropertiesParse,
@@ -114,6 +120,8 @@ const utils = minimalistNotationProvider.utils = merge([
     withDefer,
     withResult,
     map,
+    mapIn,
+    mapEach,
     values: __values,
     keys,
     escapedSplitProvider: require('mn-utils/escapedSplitProvider'),
@@ -177,7 +185,8 @@ const normalizeComboNames = normalizeMapProvider((namesMap, name) => {
 });
 function normalizeSelectorsIteratee(selectorsMap, selector) {
   forEach(splitSelector(trim(selector).replace(reSpace, ' ')), (selector) => {
-    selector && flags(map(variants(selector), selectorNormalize), selectorsMap);
+    selector
+      && flags(mapEach(variants(selector), selectorNormalize), selectorsMap);
   });
   return selectorsMap;
 }
@@ -203,7 +212,7 @@ function parseMediaPart(mediaPart, parts, v) {
 }
 function handlerWrap(essenceHandler, paramsMatchPath) {
   const parse = isArray(paramsMatchPath)
-    ? aggregate(map(paramsMatchPath, routeParseProvider), eachApply)
+    ? aggregate(mapEach(paramsMatchPath, routeParseProvider), eachApply)
     : routeParseProvider(paramsMatchPath);
   return (p) => {
     parse(p.suffix, p);
@@ -230,12 +239,12 @@ function __normalize(essence) {
   essence.selectors = selectors ? normalizeSelectors(selectors) : {'': 1};
   exts && (
     essence.exts = important
-      ? reduce(normalizeComboNames(exts), iterateeCheckImportant, {})
+      ? reduceIn(normalizeComboNames(exts), iterateeCheckImportant, {})
       : normalizeComboNames(exts)
   );
   include && (
     essence.include = important
-      ? map(normalizeInclude(include), __iterateeCheckImportant)
+      ? mapEach(normalizeInclude(include), __iterateeCheckImportant)
       : normalizeInclude(include)
   );
   childAddNormalize(essence.childs);
@@ -244,7 +253,7 @@ function __normalize(essence) {
 }
 function normalizeMapProvider(iteratee) {
   return (names) => isObject(names)
-    ? reduce(isArray(names) ? names : keys(names), iteratee, {})
+    ? reduceEach(isArray(names) ? names : keys(names), iteratee, {})
     : iteratee({}, names);
 }
 function normalizeIncludeIteratee(names, name) {
@@ -252,7 +261,7 @@ function normalizeIncludeIteratee(names, name) {
 }
 function normalizeInclude(names) {
   return isArray(names)
-    ? reduce(names, normalizeIncludeIteratee, [])
+    ? reduceEach(names, normalizeIncludeIteratee, [])
     : splitSpace(names);
 }
 function priotitySort(a, b) {
@@ -439,21 +448,21 @@ function minimalistNotationProvider(options) {
 
   mn.getCompiler = getCompiler;
   mn.recursiveCheckByAttrs = withResult((node, attrs) => {
-    eachApply( // eslint-disable-next-line
-        map(map(isString(attrs) ? [attrs] : attrs, getCompiler), 'recursiveCheck'),
-        [node],
-    );
+    eachApply(map(
+        mapEach(isString(attrs) ? [attrs] : attrs, getCompiler),
+        'recursiveCheck',
+    ), [node]);
   }, mn);
   mn.checkOneNodeByAttrs = withResult((node, attrs) => {
-    eachApply(
-        map(map(isString(attrs) ? [attrs] : attrs, getCompiler), 'checkNode'),
-        [node],
-    );
+    eachApply(map(
+        mapEach(isString(attrs) ? [attrs] : attrs, getCompiler),
+        'checkNode',
+    ), [node]);
   }, mn);
   mn.checkByAttrs = withResult((v, attrs) => {
     isString(attrs)
         ? getCompiler(attrs)(v)
-        : eachApply(map(attrs, getCompiler), [v]);
+        : eachApply(mapEach(attrs, getCompiler), [v]);
   }, mn);
   mn.setStyle = (name, content, priority) => setStyle(
       'custom.' + name, content, priority || MN_DEFAULT_OTHER_CSS_PRIORITY,
@@ -649,7 +658,7 @@ function minimalistNotationProvider(options) {
             updated[essenceName] = 1,
             cssText = contextEssence[MN_CONTEXT_ESSENCE_CSS_TEXT],
             contextEssence[MN_CONTEXT_ESSENCE_CONTENT][mediaName] = cssText
-              ? joinOnly(map(
+              ? joinOnly(mapEach(
                   getEessenceSelectors(
                       contextEssence[MN_CONTEXT_ESSENCE_MAP],
                   ),
@@ -952,7 +961,7 @@ function minimalistNotationProvider(options) {
     const keyframesPrefix = MN_KEYFRAMES_TOKEN + ' ';
     const prefixes = cssPropertiesStringify.prefixes;
     // eslint-disable-next-line
-    setStyle(MN_KEYFRAMES_TOKEN, joinOnly(reduce($$keyframes[0], (output, v, k) => {
+    setStyle(MN_KEYFRAMES_TOKEN, joinOnly(reduceIn($$keyframes[0], (output, v, k) => {
       let prefix;
       for (prefix in prefixes) push( // eslint-disable-line
           output, '@' + prefix + keyframesPrefix + k + v,
@@ -964,7 +973,7 @@ function minimalistNotationProvider(options) {
   const cssRender = mn.cssCompile = withResult(() => {
     $$css[1] = 0;
     // eslint-disable-next-line
-    setStyle('css', joinOnly(reduce($$css[0], __cssReducer, [])), MN_DEFAULT_CSS_PRIORITY);
+    setStyle('css', joinOnly(reduceIn($$css[0], __cssReducer, [])), MN_DEFAULT_CSS_PRIORITY);
   }, mn);
   const __render = mn.compile = withResult((attrName) => {
     updateOptions();
@@ -995,36 +1004,38 @@ function minimalistNotationProvider(options) {
     $$force = 1;
     return deferCompile();
   };
-  mn.setKeyframes = withResult((name, body, ifEmpty, map, output) => {
-    map = $$keyframes[0];
-    if (ifEmpty && map[name]) return;
+  mn.setKeyframes = withResult((name, body, ifEmpty) => {
+    const keyframes = $$keyframes[0];
+    if (ifEmpty && keyframes[name]) {
+      return;
+    }
     if (body) {
-      output = ['{'];
+      const output = ['{'];
       isObject(body)
         ? forIn(body, (css, k) => push(output, k + '{'
           + (isObject(css) ? cssPropertiesStringify(css) : css) + '}'),
         )
         : push(output, body);
       push(output, '}');
-      map[name] = joinOnly(output);
+      keyframes[name] = joinOnly(output);
     } else {
-      delete map[name];
+      delete keyframes[name];
     }
     $$keyframes[1] = 1;
   }, mn);
   mn.css = withResult((selector, css) => {
-    const map = $$css[0];
+    const cssMap = $$css[0];
     function baseSetCSS(css, s) {
       s = joinComma(keys(normalizeSelectorsIteratee({}, s)));
       if (css) {
-        const instance = map[s] || (map[s] = {css: {}});
+        const instance = cssMap[s] || (cssMap[s] = {css: {}});
         instance.content = joinOnly([s, '{', cssPropertiesStringify(
           isObject(css)
             ? extend(instance.css, css)
             : cssPropertiesParse(css, instance.css),
         ), '}']);
       } else {
-        delete map[s];
+        delete cssMap[s];
       }
     }
     isObject(selector)

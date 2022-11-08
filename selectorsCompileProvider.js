@@ -7,6 +7,7 @@ const variantsBase = require('mn-utils/variants').base;
 const slice = require('mn-utils/slice');
 const reduce = require('mn-utils/reduce');
 const map = require('mn-utils/map');
+const mapEach = require('mn-utils/mapEach');
 const filter = require('mn-utils/filter');
 const push = require('mn-utils/push');
 const pushArray = require('mn-utils/pushArray');
@@ -41,7 +42,7 @@ function mediaFilterIteratee(mediaNames) {
       : 0;
   });
   return mainMedia
-    ? map(splitComma(mainMedia), (mainMedia) => {
+    ? mapEach(splitComma(mainMedia), (mainMedia) => {
       return pushArray([mainMedia], mediaNames).join('&');
     }).join(',')
     : mediaNames.join('&');

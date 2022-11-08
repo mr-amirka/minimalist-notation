@@ -6,18 +6,13 @@ const noop = require('mn-utils/noop');
 
 const regexpNormalize = /\\/gim;
 
-function scanPathWatch({path, each, callback, exclude}) {
-  scanPath({
-    path,
-    each,
-    exclude,
-    callback: () => {
-      fsWatch(path, {recursive: true}, (e, p) => {
-        p = p.replace(regexpNormalize, '/');
-        exclude(p) || each(e, p);
-      });
-      callback && callback();
-    },
+function scanPathWatch(options) {
+  scanPath(options).then(() => {
+    fsWatch(options.path, {
+      recursive: true,
+    }, (e, p) => {
+      exclude(p.replace(regexpNormalize, '/')) || each(e, p);
+    });
   });
 }
 
@@ -35,7 +30,6 @@ module.exports = (path, options) => {
     (options.watch ? scanPathWatch : scanPath)({
       path,
       exclude: options.exclude,
-      callback: dec,
       each: (eventType, path) => {
         changed = 1;
         if (eventType === 'remove') {
@@ -50,7 +44,7 @@ module.exports = (path, options) => {
           dec();
         });
       },
-    });
+    }).then(dec);
   }, () => {
     onDone(data, changed);
     changed = 0;

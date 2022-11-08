@@ -2,9 +2,9 @@ const forIn = require('mn-utils/forIn');
 const isObject = require('mn-utils/isObject');
 const extend = require('mn-utils/extend');
 const merge = require('mn-utils/merge');
-const map = require('mn-utils/map');
+const mapIn = require('mn-utils/mapIn');
 const values = require('mn-utils/values');
-const reduce = require('mn-utils/reduce');
+const reduceIn = require('mn-utils/reduceIn');
 const noop = require('mn-utils/noop');
 const isEmpty = require('mn-utils/isEmpty');
 const writeFile = require('mn-utils/node/file/write');
@@ -105,9 +105,9 @@ function compileSourceBase(path, commonOptions, entries) {
       if (!changed) return;
       writeFile(outputFileName, compile(mergedData), __onFinally);
       metricsFiles && writeFile(metricsFiles, JSON.stringify(
-          reduce(sourcesMap, (dst, attrsMap, path) => {
+          reduceIn(sourcesMap, (dst, attrsMap, path) => {
             isEmpty(attrsMap)
-              || (dst[path] = map(attrsMap, __iterateeAttrsMap));
+              || (dst[path] = mapIn(attrsMap, __iterateeAttrsMap));
             return dst;
           }, {}),
           null,
@@ -115,7 +115,7 @@ function compileSourceBase(path, commonOptions, entries) {
       ), __onFinally);
       metrics && writeFile(
           metrics,
-          JSON.stringify(map(mergedData, __iterateeAttrsMap), null, '  '),
+          JSON.stringify(mapIn(mergedData, __iterateeAttrsMap), null, '  '),
           __onFinally,
       );
     };
