@@ -1,5 +1,5 @@
 const loaderUtils = require('loader-utils');
-const eachAsync = require('mn-utils/eachAsync');
+const forEachAsync = require('mn-utils/async/forEach');
 const noop = require('mn-utils/noop');
 const extend = require('mn-utils/extend');
 const merge = require('mn-utils/merge');
@@ -8,7 +8,7 @@ const isString = require('mn-utils/isString');
 const isArray = require('mn-utils/isArray');
 const isFunction = require('mn-utils/isFunction');
 const values = require('mn-utils/values');
-const writeFile = require('mn-utils/node/file/write');
+const writeFile = require('mn-utils/node/file/promisify/write');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
 const parseSource = require('../node/parseSource');
@@ -131,8 +131,8 @@ function MnPlugin(options) {
     }
     const content = compile(attrsMap);
     onDone(content, sourcesMap);
-    return eachAsync(outputs, (outputFileName, i, done) => {
-      writeFile(outputFileName, content, done);
+    return forEachAsync(outputs, (outputFileName) => {
+      return writeFile(outputFileName, content);
     });
   }
 

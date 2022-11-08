@@ -5,8 +5,8 @@ const compileProvider = require('../mnCompileProvider');
 const isObject = require('mn-utils/isObject');
 const isString = require('mn-utils/isString');
 const isArray = require('mn-utils/isArray');
-const eachAsync = require('mn-utils/eachAsync');
-const writeFile = require('mn-utils/node/file/write');
+const forEachAsync = require('mn-utils/async/forEach');
+const writeFile = require('mn-utils/node/file/promisify/write');
 
 function normalize(v) {
   return v ? (isArray(v) ? (v.length ? v : null) : [v]) : null;
@@ -29,7 +29,9 @@ function gulpMN(outputs, options) {
 
   let data = {};
   return through.obj(function(file, enc, cb) {
-    const {path} = file;
+    const {
+      path,
+    } = file;
     if (
       file.isNull()
         || file.isStream()
@@ -42,8 +44,8 @@ function gulpMN(outputs, options) {
   }, function(cb) {
     const content = compile(data);
     data = {};
-    eachAsync(outputs, (outputFileName, i, done) => {
-      writeFile(outputFileName, content, done);
+    forEachAsync(outputs, (outputFileName) => {
+      return writeFile(outputFileName, content);
     }).then(cb);
   });
 }
