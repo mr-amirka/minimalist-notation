@@ -308,7 +308,7 @@ module.exports = (mn) => {
           ),
     );
   }
-  function synonymProvider(propName, synonyms, priority, props) {
+  function synonymProvider(propName, synonyms, priority, _style, props) {
     return isArray(propName)
       ? (props = flags(propName), ((p, s, style, synonym, propName) => {
         if (synonym = synonyms[s = p.suffix]) {
@@ -330,7 +330,7 @@ module.exports = (mn) => {
                   ? snakeLeftTrim(s)
                   : toKebabCase(s),
             ), styleWrap(style, priority))
-            : 0
+            : (_style ? styleWrap(_style, priority) : 0)
           );
       });
   }
@@ -1019,6 +1019,8 @@ module.exports = (mn) => {
       D: 'Distribute',
       K: 'Kashida',
       T: 'Tibetan',
+    }, 0, {
+      textAlign: 'justify',
     }),
     tov: synonymProvider('textOverflow', {
       '': 'Ellipsis',

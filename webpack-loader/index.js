@@ -3,11 +3,10 @@ const forEachAsync = require('mn-utils/async/forEach');
 const noop = require('mn-utils/noop');
 const extend = require('mn-utils/extend');
 const merge = require('mn-utils/merge');
-const forEach = require('mn-utils/forEach');
+const forIn = require('mn-utils/forIn');
 const isString = require('mn-utils/isString');
 const isArray = require('mn-utils/isArray');
 const isFunction = require('mn-utils/isFunction');
-const values = require('mn-utils/values');
 const writeFile = require('mn-utils/node/file/promisify/write');
 const parserProvider = require('../mnParserProvider');
 const compileProvider = require('../mnCompileProvider');
@@ -66,13 +65,18 @@ __exports.defaultLoaderSettings = {
 };
 
 __exports.presetsReload = function(source) {
+  const self = this;
+  const settings = loaderUtils.getOptions(self);
+  const id = settings.id || '';
+
   const module = {};
   try {
     (new Function('module', source)).call(module, module);
   } catch (e) {
     console.error(e);
   }
-  dynamicPresetsScope[this.resourcePath] = module.exports;
+  (dynamicPresetsScope[id]
+      || (dynamicPresetsScope[id] = {}))[self.resourcePath] = module.exports;
   return '';
 };
 
@@ -100,6 +104,8 @@ function MnPlugin(options) {
   const commonEach = settings.each || noop;
   const outputs = normalize(settings.output, []);
   const sourcesMap = scope[id] || (scope[id] = {});
+  const dynamicPresetsMap = dynamicPresetsScope[id]
+    || (dynamicPresetsScope[id] = {});
 
   if (!(path && isString(path))) {
     throw new Error('Path is invalid');
@@ -155,9 +161,9 @@ function MnPlugin(options) {
     });
 
     compiler.plugin('emit', (compilation, callback) => {
-      const targetPresets = [...presets];
+      const targetPresets = presets.slice();
 
-      forEach(values(dynamicPresetsScope), (preset) => {
+      forIn(dynamicPresetsMap, (preset) => {
         isFunction(preset) && targetPresets.push(preset);
       });
 
