@@ -169,16 +169,6 @@ function toFixed(v) {
   isNaN(v = v * 100) && throwInvalid();
   return replace((Math.floor(v) * 0.01).toFixed(2), reZero, '') || '0';
 }
-function normalizeDefault(p, def) {
-  return {
-    exts: [p.name + (def || 0) + p.ni],
-  };
-}
-function stylePosition(position, priority) {
-  return styleWrap({
-    position: position,
-  }, priority);
-}
 function __wr(v) {
   return v[0] == '-'
     ? '"' + v.substr(1) + '"'
@@ -217,6 +207,19 @@ module.exports = (mn) => {
     routeParseProvider,
     indexOf,
   } = utils;
+
+  function normalizeDefault(p, def) {
+    let v, priority; // eslint-disable-line
+    isArray(def) && (
+      v = def[0],
+      priority = def[1]
+    );
+
+    return {
+      exts: [p.name + (v || 0) + p.ni],
+      priority: priority || 0,
+    };
+  }
 
   const parseVals = routeParseProvider(PATTERN_VAL);
 
@@ -802,10 +805,13 @@ module.exports = (mn) => {
     },
 
     // position
-    posR: stylePosition('relative', 0),
-    posA: stylePosition('absolute', 1),
-    posF: stylePosition('fixed', 2),
-    posS: stylePosition('static', 3),
+    pos: synonymProvider('position', {
+      R: ['Relative', 0],
+      A: ['Relative', 1],
+      F: ['Relative', 2],
+      S: ['Relative', 3],
+      SK: ['Sticky', 4],
+    }),
     pos: 'posR',
     rlv: 'posR',
     abs: 'posA',
