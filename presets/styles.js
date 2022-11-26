@@ -1271,7 +1271,12 @@ module.exports = (mn) => {
           ) : 'none',
         });
     },
-    ft: (p, v) => {
+    ft: ftProvider('filter'),
+    ftb: ftProvider('backdropFilter'),
+  });
+
+  function ftProvider(propName) {
+    return (p, v, s) => {
       return (v = filter(map(
           p.suffix.split(regexpFilterSep),
           (v, matchs, name, options) => {
@@ -1282,11 +1287,12 @@ module.exports = (mn) => {
                 + (matchs[3] || options && options[2] || '') + ')'
             ) : 0;
           },
-      )).join(' ')) ? styleWrap({
-        filter: v,
-      }) : 0;
-    },
-  });
+      )).join(' ')) ? (
+        s[propName] = v,
+        styleWrap(s)
+      ) : 0;
+    };
+  }
 
   forIn({
     wid: ['widows'],
