@@ -1229,6 +1229,8 @@ module.exports = (mn) => {
       LB: 'Last_baseline',
     }),
     ac: synonymProvider('alignContent', {
+      S: 'Start',
+      E: 'End',
       C: 'Center',
       FS: 'FlexStart',
       FE: 'FlexEnd',
@@ -1303,6 +1305,7 @@ module.exports = (mn) => {
             ) : 0;
           },
       )).join(' ')) ? (
+        s = {},
         s[propName] = v,
         styleWrap(s)
       ) : 0;
