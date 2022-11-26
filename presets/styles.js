@@ -209,7 +209,7 @@ module.exports = (mn) => {
   } = utils;
 
   function normalizeDefault(p, def) {
-    let v, priority; // eslint-disable-line
+    let v = def, priority; // eslint-disable-line
     isArray(def) && (
       v = def[0],
       priority = def[1]
