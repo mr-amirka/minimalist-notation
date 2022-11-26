@@ -179,6 +179,11 @@ function __wr(v) {
 function calc(v, sign, add) {
   return 'calc(' + v + ' ' + sign + ' ' + add + ')';
 }
+function normalizeDefault(p, def) {
+  return {
+    exts: [p.name + (def || 0) + p.ni],
+  };
+}
 
 
 module.exports = (mn) => {
@@ -207,19 +212,6 @@ module.exports = (mn) => {
     routeParseProvider,
     indexOf,
   } = utils;
-
-  function normalizeDefault(p, def) {
-    let v = def, priority; // eslint-disable-line
-    isArray(def) && (
-      v = def[0],
-      priority = def[1]
-    );
-
-    return {
-      exts: [p.name + (v || 0) + p.ni],
-      priority: priority || 0,
-    };
-  }
 
   const parseVals = routeParseProvider(PATTERN_VAL);
 
@@ -744,6 +736,37 @@ module.exports = (mn) => {
     });
   });
 
+  const positionSynonyms = {
+    '': 'Relative',
+    R: 'Relative',
+    A: 'Absolute',
+    F: 'Fixed',
+    S: 'Static',
+    SK: 'Sticky',
+  };
+  const positionPriorities = {
+    relative: 0,
+    absolute: 1,
+    fixed: 2,
+    static: 3,
+    sticky: 4,
+  };
+  mn('pos', (p, s, synonym, v) => {
+    return (synonym = positionSynonyms[s = p.suffix])
+      ? normalizeDefault(p, synonym)
+      : (
+        s ? (
+          v = spaceNormalize(
+              s[0] == '_'
+                ? snakeLeftTrim(s)
+                : toKebabCase(s),
+          ),
+          styleWrap({
+            position: v,
+          }, positionPriorities[v] || 0)
+        ) : 0
+      );
+  });
 
   mn({
     cfx: {
@@ -805,14 +828,6 @@ module.exports = (mn) => {
     },
 
     // position
-    pos: synonymProvider('position', {
-      R: ['Relative', 0],
-      A: ['Relative', 1],
-      F: ['Relative', 2],
-      S: ['Relative', 3],
-      SK: ['Sticky', 4],
-    }),
-    pos: 'posR',
     rlv: 'posR',
     abs: 'posA',
     fixed: 'posF',
