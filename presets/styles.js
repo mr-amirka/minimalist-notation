@@ -125,6 +125,22 @@ const outlineStyleSynonyms = {
   I: 'Inset',
   O: 'Outset',
 };
+const positionSynonyms = {
+  '': 'Relative',
+  R: 'Relative',
+  A: 'Absolute',
+  F: 'Fixed',
+  S: 'Static',
+  SK: 'Sticky',
+};
+const positionPriorities = {
+  relative: 0,
+  absolute: 1,
+  fixed: 2,
+  static: 3,
+  sticky: 4,
+};
+
 const SHADOW_HANDLERS = {
   bxsh: ['boxShadow', function(x, y, value, r, color) {
     return [x, y, value, r, color];
@@ -736,21 +752,6 @@ module.exports = (mn) => {
     });
   });
 
-  const positionSynonyms = {
-    '': 'Relative',
-    R: 'Relative',
-    A: 'Absolute',
-    F: 'Fixed',
-    S: 'Static',
-    SK: 'Sticky',
-  };
-  const positionPriorities = {
-    relative: 0,
-    absolute: 1,
-    fixed: 2,
-    static: 3,
-    sticky: 4,
-  };
   mn('pos', (p, s, synonym, v) => {
     return (synonym = positionSynonyms[s = p.suffix])
       ? normalizeDefault(p, synonym)
@@ -1021,6 +1022,22 @@ module.exports = (mn) => {
       EE: 'ExtraExpanded',
       UE: 'UltraExpanded',
     }, 1),
+    tcha: synonymProvider('touchAction', {
+      A: 'Auto',
+      N: 'None',
+      M: 'Manipulation',
+      I: 'Initial',
+      R: 'Revert',
+      U: 'Unset',
+      RL: 'RevertLayer',
+      PX: 'PanX',
+      PY: 'PanY',
+      PL: 'PanLeft',
+      PR: 'PanRight',
+      PU: 'PanUp',
+      PD: 'PanDown',
+      PZ: 'PinchZoom',
+    }),
     tal: synonymProvider('textAlignLast', {
       A: 'Auto',
       L: 'Left',
