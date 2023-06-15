@@ -66,7 +66,7 @@ __exports.defaultLoaderSettings = {
 
 __exports.presetsReload = function(source) {
   const self = this;
-  const settings = loaderUtils.getOptions(self);
+  const settings = loaderUtils.getOptions(self) || {};
   const id = settings.id || '';
 
   const module = {};
