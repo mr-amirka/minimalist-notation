@@ -29,10 +29,11 @@ function MnPlugin(options) {
     id,
   };
 
+  const plugin = pluginModule.plugin({});
 
   const compile = withReDelay(() => {
-    pluginModule.startTemplateParse({});
-    pluginModule.startCompile();
+    plugin.startTemplateParse({});
+    plugin.startCompile();
   }, 100);
 
 
