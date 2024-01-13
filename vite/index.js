@@ -1,5 +1,5 @@
 const extend = require('mn-utils/extend');
-const merge = require('mn-utils/with');
+const withReDelay = require('mn-utils/withReDelay');
 
 const pluginModuleProvider = require('../common/pluginProvider');
 
