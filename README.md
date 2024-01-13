@@ -226,9 +226,9 @@ module.exports = {
         test: /\.mn\.js$/,
         use: [
           {
-            loader: 'minimalist-notation/webpack-loader/reload'
-          }
-        ]
+            loader: 'minimalist-notation/webpack-loader/reload',
+          },
+        ],
       },
       {
         test: /\.jsx?$/,
@@ -237,7 +237,7 @@ module.exports = {
             loader: "babel-loader",
             options: {
               /* ... */
-            }
+            },
           },
           {
             loader: 'minimalist-notation/webpack-loader',
@@ -248,10 +248,11 @@ module.exports = {
                 // 'm-n': 'm-n',
                 // m: 'm',
               },
-            }
-          }
-        ]
-      }
+            },
+          },
+        ],
+      },
+    ],
   },
   plugins: [
     new MnPlugin({

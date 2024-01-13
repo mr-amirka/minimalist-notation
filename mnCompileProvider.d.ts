@@ -1,4 +1,6 @@
-import {IAttrsMap, IMNPreset} from "./global";
+import {IAttrsMap, IMinimalistNotationOptions} from "./global";
 
-declare const compileProvider: (presets: IMNPreset[]) => (attrsMap: IAttrsMap) => string;
+declare const compileProvider: (
+  options: IMinimalistNotationOptions,
+) => (attrsMap: IAttrsMap) => string;
 export = compileProvider;
