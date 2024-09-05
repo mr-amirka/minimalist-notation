@@ -1,4 +1,3 @@
-const Observable = require('mn-utils/Observable');
 const extend = require('mn-utils/extend');
 const isPlainObject = require('mn-utils/isPlainObject');
 const isObject = require('mn-utils/isObject');
@@ -46,6 +45,7 @@ const color = require('mn-utils/color');
 const joinProvider = require('mn-utils/joinProvider');
 const colorGetBackground = require('mn-utils/colorGetBackground');
 const selectorsCompileProvider = require('./selectorsCompileProvider');
+const removeOf = require('mn-utils/removeOf');
 const {
   extractMedia,
 } = selectorsCompileProvider;
@@ -61,9 +61,32 @@ function spaceNormalize(v) {
 }
 
 
+function observableProvider(_value) {
+  const callbacks = [];
+  return {
+    getValue: () => {
+      return _value;
+    },
+    emit: (value) => {
+      _value = value;
+      eachTry(callbacks, [value]);
+    },
+    on: (callback) => {
+      callbacks.push(callback);
+      return () => {
+        if (callback) {
+          callback = 0;
+          removeOf(callbacks, callback);
+        }
+      };
+    }
+  };
+}
+
+
 const utils = minimalistNotationProvider.utils = merge([
   {
-    Observable: Observable,
+    observableProvider,
     color,
     colorGetBackground,
     half: require('mn-utils/half'),
@@ -89,7 +112,7 @@ const utils = minimalistNotationProvider.utils = merge([
     indexOf: require('mn-utils/indexOf'),
     once: require('mn-utils/once'),
     delay: require('mn-utils/delay'),
-    removeOf: require('mn-utils/removeOf'),
+    removeOf,
     addOf: require('mn-utils/addOf'),
     set,
     get,
@@ -473,8 +496,8 @@ function minimalistNotationProvider(options) {
   const $$compilers = $$data.compilers = {};
   const cssPropertiesStringify = mn.propertiesStringify
     = cssPropertiesStringifyProvider();
-  const emit = (mn.styles$ = new Observable([])).emit;
-  const error$ = mn.error$ = new Observable();
+  const emit = (mn.styles$ = observableProvider([])).emit;
+  const error$ = mn.error$ = observableProvider();
   const emitError = error$.emit;
   let $$onError = noop;
   let $$updated;
