@@ -17,5 +17,6 @@ module.exports = (mn) => {
     n: ':nth-child',
     first: ':first-child',
     last: ':last-child',
+    only: ':only-child',
   });
 };

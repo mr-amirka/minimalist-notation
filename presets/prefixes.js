@@ -32,6 +32,7 @@ module.exports = (mn) => {
   });
 
   flags([
+    'backdropFilter',
     'backgroundClip',
     'transform',
     'transformStyle',

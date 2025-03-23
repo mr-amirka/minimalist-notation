@@ -133,6 +133,17 @@ const positionSynonyms = {
   S: 'Static',
   SK: 'Sticky',
 };
+
+const overscrollBehaviorPriorities = {
+  A: 'Auto',
+  CT: 'Contain',
+  N: 'None',
+  I: 'Inherit',
+  R: 'Revert',
+  RL: 'RevertLayer',
+  U: 'Unset',
+};
+
 const positionPriorities = {
   relative: 0,
   absolute: 1,
@@ -160,7 +171,6 @@ const FILTER_MAP = {
   sepia: ['sepia', 100, '%'],
 };
 const UNITS = 'em,ex,%,px,cm,mm,in,pt,pc,ch,rem,vh,vw,vmin,vmax'.split(',');
-
 
 function throwInvalid(message) {
   throw new Error(message || 'Parameter is invalid');
@@ -346,6 +356,15 @@ module.exports = (mn) => {
       });
   }
 
+  function backgroundProvider(propName) {
+    return (p, v, style) => {
+      p.negative && throwInvalid();
+      return (v = p.suffix)
+        ? (style = {}, style[propName] = colorGetBackground(v), styleWrap(style))
+        : normalizeDefault(p);
+    };
+  }
+
   forIn(map(SIDES_MAP, (sides) => flags(sides)), (sides, suffix) => {
     const priority = suffix ? (4 - size(sides)) : 0;
     const bsSidesSet = sidesSetter((side) => 'border' + side + '-style');
@@ -430,6 +449,7 @@ module.exports = (mn) => {
     });
   });
 
+
   forIn({
     sq: ['width', 'height'],
     w: ['width'],
@@ -458,6 +478,17 @@ module.exports = (mn) => {
       }, 0, 1);
     });
   });
+
+  mn('gap', (p) => {
+    const suffix = p.suffix;
+    if (!suffix) return normalizeDefault(p, '100%');
+    const synonym = sizeSynonyms[suffix];
+    if (synonym) return normalizeDefault(p, synonym);
+    const v = getVal(suffix, 1, 1, 'px', 0, sizeSynonyms);
+    return styleWrap({
+      gap: v[0],
+    }, priority + v[1]);
+  }, 0, 1);
 
   mn('tbl', styleWrap({display: 'table'}));
   mn('tbl.cell', {
@@ -560,6 +591,7 @@ module.exports = (mn) => {
     bgi: 'backgroundImage',
     // listStyleImage: url(...)
     lisi: 'listStyleImage',
+    maski: 'maskImage',
   }, (propName, name) => {
     mn(name, (p, style, url) => {
       style = {};
@@ -810,12 +842,7 @@ module.exports = (mn) => {
     olcI: 'olcInvert',
 
     // background: (...)
-    bg: (p, v) => {
-      p.negative && throwInvalid();
-      return (v = p.suffix) ? styleWrap({
-        background: colorGetBackground(v),
-      }) : normalizeDefault(p);
-    },
+    bg: backgroundProvider('background'),
 
     // font-weight
     fw: (p, camel, synonym) => {
@@ -833,6 +860,7 @@ module.exports = (mn) => {
     abs: 'posA',
     fixed: 'posF',
     'static': 'posS', // eslint-disable-line
+    sticky: 'posSK',
 
     olwTN: 'olwThin',
     olwM: 'olwMedium',
@@ -919,6 +947,41 @@ module.exports = (mn) => {
       RBT: 'RubyText',
       RBTG: 'RubyTextGroup',
     }),
+
+    dir: synonymProvider('direction', {
+      LTR: 'Ltr',
+      RTL: 'Rtl',
+      I: 'Inherit',
+      R: 'Revert',
+      RL: 'RevertLayer',
+      U: 'Unset',
+    }),
+
+    ovb: synonymProvider('overscrollBehavior', overscrollBehaviorPriorities),
+    ovbx: synonymProvider('overscrollBehaviorX', overscrollBehaviorPriorities),
+    ovby: synonymProvider('overscrollBehaviorY', overscrollBehaviorPriorities),
+
+    maskt: synonymProvider('maskType', {
+      L: 'Luminance',
+      A: 'Alpha',
+      I: 'Inherit',
+      R: 'Revert',
+      RL: 'RevertLayer',
+      U: 'Unset',
+    }),
+
+    maskm: synonymProvider('maskMode', {
+      L: 'Luminance',
+      A: 'Alpha',
+      I: 'Inherit',
+      R: 'Revert',
+      RL: 'RevertLayer',
+      U: 'Unset',
+      MS: 'MatchSource',
+    }),
+
+    maskbg: backgroundProvider('maskImage'),
+
     cl: synonymProvider('clear', {
       '': 'Both',
       B: 'Both',
@@ -1330,6 +1393,9 @@ module.exports = (mn) => {
   }
 
   forIn({
+    ar: ['aspectRatio'],
+
+    col: ['columns'],
     wid: ['widows'],
     orp: ['orphans'],
     coi: ['counterIncrement'],
@@ -1343,9 +1409,11 @@ module.exports = (mn) => {
     tp: ['transitionProperty', 1],
     ttf: ['transitionTimingFunction', 1],
 
+
+    op: ['objectPosition', 1],
     bgp: ['backgroundPosition', 1],
-    bgpx: ['backgroundPositionX', 1],
-    bgpy: ['backgroundPositionY', 1],
+    bgpx: ['backgroundPositionX', 2],
+    bgpy: ['backgroundPositionY', 2],
 
     g: ['grid'],
     gt: ['gridTemplate', 1],
@@ -1417,7 +1485,6 @@ module.exports = (mn) => {
     );
   // eslint-disable-next-line
   }, '^((((\\d+):w)x((\\d+):h))|(\\d+):oh)?(([-+]):sa([0-9\\.]+):addv([a-z%]+):addu?):add?|(.*):other', 1);
-
 
   mn({
     contrast: styleWrap({

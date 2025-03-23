@@ -13,6 +13,8 @@ module.exports = (mn) => {
   });
   flags([
     'appearance',
+    'overflowScrolling',
+    'backdropFilter',
     'backgroundClip',
     'transform',
     'transformStyle',
