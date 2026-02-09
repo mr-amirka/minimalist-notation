@@ -14,3 +14,5 @@ module.exports = (options) => {
     return map(getValue(), 'content').join('');
   };
 };
+
+module.exports.default = module.exports;

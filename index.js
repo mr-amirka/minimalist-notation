@@ -1085,3 +1085,4 @@ function minimalistNotationProvider(options) {
 }
 
 module.exports = minimalistNotationProvider;
+module.exports.default = minimalistNotationProvider;

@@ -250,3 +250,4 @@ provider.getCombinatorByDepth = getCombinatorByDepth;
 provider.getCombinator = getCombinator;
 provider.extractMedia = extractMedia;
 module.exports = provider;
+module.exports.default = provider;

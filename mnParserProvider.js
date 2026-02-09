@@ -41,7 +41,7 @@ function parser(attrs) {
   ].join('|') + ')';
 
 
-  const regexpValue = attrPrefix + attrNames + '\\s*[\\:=]\\s*' + attrValue;
+  const regexpValue = attrPrefix + attrNames + '\\s*[\\:=]\\s*\\{?s*' + attrValue;
   const regexp = new RegExp(regexpValue, 'gm');
 
   return (dst, text) => {
@@ -87,3 +87,4 @@ function getAttrs(attrs) {
 parser.getAttrs = getAttrs;
 
 module.exports = parser;
+module.exports.default = parser
